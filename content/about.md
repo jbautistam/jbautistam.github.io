@@ -1,6 +1,6 @@
 +++
 title = "Acerca de"
-description = "Acerca de de la web ant 2e6"
+description = "Acerca de de la web jbautistam"
 date = "2020-10-10"
 aliases = ["about-me", "contacto"]
 +++
