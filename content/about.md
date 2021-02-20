@@ -2,7 +2,6 @@
 title = "Acerca de"
 description = "Acerca de de la web jbautistam"
 date = "2020-10-10"
-aliases = ["about-me", "contacto"]
 +++
 
 Programación, código fuente, aplicaciones. La Web de un programador en resumen.
