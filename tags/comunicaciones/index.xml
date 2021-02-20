@@ -1,0 +1,958 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Comunicaciones on jbautistam</title><link>http://jbautistam.github.io/tags/comunicaciones/</link><description>Recent content in Comunicaciones on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/comunicaciones/index.xml" rel="self" type="application/rss+xml"/><item><title>BauMessenger: implementación del protocolo XMPP</title><link>http://jbautistam.github.io/articles/source-code/baumessenger/baumessenger/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/baumessenger/baumessenger/</guid><description>
+&lt;p>Los más veteranos del lugar quizá recuerden que sobre el año 2.000 surgieron una nueva línea de aplicaciones
+conocidas con el nombre genérico de 'aplicaciones de mensajería instantánea'. Entre estas aplicaciones estaban
+&lt;strong>Icq&lt;/strong> (de Mirabilis), &lt;strong>Yahoo! Messenger&lt;/strong> (de Yahoo, obviamente) o &lt;strong>MSN Messenger&lt;/strong> (de Microsoft) y
+plantearon una nueva guerra por captar usuarios similar a la que se había vivido entre los navegadores.&lt;/p>
+&lt;p>La función de estas aplicaciones eran permitir enviar información de presencia (el usuario está conectado y libre para conversar o no) y
+mensajes y archivos instantáneamente entre usuarios. Algunos de ellos incluso permitían conversaciones en grupo o chat.
+Todas ellas utilizaban software de comunicación propietario, es decir, no existía un estándar y era imposible contactar
+con un usuario a menos que se utilizase la misma aplicación. ¿Os suena de algo? ¿Alguien ha pensado en WhatsApp / Telegram / Line...?&lt;/p>
+&lt;p>Para evitar estos inconvenientes surgieron aplicaciones como Trillian que permitían comunicar usuarios de diferentes redes aunque
+se perdían ciertas funcionalidades en algunas de ellas. Al mismo tiempo, surgió un protocolo que pretendía ser un nuevo
+estándar de comunicaciones llamado &lt;a href="http://www.jabber.org/">Jabber&lt;/a> que posteriormente
+se convertiría en estándar de IETF bajo el nombre &lt;a href="http://xmpp.org/">XMPP&lt;/a>
+(Extensible Messaging and Presence Protocol - Protocolo extensible de mensajería y presencia).&lt;/p>
+&lt;p>Aunque los programas de mensajería poco a poco fueron cayendo en el olvido relegados por las redes sociales, &lt;strong>XMPP&lt;/strong> sigue
+funcionando y es la base de aplicaciones conocidas como &lt;strong>Google Talk&lt;/strong> o el propio
+&lt;a href="https://es.wikipedia.org/wiki/WhatsApp">WhatsApp&lt;/a>.&lt;/p>
+&lt;p>&lt;strong>XMPP&lt;/strong> es un prococolo de comunicación abierto (cualquiera puede utilizarlo para sus aplicaciones de mensajería) y extensible:
+se puede ampliar para incluir funcionalidades propias. De hecho, si miráis el protocolo veréis extensiones para
+prácticamente todo: grupos, envío de archivos, avatares, formularios, suscripción de contenido e incluso videoconferencia.&lt;/p>
+&lt;p>Al ser un protocolo abierto no sólo existen varios clientes si no diferentes servidores la mayor parte de ellos de código libre.
+Estos clientes y servidores se comunican entre sí sin ningún tipo de problema: no me hace falta tener una cuenta en el servidor
+&lt;strong>jabber.org&lt;/strong> para comunicarme con un usuario del servidor &lt;strong>otroservidor.org&lt;/strong>.&lt;/p>
+&lt;p>Además, al ser un protocolo extensible basado en XML, se pueden crear mensajes adicionales (los conocidos como mensajes &lt;strong>x&lt;/strong>)
+que implementen nuevas funcionalidades. La mayor parte de las extensiones de las que hablábamos anterioremente se crean a
+partir de este tipo de mensajes.&lt;/p>
+&lt;p>Todas estas razones convierten a &lt;strong>XMPP&lt;/strong> en un protocolo que me lleva atrayendo ya algún tiempo y que he utilizado en un par
+de proyectos. Siempre me ha sorprendido que no se utilice más a menudo.&lt;/p>
+&lt;p>Lo malo es que el protocolo evoluciona y mi librería base comienza a ser, por decirlo suavemente, un batiburrillo de ideas que
+dificulta enormemente el mantenimiento, por eso decidí buscar código algo más 'estándar' que me sirviera como base para futuras
+aplicaciones.&lt;/p>
+&lt;p>Existen varias librerías de código abierto para &lt;strong>XMPP&lt;/strong> en C# en &lt;strong>GitHub&lt;/strong> y otros servicios. Por mi parte escogí
+&lt;a href="https://github.com/pgstath/Sharp.Xmpp">Sharp.Xmpp&lt;/a> simplemente porque me pareció que
+estaba más actualizada que el resto y se mantenía con cierta regularidad.&lt;/p>
+&lt;p>Lo malo es que la documentación y los ejemplos de la librería eran por así decirlo, exíguos. Un par de ejemplos de conexión y
+carga del roster o lista de contactos pero nada sobre registro de nuevos usuarios. Así que poco a poco me fui haciendo mi
+propia aplicación de mensajería (BauMessenger) y aquí estamos.&lt;/p>
+&lt;p>Por si os interesa y no queréis leer el resto del artículo dedicado a explicar su funcionamiento, el código fuente de la
+aplicación lo podéis encontrar en &lt;a href="https://github.com/jbautistam/BauXmppMessenger">GitHub&lt;/a>.&lt;/p>
+&lt;h2 id="librería-de-comunicaciones">Librería de comunicaciones&lt;/h2>
+&lt;p>Para trabajar con la librería &lt;strong>Sharp.Xmpp&lt;/strong> pero sin 'atarme' a su implementación, decidí desarrollar una librería intermedia
+(&lt;code>LibXmppClient&lt;/code>) que oculta las funcionalidades de Xmpp tras una pequeña capa de dominio.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> Me he encontrado con algunos problemas al utilizar la versión de &lt;strong>Nuget&lt;/strong> de Sharp.Xmpp, por
+eso en la aplicación he enlazado directamente la versión del código fuente que estaba utilizando.&lt;/p>
+&lt;p>La clase que vamos a utilizar de esta librería para mantener las comunicaciones es &lt;code>JabberManager&lt;/code> (lo siento, siempre
+he preferido el término Jabber al de Xmpp, llámenme nostálgico). En esta clase tenemos opciones para registrar un nuevo
+usuario y para añadir conexiones.&lt;/p>
+&lt;p>Las conexiones (clase &lt;code>JabberConnection&lt;/code>) por su parte, mantienen los datos del servidor y el usuario y son las encargadas del tráfico
+de datos y mensajes.&lt;/p>
+&lt;p>Es decir: &lt;code>JabberManager&lt;/code> simplemente mantiene una lista de conexiones (propiedad &lt;code>Connections&lt;/code>) y agrupa los eventos que
+vienen de las diferentes conexiones que tengamos abiertas para tratarlos de forma centralizada en nuestras aplicaciones. Además,
+dispone de un método llamado &lt;code>RegisterUser&lt;/code> desde el que podemos dar de alta un usuario en un servidor dado que en ese momento
+aún no disponemos de ninguna conexión válida.&lt;/p>
+&lt;h2 id="formularios-de-la-aplicación">Formularios de la aplicación&lt;/h2>
+&lt;p>Se puede manejar completamente &lt;strong>BauMessenger&lt;/strong> desde su formulario principal:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/formulario-principal.jpg" alt="Formulario principal de BauMessenger" title="Formulario principal de BauMessenger">&lt;/p>
+&lt;p>El árbol de la derecha muestra la lista de conexiones y contactos. Podemos registrar un nuevo usuario con el botón de &lt;em>Crear
+usuario&lt;/em> de la barra de herramients superior. Al registrar un nuevo usuario se nos muestra un formulario con los datos necesarios
+para crear una cuenta:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/creacion-usuario.jpg" alt="Creación de nueva cuenta XMPP con BauMessenger" title="Creación de nueva cuenta XMPP con BauMessenger">&lt;/p>
+&lt;p>El formulario que aparece es una de las particularidades del protocolo XMPP: no existe una forma predefinida para crear un usuario si no
+que el servidor al que nos conectamos nos envía un XML con los datos que necesita y el cliente los rellena y reenvía para dar de
+alta el usuario. Es decir, nos encontraremos con servidores que nos pidan usuario y contraseña simplemente, otros nos pedirán además
+un captcha y nuestro nombre. Las posibilidades son ilimitadas.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> en esta versión no están implementados todos los posibles controles del formulario. Por ejemplo, los
+captcha se presentan como URL y no como imagen y no presenta combos. Recordemos que esto comenzó siendo una prueba de concepto.&lt;/p>
+&lt;p>Si ya tenemos un usuario podemos añadir la conexión a nuestra colección con el segundo botón por la derecha de la barra de herramientas
+superior:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/conexion-a-servidor.jpg" alt="Conexión a un servidor XMPP con BauMessenger" title="Conexión a un servidor XMPP con BauMessenger">&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> como dijimos anteriormente, hay varios servidores disponibles. Yo suelo utilizar &lt;strong>jabberes.org&lt;/strong> pero
+la aplicación debe ser capaz de comunicarse con cualquier servidor.&lt;/p>
+&lt;p>Una vez tenemos una conexión nos podemos conectar y desconectar así como cambiar nuestro estado con el menú del primer
+botón de la barra superior:&lt;/p>
+&lt;p>&lt;img src="articles/source-code/baumessenger/menu-de-conexion.jpg" alt="Menú de conexión y desconexión y cambio de estado de BauMessenger" title="Conexión / desconexión">&lt;/p>
+&lt;p>Por supuesto, podemos añadir contactos una vez conectados a un servidor simplemente añadiendo su nombre de usuario. El nombre de
+usuario en XMPP es similar a las cuentas de correo, es decir, &lt;em>Nombre de usuario@servidor&lt;/em>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/anadir-contacto.jpg" alt="Añadir un contacto a la lista de contactos de BauMessenger" title="Añadir contacto">&lt;/p>
+&lt;p>&lt;strong>Xmpp&lt;/strong> define que al añadir un contacto a nuestra lista se le envíe un mensaje al usuario destino para que acepte o rechace
+nuestra solicitud. Del mismo modo si algún otro usuario solicita añadirnos a su lista de contactos, se abrirá una ventana
+indicando que aceptemos o rechacemos su solicitud.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> para mis pruebas he utilizado un par de clientes estándar, &lt;a href="https://www.pidgin.im/">Pidgin&lt;/a>
+y &lt;a href="https://gajim.org/index.php?lang=es">Gajim&lt;/a>. Hay muchos más si buscáis por Internet
+y no los elegí por ninguna razón en especial, simplemente me pillaban a mano. También hay varios servidores disponibles
+como &lt;a href="http://www.igniterealtime.org/projects/openfire/">OpenFire&lt;/a> que podemos utilizar
+para probar opciones avanzadas desde nuestro propio ordenador.&lt;/p>
+&lt;p>Por supuesto, lo más importante de una aplicación de mensajería es que podamos enviar y recibir mensajes. Para comenzar una
+conversación simplemente debemos pulsar dos veces sobre el icono de un contacto en el árbol de la derecha y se nos abrirá
+una ficha de chat con ese usuario:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/chat.jpg" alt="Ficha de chat de BauMessenger" title="Chat de BauMessenger">&lt;/p>
+&lt;p>Si la comunicación comienza por uno de nuestros contactos, es decir, si otro contacto intenta comunicarse con nosotros, se
+abrirá automáticamente una ficha de conversación.&lt;/p>
+&lt;h2 id="resumen">Resumen&lt;/h2>
+&lt;p>Como vemos, &lt;strong>BauMessenger&lt;/strong> es una implementación básica del protocolo XMPP. Permite conectar, crear usuarios, añadir
+contactos y enviar y recibir mensajes. Es decir, implementa las opciones principales de una aplicación de mensajería.&lt;/p>
+&lt;p>Aún así, como decíamos al principio, esto no es más que una aplicación de ejemplo y como tal le faltan opciones importantes:&lt;/p>
+&lt;ul>
+&lt;li>No puede abrir ventanas de conferencia o MUC, es decir, no podremos establecer conversaciones con un grupo.&lt;/li>
+&lt;li>No envía ni recibe archivos aunque la librería &lt;strong>Sharp.Xmpp&lt;/strong> está preparada para ello.&lt;/li>
+&lt;li>No tiene opciones avanzadas como videoconferencia aunque el protocolo lo permite.&lt;/li>
+&lt;/ul>
+&lt;p>Os invito a ampliar la librería y la aplicación con vuestras ideas y a investigar en todas las posibilidades de este protocolo.&lt;/p></description></item><item><title>Consumir servicios Web utilizando SSL/HTTPS en C#</title><link>http://jbautistam.github.io/articles/development/consumir-servicios-web/consumir-servicios-web/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/consumir-servicios-web/consumir-servicios-web/</guid><description>
+&lt;p>En ocasiones, cuando se consumen &lt;strong>servicios Web&lt;/strong> utilizando &lt;strong>SSL / HTTPS&lt;/strong> puede que encontremos errores de este tipo:&lt;/p>
+&lt;blockquote>
+&lt;p>Se ha cerrado la conexión subyacente: no se han podido establecer relaciones de confianza con el servidor remoto /
+The underlying connection was closed: Could not establish trust relationship with remote server.&amp;quot;&lt;/p>
+&lt;/blockquote>
+&lt;p>En estos casos, si conectamos a la URL del &lt;strong>servicio Web&lt;/strong> utilizando el explorador, veremos en ocasiones un cuadro de diálogo
+de confirmación sobre el certificado o similar, por ejemplo, un cuadro de diálogo que nos informa que el certificado está
+caducado y si deseamos seguir confiando en él.&lt;/p>
+&lt;p>Existe una forma de automatizar la respuesta a estos cuadros de diálogo y así evitar que nuestra llamada al &lt;strong>servicio Web&lt;/strong>
+lance una excepción. Consiste en implementar la función &lt;code>CheckValidationResult&lt;/code> del interface &lt;code>ICertificatePolicy&lt;/code>.
+Este interface decide si se puede confiar o no en un certificado dependiendo del error.&lt;/p>
+&lt;p>Por ejemplo, podríamos implementar el interface de la forma más simple posible indicando que vamos a confiar en todos los
+certificados independientemente del error:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Net&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Net.Security&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Security.Cryptography.X509Certificates&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="p">....&lt;/span>
+&lt;span class="ln"> 6&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">class&lt;/span> &lt;span class="nc">CertificatePolicy&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ICertificatePolicy&lt;/span>
+&lt;span class="ln"> 8&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="n">CertificatePolicy&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">12&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="n">CheckValidationResult&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ServicePoint&lt;/span> &lt;span class="n">sp&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">X509Certificate&lt;/span> &lt;span class="n">cert&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">WebRequest&lt;/span> &lt;span class="n">req&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">problem&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">17&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez implementado el interface, antes de realizar cualquier solicitud a la red (con &lt;code>WebRequest&lt;/code> o similar)
+debemos indicar que todas los errores de certificado se deben validar utilizando nuestra clase. Es muy sencillo,
+simplemente cambiamos la propiedad &lt;code>CertificatePolicy&lt;/code> del objeto &lt;code>ServicePointManager&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">ServicePointManager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CertificatePolicy&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">TrustAllCertificatePolicy&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En las últimas versiones de.NET, aunque el sistema sigue funcionando, esta forma de hacerlo está marcada como
+&lt;strong>obsoleta&lt;/strong>. Para solucionarlo, en las últimas versiones, en lugar de crear una clase implementando una interfaz,
+asignaremos una función al método &lt;code>ServerCertificateValidationCallback&lt;/code>
+podemos seguir las instrucciones para cambiar este método por un delegado:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Net&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Net.Security&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Security.Cryptography.X509Certificates&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="p">....&lt;/span>
+&lt;span class="ln"> 6&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="n">ServicePointManager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ServerCertificateValidationCallback&lt;/span> &lt;span class="p">=&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="k">delegate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">object&lt;/span> &lt;span class="n">objSender&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">X509Certificate&lt;/span> &lt;span class="n">objCertificate&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="n">X509Chain&lt;/span> &lt;span class="n">objChain&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">SslPolicyErrors&lt;/span> &lt;span class="n">objSslPolicyErrors&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">//... descarta todos los errores
+&lt;/span>&lt;span class="ln">12&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>De esta forma podemos saltarnos todos los errores en la lectura de los certificados. Si sólo deseamos que se considere el certificado
+como válido en el caso que no haya errores utilizaríamos este otro código:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Net&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Net.Security&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Security.Cryptography.X509Certificates&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="p">....&lt;/span>
+&lt;span class="ln"> 6&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="n">ServicePointManager&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ServerCertificateValidationCallback&lt;/span> &lt;span class="p">=&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="k">delegate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">object&lt;/span> &lt;span class="n">objSender&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">X509Certificate&lt;/span> &lt;span class="n">objCertificate&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="n">X509Chain&lt;/span> &lt;span class="n">objChain&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">SslPolicyErrors&lt;/span> &lt;span class="n">objSslPolicyErrors&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">sslPolicyErrors&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="n">SslPolicyErrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">None&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="p">};&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, la utilización del último parámetro nos ofrece muchas posibilidades aunque esto lo dejaremos para
+próximos artículos.&lt;/p></description></item><item><title>Descargar archivo FTP</title><link>http://jbautistam.github.io/articles/development/descargar-archivo-ftp/descargar-archivo-ftp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/descargar-archivo-ftp/descargar-archivo-ftp/</guid><description>
+&lt;p>Si deseamos descargar archivos de un servidor &lt;strong>FTP&lt;/strong> con C#, podemos utilizar la clase &lt;strong>FtpWebRequest&lt;/strong> del
+espacio de nombre &lt;strong>System.Net&lt;/strong> del &lt;strong>.NET Framework&lt;/strong>.&lt;/p>
+&lt;p>La utilización es bastante sencilla, simplemente creamos una solicitud sobre el servidor &lt;strong>FTP&lt;/strong> indicando
+el nombre de archivo que deseamos descargar en el servidor remoto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">FtpWebRequest&lt;/span> &lt;span class="n">ftpRequest&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FtpWebRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">WebRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ftp://servidorFTP/directorio/archivo.txt&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez creada la conexión asignamos las credenciales e indicamos que deseamos descargar un archivo y
+algunas propiedades básicas:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="c1">// Asigna las credenciales
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Credentials&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">NetworkCredential&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;usuario&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Password&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="c1">// Asigna las propiedades
+&lt;/span>&lt;span class="ln">4&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Method&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">WebRequestMethods&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Ftp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">DownloadFile&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UsePassive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UseBinary&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">KeepAlive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y por último leemos el archivo en un &lt;strong>stream&lt;/strong> sobre el servidor FTP (utilizando el método &lt;strong>GetResponse()&lt;/strong> del
+objeto &lt;strong>FtpWebRequest&lt;/strong> ) y lo grabamos sobre un archivo local:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">// Descarga el archivo y lo graba
+&lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">stmFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">File&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">OpenWrite&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="c1">// Obtiene el stream sobre la comunicación FTP
+&lt;/span>&lt;span class="ln"> 5&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Stream&lt;/span> &lt;span class="n">responseStream&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">FtpWebResponse&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetResponse&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="n">GetResponseStream&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 9&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="c1">// Lee los datos del stream y los graba en el archivo
+&lt;/span>&lt;span class="ln">11&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">intRead&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">responseStream&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="c1">// Cierra el stream FTP
+&lt;/span>&lt;span class="ln">14&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">responseStream&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="c1">// Cierra el archivo de salida
+&lt;/span>&lt;span class="ln">17&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Flush&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">19&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El siguiente bloque muestra el código completo en un único método:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">/// Descarga de un archivo por FTP
+&lt;/span>&lt;span class="ln"> 3&lt;/span>&lt;span class="c1">/// &amp;lt;/summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Download&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strServer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strUser&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strPassword&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strFileNameFTP&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="n">FtpWebRequest&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Crea el objeto de conexión del servidor FTP
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">ftpRequest&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FtpWebRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">WebRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ftp://{0}/{1}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strServer&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="n">strFileNameFTP&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="c1">// Asigna las credenciales
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Credentials&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">NetworkCredential&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strUser&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strPassword&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="c1">// Asigna las propiedades
+&lt;/span>&lt;span class="ln">15&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Method&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">WebRequestMethods&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Ftp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">DownloadFile&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UsePassive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UseBinary&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">KeepAlive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="c1">// Descarga el archivo y lo graba
+&lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">stmFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">File&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">OpenWrite&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="c1">// Obtiene el stream sobre la comunicación FTP
+&lt;/span>&lt;span class="ln">23&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Stream&lt;/span> &lt;span class="n">responseStream&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">FtpWebResponse&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetResponse&lt;/span>&lt;span class="p">()).&lt;/span>&lt;span class="n">GetResponseStream&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">27&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="c1">// Lee los datos del stream y los graba en el archivo
+&lt;/span>&lt;span class="ln">29&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">intRead&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">responseStream&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">30&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="c1">// Cierra el stream FTP
+&lt;/span>&lt;span class="ln">32&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">responseStream&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">33&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">34&lt;/span> &lt;span class="c1">// Cierra el archivo de salida
+&lt;/span>&lt;span class="ln">35&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Flush&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">36&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">37&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">38&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> si desea información sobre cómo subir un archivo a un servidor FTP
+lea el artículo: [subir archivo por FTP](Artículos\Programación\Subir archivo FTP).&lt;/p></description></item><item><title>Librería FTP en C#</title><link>http://jbautistam.github.io/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</guid><description>
+&lt;p>En las aplicaciones que utilizan &lt;a href="https://en.wikipedia.org/wiki/File_Transfer_Protocol">FTP&lt;/a>
+para intercambio de archivos, hasta ahora he utilizado un wrapper sobre la librería de FTP de.NET.&lt;/p>
+&lt;p>En uno de mis últimos proyectos, necesitaba acceder a &lt;strong>FTPs&lt;/strong> y no pude conseguirlo a través de
+las librerías básicas de.NET. En algunos casos me daban errores de conexión a través de un proxy HTTP y en
+otros errores de comunicación. Existen formas de solventarlo pero me pareció más eficaz e instructivo implementarlo por mí
+mismo.&lt;/p>
+&lt;p>Así que armado con los conocimientos adquiridos en la programacación de mi
+&lt;a href="http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp">servicio de SMTP para desarrollo&lt;/a> y la información del
+&lt;a href="https://www.w3.org/Protocols/rfc959/">protocolo FTP&lt;/a> me puse manos a la obra. El resultado
+es una librería de acceso tanto a FTP como a FTPs o FTPes cuyo código fuente, como siempre, se puede encontrar
+en &lt;a href="https://github.com/jbautistam/LibFtpClient">GitHub&lt;/a>.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> como base para la librería utilicé &lt;a href="https://github.com/ArxOne/FTP">ArxOne.FTP&lt;/a>
+que funciona bastante bien pero añade múltiples sesiones por conexión. Esto no supone ningún problema si realmente se necesitan utilizar
+varias sesiones, si no, complica bastante el código y nos obliga a utilizar bloqueos de acceso para poder trabajar con diferentes hilos.&lt;/p>
+&lt;h2 id="conexión-a-un-servidor-ftp">Conexión a un servidor FTP&lt;/h2>
+&lt;p>Para utilizar la librería, por supuesto lo primero es conectar al servidor. El código de conexión es bastante sencillo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">Bau.Libraries.LibFtpClient&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">Bau.Libraries.LibFtpClient.Parameters&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 3&lt;/span>
+&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">//....
+&lt;/span>&lt;span class="ln"> 5&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FtpClient&lt;/span> &lt;span class="n">objFtpClient&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">FtpClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">FtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FtpProtocol&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FtpS&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strServer&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="n">intPort&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">NetworkCredential&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strUser&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strPassword&lt;/span>&lt;span class="p">),&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">FtpClientParameters&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">blnPassive&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FtpClientParameters&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">blnPassive&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="n">FtpClientParameters&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FtpProtection&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FtpS&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="n">FtpClientParameters&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SslType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Default&lt;/span>&lt;span class="p">)))&lt;/span>
+&lt;span class="ln">11&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="c1">// Conecta al servidor
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Connect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="c1">//..... aquí irían las funciones
+&lt;/span>&lt;span class="ln">15&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// Desconecta del servidor
+&lt;/span>&lt;span class="ln">16&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Disconnect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">17&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El enumerado del modo (&lt;code>FtpClient.FtpProtocol&lt;/code>) nos indica si deseamos conectar utilizando FTP, FTPs o FTPes. En los
+parámetros de la conexión indicamos si accedemos en modo pasivo y los métodos de protección y conexión por SSL.&lt;/p>
+&lt;h2 id="tratamiento-de-directorios">Tratamiento de directorios&lt;/h2>
+&lt;p>Una vez conectados, para obtener, crear, borrar o cambiar el directorio actual utilizamos los siguientes métodos:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strActualPath&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetActualPath&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ChangeDir&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/dev&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MakeDir&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/dev/test&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MakeDirRecursive&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/dev/hola/test/pruebas/&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RemoveDirectory&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;/dev/hola/test/pruebas/&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como podemos observar, en el manejo de directorios y archivos, se utiliza la barra de Unix en lugar de la barra invertida de Windows. En
+realidad, podemos utilizar cualquiera de las dos. La librería modifica el separador según la plataforma del servidor FTP.&lt;/p>
+&lt;h2 id="tratamiento-de-archivos">Tratamiento de archivos&lt;/h2>
+&lt;p>Por supuesto, además de con directorios podemos tratar con archivos. Tenemos funciones para borrar un archivo o cambiarle el nombre:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileRemote&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Rename&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileRemoteOld&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strFileRemoteNew&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Si deseamos ver el listado de archivos del directorio actual utilizamos una función como la siguiente:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">IList&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">FtpEntry&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="n">objColFiles&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">List&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cnstStrPathRemote&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">foreach&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FtpEntry&lt;/span> &lt;span class="n">objFile&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="n">objColFiles&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">Console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;{0} - {1} - {2} - {3}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">objFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Name&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">objFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Type&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="n">FtpEntry&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FtpEntryType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Directory&lt;/span>&lt;span class="p">?&lt;/span> &lt;span class="s">&amp;#34;Directorio&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s">&amp;#34;Archivo&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="n">objFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Size&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">objFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Date&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El método &lt;code>List&lt;/code> utiliza el comando &lt;code>LIST&lt;/code> de FTP para obtener los archivos. En algunos servidores se puede utilizar
+también el comando &lt;code>MLST&lt;/code> que en teoría ofrece más información. Para ello podemos utilizar el método:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">IList&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="n">FtpEntry&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="n">objColFiles&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MList&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cnstStrPathRemote&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="subida-y-descarga-de-archivos-al-servidor-ftp">Subida y descarga de archivos al servidor FTP&lt;/h2>
+&lt;p>Por supuesto, lo más importante de una librería de FTP es que nos permita subir y descargar archivos. Los métodos
+para ésto son los siguientes:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Upload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileLocal&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strFileRemote&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">objFtpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Commands&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Download&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileRemote&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strFileLocal&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="código-fuente">Código fuente&lt;/h2>
+&lt;p>Como comentábamos al principio, podemos encontrar el código fuente de la
+&lt;a href="https://github.com/jbautistam/LibFtpClient">librería cliente de FTP&lt;/a> en &lt;strong>GitHub&lt;/strong>.&lt;/p>
+&lt;p>Aparte del código de la librería (proyecto &lt;code>LibFtpClient&lt;/code>) en la solución se incluye el proyecto de consola
+&lt;code>TestLibFtp&lt;/code> que muestra los parámetros de conexión y cómo utilizar los diferentes comandos y modos de conexión.&lt;/p>
+&lt;p>Por cierto, la librería no trata con el protocolo &lt;a href="https://es.wikipedia.org/wiki/SSH_File_Transfer_Protocol">sFTP&lt;/a>
+que aunque pueda parecer lo mismo que &lt;strong>FTPs&lt;/strong>, en realidad es un protocolo
+completamente diferente. Si necesitan una librería de sFTP les propongo &lt;a href="https://sshnet.codeplex.com/">SSH.Net&lt;/a>.&lt;/p></description></item><item><title>Librería POP3 en C# (I)</title><link>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</guid><description>
+&lt;p>En uno de mis últimos proyectos tenía que recoger los correos recibidos en una cuenta de correo y procesarlos para guardarlos en
+una base de datos.&lt;/p>
+&lt;p>Aunque el &lt;strong>Framework.NET&lt;/strong> ofrece librerías para enviar correos (protocolo &lt;strong>SMTP&lt;/strong> ) no incorpora ninguna librería para
+recibir corrreos electrónicos (protocolo &lt;strong>POP3&lt;/strong> ), así que tuve que programar una solución prácticamente desde cero.&lt;/p>
+&lt;p>Estuve buscando por Internet implementaciones del &lt;strong>protocolo POP3&lt;/strong> y aunque la mayoría hacen su trabajo correctamente, la mayor
+parte son excesivamente complejas o fallan al recibir correos en español o al codificar distintos tipos de mensajes o al utilizar
+SSL para conectarse a algunos servidores de correo (como cuando deseamos recibir correos de &lt;strong>GMail&lt;/strong> ).&lt;/p>
+&lt;p>Al final programé una librería completamente nueva que implementa el &lt;strong>protocolo POP3&lt;/strong> de la forma más sencilla posible.&lt;/p>
+&lt;p>El &lt;strong>código fuente&lt;/strong> de esta librería se puede descargar desde &lt;a href="https://github.com/jbautistam/Pop3">GitHub&lt;/a>.&lt;/p>
+&lt;h2 id="descripción-del-desarrollo">Descripción del desarrollo&lt;/h2>
+&lt;p>La solución se divide en dos librerías:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>LibEncoder&lt;/code>: contiene las clases de codificación y decodificación de cadenas o archivos en los formatos Bit7, Bit8, Quoted Printable y
+Base64.&lt;/li>
+&lt;li>&lt;code>LibEMailProtocols&lt;/code>: contiene las clases relacionadas con el envío y recepción de correos.&lt;/li>
+&lt;/ul>
+&lt;p>&lt;code>LibEncoder&lt;/code> es una librería bastante básica: a partir de una clase inicial (&lt;code>Encoder&lt;/code>) podemos llamar a las funciones que realizan
+la codificación / decodificación de las cadenas / archivos en el formato deseado. Por ahora no vamos a entretenernos en ella.&lt;/p>
+&lt;p>La librería &lt;code>LibEMailProtocols&lt;/code> es la realmente interesante en este caso dado que es la que define los mensajes y protocolos tanto de
+envío (&lt;strong>SMTP&lt;/strong>) como de recepción (&lt;strong>POP3&lt;/strong>) de correos electrónicos.&lt;/p>
+&lt;p>La solución se divide en cuatro directorios y espacios de nombres:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Helper&lt;/code>: con clases de ayuda para la utilización de la librería de envío de correos (&lt;strong>SMTP&lt;/strong>).&lt;/li>
+&lt;li>&lt;code>Messages&lt;/code>: con clases para definición de los mensajes de correo (direcciones, adjuntos, cabeceras y demás) comunes tanto para
+el envío como para la recepción de mensajes.&lt;/li>
+&lt;li>&lt;code>POP3&lt;/code>: con las clases que implementan el protocolo &lt;strong>POP3&lt;/strong>.&lt;/li>
+&lt;li>&lt;code>SMTP&lt;/code>: con las clases que implementan el protocolo &lt;strong>SMTP&lt;/strong>.&lt;/li>
+&lt;li>&lt;code>Tools&lt;/code>: con las clases estáticas que implementan los métodos de conexión a Internet y criptografía necesarios para implementar
+los protocolos.&lt;/li>
+&lt;/ul>
+&lt;h3 id="el-espacio-de-nombres-pop3">El espacio de nombres POP3&lt;/h3>
+&lt;p>En el espacio de nombres POP3 se encuentran las clases relacionadas más íntimamente con el protocolo. Se definen tres clases:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Pop3Client&lt;/code>: clase que implementa el protocolo POP3.&lt;/li>
+&lt;li>&lt;code>Pop3ClientException&lt;/code>: excepción lanzada por la clase anterior.&lt;/li>
+&lt;li>&lt;code>Pop3EventArgs&lt;/code>: argumentos de los eventos lanzados por la clase &lt;code>Pop3Client&lt;/code>.&lt;/li>
+&lt;/ul>
+&lt;p>La clase &lt;code>Pop3Client&lt;/code> contiene únicamente ocho métodos públicos para que sea más fácil de utilizar:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>Connect&lt;/code>: conecta al servidor definido en el constructor de la clase.&lt;/li>
+&lt;li>&lt;code>Disconnect&lt;/code>: desconecta del servidor.&lt;/li>
+&lt;li>&lt;code>GetMailBoxDetails&lt;/code>: obtiene el número de correos pendientes de descargar y el tamaño de estos.&lt;/li>
+&lt;li>&lt;code>GetMailSize&lt;/code>: obtiene el tamaño de un correo determinado entre los pendientes de descargar.&lt;/li>
+&lt;li>&lt;code>Delete&lt;/code>: marca un mensaje como pendiente de borrar (se borrará cuando se desconecte del servidor.&lt;/li>
+&lt;li>&lt;code>Undelete&lt;/code>: recupera los mensajes marcados con el método anterior (siempre y cuando no se haya desconectado
+aún del servidor).&lt;/li>
+&lt;li>&lt;code>FetchEMail&lt;/code>: # descarga un mensaje del servidor.&lt;/li>
+&lt;li>&lt;code>FetchEMailHeader&lt;/code>: # recupera las primeras líneas de un mensaje del servidor.&lt;/li>
+&lt;/ul>
+&lt;p>De esta forma el trabajo con la clase es bastante sencillo. Si deseamos descargar los correos del servidor, basta con construir la clase indicando los
+parámetros de conexión al servidor, conectar, obtener el número de mensajes pendientes e ir recorriendo y descargando antes de desconectar del servidor:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="n">Pop3Client&lt;/span> &lt;span class="n">objPop3&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">Pop3Client&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;pop.gmail.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">995&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;user@gmail.com&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 2&lt;/span> &lt;span class="s">&amp;#34;password&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">intNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intSize&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="c1">// Conecta al servidor
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objPop3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Connect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="c1">// Obtiene el número de correos
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objPop3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetMailBoxDetails&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">out&lt;/span> &lt;span class="n">intNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">out&lt;/span> &lt;span class="n">intSize&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Descarga los correos
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">intIndex&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">intIndex&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="n">intNumber&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">intIndex&lt;/span>&lt;span class="p">++)&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="c1">// Descarga y muestra el correo en la consola
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objPop3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FetchEMail&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">intIndex&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="m">1&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="c1">// Borra el correo recibido del servidor
+&lt;/span>&lt;span class="ln">15&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objPop3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">intIndex&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="m">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="c1">// Desconecta del servidor
+&lt;/span>&lt;span class="ln">18&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objPop3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Disconnect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En este caso nos estamos conectando al servidor de correo de &lt;strong>GMail&lt;/strong> en el puerto 995 utilizando una conexión &lt;strong>SSL&lt;/strong>.&lt;/p>
+&lt;p>Lo que obtenemos del método &lt;code>FetchEMail&lt;/code> es una cadena con el contenido del mensaje sin ningún tratamiento. Esto resulta interesante en algunos casos, por
+ejemplo en depuración, para ver el código recibido y las cabeceras. Lo normal sin embargo, es que deseemos interpretar el mensaje de forma que separemos el
+título del cuerpo y los archivos adjuntos. Para esto utilizamos las clases del espacio de nombres &lt;code>Messages&lt;/code>.&lt;/p></description></item><item><title>Librería POP3 en CSharp (II)</title><link>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</guid><description>
+&lt;p>Siguiendo con la explicación de la &lt;a href="http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp">librería POP3 en CSharp&lt;/a>
+hoy vamos a hablar de mensajes.&lt;/p>
+&lt;p>Como vimos hace ya unos meses, se pueden descargar mensajes de correo fácilmente utilizando el método
+&lt;code>FetchEMail&lt;/code> pero una vez que tenemos este mensaje debemos interpretarlo y tratarlo adecuadamente.&lt;/p>
+&lt;p>Para los nuevos en el protocolo POP3 debemos decir que todos los mensajes que se reciben utilizando este protocolo
+son cadenas en texto plano en &lt;a href="http://es.wikipedia.org/wiki/Multipurpose_Internet_Mail_Extensions">formato MIME&lt;/a>.
+Este formato no se utiliza únicamente en este protocolo, también se usa en SMTP, IMAP y el omnipresente REST por citar
+sólo algunos ejemplos.&lt;/p>
+&lt;p>Por resumir diremos que en este formato se combina toda la información del correo recibido en una cadena, es decir,
+incluye cabeceras con el tipo de codificación, los datos del destinatario y el remitente,
+el asunto, el cuerpo y los adjuntos. Si tenéis curiosidad por ver un ejemplo simplemente buscad en vuestro gestor de correo
+una opción de &amp;quot;Ver mensaje original&amp;quot; o similar.&lt;/p>
+&lt;p>Para mantener este formato la librería utiliza las clases del espacio de nombres &lt;code>Bau.Libraries.LibMailProtocols.Messages&lt;/code>,
+en concreto la clase &lt;code>MimeMessage&lt;/code> es la encargada de almacenar las propiedades del correo del remitente (From), destinatario
+o destinatarios (To, CC y BCC), asunto (Subject), cuerpo del mensaje (Body) y cuerpo del mensaje en HTML (BodyHTML) y
+adjuntos (Attachment).&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> puede que parezca extraño que haya dos cuerpos en el mensaje (Body y BodyHTML) pero el protocolo distingue entre
+ambos formatos.&lt;/p>
+&lt;p>Si lo que deseamos es interpretar la cadena de texto que hemos recibido como salida del método &lt;code>FethEMail&lt;/code> podemos
+utilizar la clase &lt;code>MimeMessageParser&lt;/code> de esta forma:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strMessage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objPop3&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FetchEMail&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">2&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">MimeMessage&lt;/span> &lt;span class="n">objMimeMessage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">MimeMessageParser&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Parse&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strMessage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>A partir de este momento podemos utilizar las propiedades del objeto &lt;code>MimeMessage&lt;/code> para lo que deseemos, por ejemplo,
+para mostrarlo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="c1">// Propiedades del mensaje
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">txtFrom&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">GetAddress&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">From&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">txtTo&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">GetAddress&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">To&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="n">txtCC&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">GetAddress&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CC&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="n">txtSubject&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Subject&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="n">txtDate&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;{0:dd-MM-yyyy HH:mm}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">objMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">DateSend&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="c1">// Cuerpo del mensaje
+&lt;/span>&lt;span class="ln">8&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">txtMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Body&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Replace&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;\n&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Environment&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">NewLine&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El método &lt;code>GetAddress&lt;/code> simplemente crea una cadena con las direcciones de correo y no tiene interés para este artículo.&lt;/p>
+&lt;p>Si lo que deseamos es archivar los adjuntos en nuestro disco, podemos utilizar el método &lt;code>Save&lt;/code> de la clase &lt;code>Section&lt;/code> (los
+adjuntos se consideran secciones del correo igual que el cuerpo) de esta forma:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">foreach&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Section&lt;/span> &lt;span class="n">objAttachment&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="n">objMimeMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Attachments&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="n">objAttachment&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Save&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Servidor SMTP para desarrollo (C#)</title><link>http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp/</guid><description>
+&lt;p>Este fin de semana tenía la intención de recuperar el código de una librería antigua para generación de informes y aprovechar
+el tratamiento de plantillas de [NSharpDoc]/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas)
+para hacerla algo más versátil pero el primer correo electrónico de la mañana desbarató mis planes y me llevó a otro desarrollo completamente diferente.&lt;/p>
+&lt;p>El correo en sí era sobre una aplicación que ofrecía servidores SMTP para desarrollo, los conocidos como
+&lt;code>FakeSMTP&lt;/code>. Un &lt;code>FakeSMTP&lt;/code> no es más que un servidor de SMTP que no envía los correos recibidos a las direcciones de correo finales.&lt;/p>
+&lt;p>¿Y para qué querríamos algo así? Muy sencillo: para pruebas en desarrollo aunque, como veremos al final del artículo,
+puede tener otros usos.&lt;/p>
+&lt;p>En desarrollo, es normal tener que enviar correos electrónicos. El problema es que mientras hacemos pruebas no queremos que estos correos
+lleguen a usuarios finales. Una solución es introducir siempre direcciones de correo falsas pero irremediablemente nos encontramos
+a alguien que haciendo pruebas introduce una dirección real y acabamos enviando un correo totalmente ilógico a un cliente con las
+molestias que nos podemos imaginar. Otra solución puede ser trucar el código de modo que si estamos en entornos de desarrollo
+o de preproducción envíen el correo a una dirección fija pero eso nos obliga a escribir código para comprobar el entorno y
+ésto no siempre funciona.&lt;/p>
+&lt;p>La solución más idónea es utilizar un servidor de SMTP que almacene los correos de forma que podamos ver el resultado pero que no
+los envíe a los destinatarios finales. Esto es un #b FakeSMTP#.&lt;/p>
+&lt;p>Como decía al principio, a eso dediqué mi fin de semana. Por supuesto, no es tan versátil como la solución comercial que me envió
+la publicidad pero demuestra lo sencillo que es crear un servidor de SMTP enC#.&lt;/p>
+&lt;h2 id="código-fuente-del-servidor-smtp">Código fuente del servidor SMTP&lt;/h2>
+&lt;p>Para los que no puedan esperar, las fuentes de este servidor SMTP se encuentran en
+&lt;a href="https://github.com/jbautistam/DevelopSmtpServer">GitHub&lt;/a>. Este artículo explica
+su funcionamiento.&lt;/p>
+&lt;h2 id="introducción-al-protocolo-smtp">Introducción al protocolo SMTP&lt;/h2>
+&lt;p>Cualquier servidor SMTP debe cumplir con el protocolo definido en la
+&lt;a href="https://tools.ietf.org/html/rfc821">RFC 821&lt;/a> de agosto de 1.982, todo un veterano. El protocolo
+ha tenido algunos añadidos a lo largo del tiempo para tratar objetos MIME o añadir conceptos de seguridad (extrañamente,
+el protocolo inicial ni siquiera define la forma de enviar la contraseña del usuario), pero si queremos un servidor
+sencillo como es este caso, nos basta con cumplir esta RFC.&lt;/p>
+&lt;p>En el protocolo se identifican los mensajes que recibe el servidor y las respuestas de éste. Todo el protocolo se basa en el envío
+y la recepción de cadenas de texto en ASCII. Por tanto, cualquier adjunto se tiene que enviar utilizando MIME y cualquier
+carácter que se salga del ASCII de 7bits debe ir codificado.&lt;/p>
+&lt;p>Sin embargo, para el proyecto que tenemos entre manos, no necesitamos interpretar esta codificación dado que
+es el cliente quien debe encargarse de enviar y traducir correctamente el contenido del correo.&lt;/p>
+&lt;p>Entre las cadenas de texto que se intercambian el cliente y el servidor hay siete comandos obligatorios. El cliente envía estos
+comandos al comienzo de cada línea de texto seguido de una serie de parámetros. El servidor envía un número como respuesta
+seguido de información adicional que normalmente no se procesa.&lt;/p>
+&lt;p>Los comandos que debemos implementar son:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>EHLO (o HELO):&lt;/strong> es el comando que envía el cliente para iniciar la sesión. No tiene porqué llevar parámetros pero normalmente
+nos encontramos con el nombre de la máquina que se está conectando con el servidor. El servidor responde a este mensaje con
+una cadena de texto que comienza por &lt;strong>250&lt;/strong>. Normalmente la respuesta suele ser '250 OK'.&lt;/li>
+&lt;li>&lt;strong>MAIL FROM:&lt;/strong> con este comando, el cliente indica el correo del remitente del mensaje. El argumento de este mensaje es precisamente
+la dirección de correo origen y en algunos casos el nombre de la persona asociada al correo. La respuesta del servidor, como
+en el caso anterior debe ser 250 OK.&lt;/li>
+&lt;li>&lt;strong>RCPT TO:&lt;/strong> este comando es similar al anterior pero identifica el destinatario del correo. Se puede enviar más de un destinatario
+con varios comandos consecutivos. La respuesta a cada una de las líneas, como es ya habitual será 250 OK.&lt;/li>
+&lt;li>&lt;strong>DATA:&lt;/strong> indica el inicio del cuerpo del mensaje. El servidor debe responder con un valor 354. Normalmente se envía algo así
+como '354 send the mail data, end with.'. A partir de ese momento el cliente envía líneas de texto con el contenido del mensaje
+correctamente codificado y en formato MIME si es necesario. Para indicar el final del correo el cliente envía una línea vacía seguida
+de una línea con únicamente un punto. A esta última línea el servidor debe responder con un mensaje '250 OK'.&lt;/li>
+&lt;li>&lt;strong>QUIT:&lt;/strong> indica el fin de sesión. A este comando el servidor responde con un mensaje 221 y puede cerrar la sesión.&lt;/li>
+&lt;li>&lt;strong>NOOP:&lt;/strong> este es un comando que indica que no se debe hacer nada. El servidor, de cualquier forma responde con un mensaje
+'250 OK'. Este mensaje se suele utilizar para mantener la conexión abierta.&lt;/li>
+&lt;li>&lt;strong>RSET:&lt;/strong> comando que indica que se deseche el correo que se estaba enviando, los emisores y los destinatarios. La respuesta
+debe ser '250 OK'.&lt;/li>
+&lt;/ul>
+&lt;p>Existen algunos comandos adicionales en el protocolo pero el mínimo que debe reconocer nuestro servidor son los siete anteriores.&lt;/p>
+&lt;h2 id="creación-del-servidor-smtp">Creación del servidor SMTP&lt;/h2>
+&lt;p>Como podemos anticipar por la explicación del protocolo, el servidor es bastante sencillo de escribir, nuestro mayor problema es crear
+una conexión TCP al puerto adecuado y esperar los clientes de forma asíncrona para no bloquear el proceso.&lt;/p>
+&lt;p>En mi código, he creado una librería que implementa el protocolo SMTP y graba los correos recibidos en un directorio. Esta librería
+la podéis encontrar en &lt;a href="https://github.com/jbautistam/DevelopSmtpServer">GitHub&lt;/a>. Dentro de la
+solución, el proyecto en el que se programa el servidor SMTP es &lt;code>LibSmtpServer&lt;/code>.&lt;/p>
+&lt;p>Dentro de esta librería, la clase &lt;code>SmtpServer&lt;/code> es la encargada de la configuración del servidor, preparar las conexiones y recibir y
+enviar eventos. Por supuesto es una clase muy sencilla, lo fundamental (para no perdernos) sería lo siguiente:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="n">SmtpServer&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strPathBase&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strIP&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;127.0.0.1&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intPort&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">25&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="n">PathBase&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Combine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strPathBase&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;EMail&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="n">IP&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">strIP&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="n">Port&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">intPort&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln"> 7&lt;/span>
+&lt;span class="ln"> 8&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Connect&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln"> 9&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="c1">// Cierra el listener
+&lt;/span>&lt;span class="ln">11&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Disconnect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="c1">// Crea de nuevo el listener
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Listener&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">Receiver&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SmtpListener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">this&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="n">Listener&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Connect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="c1">// Lanza el evento
+&lt;/span>&lt;span class="ln">16&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">RaiseEventLog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Conexión&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Conectado&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">17&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">18&lt;/span>
+&lt;span class="ln">19&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Disconnect&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln">20&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Listener&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="k">null&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">23&lt;/span> &lt;span class="c1">// Desconecta el listener
+&lt;/span>&lt;span class="ln">24&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Listener&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Disconnect&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="c1">// Log
+&lt;/span>&lt;span class="ln">26&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">RaiseEventLog&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Desconesión&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Desconectado&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">27&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">28&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">29&lt;/span>
+&lt;span class="ln">30&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="n">Receiver&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SmtpListener&lt;/span> &lt;span class="n">Listener&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="k">get&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">set&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Lo más importante es que recogemos el directorio donde vamos a dejar los mensajes, la dirección IP y el puerto en el que vamos a escuchar.&lt;/p>
+&lt;p>El método &lt;code>Connect&lt;/code> conecta el objeto que implementa el protocolo utilizando TCP en la dirección IP definida y el método &lt;code>Disconnect&lt;/code>
+desconecta y cierra el servicio.&lt;/p>
+&lt;p>Por supuesto, el grueso del trabajo lo hace precisamente la clase &lt;code>SmtpListener&lt;/code>. En primer lugar, tenemos un método de conexión y otro
+de desconexión:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Connect&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(!&lt;/span>&lt;span class="n">IsConnected&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="c1">// Indica que está conectado
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">IsConnected&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="c1">// Arranca el servicio de escucha
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">StartListener&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">11&lt;/span>
+&lt;span class="ln">12&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Disconnect&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln">13&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="n">StopListener&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="n">IsConnected&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">16&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El método &lt;code>StartListener&lt;/code> utiliza un objeto &lt;a href="https://msdn.microsoft.com/es-es/library/system.net.sockets.tcplistener(v=vs.110).aspx">TcpListener&lt;/a>
+de .NET. La función de este objeto básicamente es conectarse a un puerto y esperar a que se conecten los clientes de forma asíncrona:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">async&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">StartListener&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="c1">// Si no existe el objeto de escucha, lo crea
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Listener&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="k">null&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="n">Listener&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">TcpListener&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IPEndPoint&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Net&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IPAddress&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Parse&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Server&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IP&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="n">Server&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Port&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="c1">// Inicializa el listener
+&lt;/span>&lt;span class="ln"> 7&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Listener&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Start&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="c1">// Mientras continúe conectado
+&lt;/span>&lt;span class="ln"> 9&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">IsConnected&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="k">try&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="n">TcpClient&lt;/span> &lt;span class="n">objTcpclient&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="n">Listener&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">AcceptTcpClientAsync&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">ConfigureAwait&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">14&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="c1">// Trata el cliente
+&lt;/span>&lt;span class="ln">16&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">HandleClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objTcpclient&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="k">catch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span> &lt;span class="n">objException&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">20&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Diagnostics&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Debug&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Excepción: &amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">objException&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Message&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">23&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">24&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como vemos en el método anterior, cada vez que un cliente se conecte a nuestro servidor, se pasará al método &lt;code>HandleClient&lt;/code>
+que es el que implementa el protocolo. Veamos una versión reducida del método (sin log ni verificaciones finales):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">HandleClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">TcpClient&lt;/span> &lt;span class="n">objTcpClient&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">NetworkStream&lt;/span> &lt;span class="n">stmNetwork&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objTcpClient&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetStream&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StreamReader&lt;/span> &lt;span class="n">stmReader&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StreamReader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="n">blnIsEnd&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">blnIsData&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strPreviousLine&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;&amp;#34;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="n">MessageWriter&lt;/span> &lt;span class="n">objWriter&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">MessageWriter&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">10&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="c1">// Crea el generador de archivo
+&lt;/span>&lt;span class="ln">12&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Server&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">PathEMailsToSend&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="c1">// Envía la línea de información del servidor
+&lt;/span>&lt;span class="ln">14&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;220 BauSMTPServer&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="c1">// Recoge los datos
+&lt;/span>&lt;span class="ln">16&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(!&lt;/span>&lt;span class="n">blnIsEnd&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strLine&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">stmReader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ReadLine&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">19&lt;/span>
+&lt;span class="ln">20&lt;/span> &lt;span class="k">switch&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">GetLineType&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">blnIsData&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Hello&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">23&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Quit&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="n">blnIsEnd&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">27&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;221 DevelopSMTP Service closing transmission channel&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">29&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartData&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">30&lt;/span> &lt;span class="n">blnIsData&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;354 send the mail data, end with.&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">32&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">33&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">EndData&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">34&lt;/span> &lt;span class="n">blnIsData&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">35&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">36&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">37&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Noop&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">38&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">39&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">40&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MailFrom&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">41&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteFrom&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetEMail&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cnstStrEMailFrom&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strLine&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">42&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">43&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">44&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MailTo&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">45&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">GetEMail&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cnstStrEMailTo&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strLine&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">46&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">47&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">48&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Reset&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">49&lt;/span> &lt;span class="n">blnReset&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">50&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">51&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">52&lt;/span> &lt;span class="k">case&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Unknown&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">53&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">blnIsData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">54&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">55&lt;/span> &lt;span class="c1">// Si la línea es un punto y la línea anterior es un salto de línea, termina la transmisión de datos
+&lt;/span>&lt;span class="ln">56&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="s">&amp;#34;.&amp;#34;&lt;/span> &lt;span class="p">&amp;amp;&amp;amp;&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IsNullOrEmpty&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strPreviousLine&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">57&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">58&lt;/span> &lt;span class="c1">// Indica que ya no hay más datos
+&lt;/span>&lt;span class="ln">59&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">blnIsData&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">60&lt;/span> &lt;span class="c1">//... y envía un OK al cliente
+&lt;/span>&lt;span class="ln">61&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">62&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">63&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="c1">// Añade la línea al mensaje
+&lt;/span>&lt;span class="ln">64&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">65&lt;/span> &lt;span class="c1">// Guarda la línea actual para la comparación con la siguiente
+&lt;/span>&lt;span class="ln">66&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">strPreviousLine&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">strLine&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">67&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">68&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="c1">//... cualquier mensaje que no entienda, devuelve un OK
+&lt;/span>&lt;span class="ln">69&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">70&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">71&lt;/span> &lt;span class="k">default&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="c1">//... esto no debería pasar... siempre va a entrar por el LineType.Unknown
+&lt;/span>&lt;span class="ln">72&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">73&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">74&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">75&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">76&lt;/span> &lt;span class="c1">// Cierra el generador de mensajes
+&lt;/span>&lt;span class="ln">77&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Dispose&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">78&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">79&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">80&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En este método se abre un stream de lectura sobre la conexión TCP del cliente y se van leyendo líneas de texto. Por cada una de las líneas
+de texto, se llama a la función &lt;code>GetLineType&lt;/code> que coge la cabecera del comando y la transforma en un enumerado. Dependiendo de este
+enumerado se responde al cliente escribiendo sobre el stream que tenemos abierto.&lt;/p>
+&lt;p>La parte más 'complicada' es la que va recibiendo el contenido del correo. Dado que el protocolo nos indica que los datos
+terminan cuando recibimos un punto después de una línea vacía, nos vamos guardando la línea anterior y comparando la que hemos
+recibido en el bucle y la anterior con una línea vacía y un punto respectivamente.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> Para los que se pregunten qué ocurre cuando dentro del correo se envía una línea en blanco seguida
+por una línea con únicamente un punto (yo lo haría), este tipo de mensajes se codifica de forma que nunca pueda ocurrir algo así
+en el texto de un correo electrónico (normalmente utilizando
+&lt;a href="https://es.wikipedia.org/wiki/Quoted_printable">codificación Quoted Printable&lt;/a>.&lt;/p>
+&lt;p>Por completar el ejemplo, vamos a ver el resto de métodos importantes:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="n">LineType&lt;/span> &lt;span class="n">GetLineType&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strLine&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="n">blnIsData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="n">LineType&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Unknown&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="c1">// Obtiene el tipo de línea
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(!&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IsNullOrEmpty&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(!&lt;/span>&lt;span class="n">blnIsData&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;HELO&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">||&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;EHLO&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Hello&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;DATA&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartData&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;NOOP&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Noop&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;QUIT&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Quit&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;RSET&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">20&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Reset&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cnstStrEMailFrom&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MailFrom&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">23&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StartsWith&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">cnstStrEMailTo&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">StringComparison&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentCultureIgnoreCase&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="n">intType&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">LineType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MailTo&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">27&lt;/span> &lt;span class="c1">// Devuelve el tipo de línea
+&lt;/span>&lt;span class="ln">28&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">intType&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">29&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">30&lt;/span>
+&lt;span class="ln">31&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">WriteOk&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NetworkStream&lt;/span> &lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">32&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">33&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;250 OK&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">34&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">35&lt;/span>
+&lt;span class="ln">36&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">NetworkStream&lt;/span> &lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strLine&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">37&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">38&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ASCIIEncoding&lt;/span> &lt;span class="n">objEncoder&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ASCIIEncoding&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">39&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objEncoder&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetBytes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strLine&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">cnstStrLineSeparator&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">40&lt;/span>
+&lt;span class="ln">41&lt;/span> &lt;span class="c1">// Escribe la cadena codificada
+&lt;/span>&lt;span class="ln">42&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Length&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">43&lt;/span> &lt;span class="c1">// Envía la cadena
+&lt;/span>&lt;span class="ln">44&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmNetwork&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Flush&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">45&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como decíamos anteriormente, el método &lt;code>GetLineType&lt;/code> interpreta el tipo de comando mientras que los métodos &lt;code>WriteOk&lt;/code> y &lt;code>Write&lt;/code>
+escriben las respuestas del servidor.&lt;/p>
+&lt;p>Lo único que nos faltaría es el objeto &lt;code>objWriter&lt;/code> de tipo &lt;code>MessageWriter&lt;/code>. Este objeto realmente lo único que hace es escrbir líneas
+de texto sobre un archivo. Habría podido utilizar directamente un stream de escritura sin necesidad de una clase nueva pero lo dejé
+separado en una clase por añadirle todas las funciones de tratamiento de directorios y en previsión de añadidos posteriores.&lt;/p>
+&lt;p>Como muestra alguno de los métodos de esta clase:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strFileName&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">GetFileName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strPath&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="c1">// Crea el directorio
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Directory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CreateDirectory&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetDirectoryName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileName&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="c1">// Abre el stream de escritura
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Writer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StreamWriter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ASCIIEncoding&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ASCII&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Indica que está abierto
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">IsDisposed&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">11&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">12&lt;/span>
+&lt;span class="ln">13&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">GetFileName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strPath&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">14&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strFileName&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Combine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strPath&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;{0:yyyy-MM-dd}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">DateTime&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Now&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">16&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="c1">// Añade el nombre de archivo
+&lt;/span>&lt;span class="ln">18&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">strFileName&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Combine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Guid&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">NewGuid&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">ToString&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="s">&amp;#34;.msg&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="c1">// Devuelve el nombre de archivo
+&lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">strFileName&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">21&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">22&lt;/span>
+&lt;span class="ln">23&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">WriteFrom&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strEMail&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">24&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;FROM: &amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">strEMail&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">26&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">27&lt;/span>
+&lt;span class="ln">28&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">WriteTo&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strEMail&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">29&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">30&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;TO: &amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">strEMail&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">31&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">32&lt;/span>
+&lt;span class="ln">33&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strMessage&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">34&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">35&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Writer&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="k">null&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">36&lt;/span> &lt;span class="n">Writer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strMessage&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="s">&amp;#34;\r\n&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">37&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">38&lt;/span>
+&lt;span class="ln">39&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">StreamWriter&lt;/span> &lt;span class="n">Writer&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="k">get&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="k">set&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Simple tratamiento de archivos. El archivo de texto que se genera consta de una línea que comienza por &lt;code>FROM&lt;/code> con el remitente,
+una o varias líneas comenzando por &lt;code>TO&lt;/code> con el o los destinatarios y el cuerpo del mensaje tal y cómo lo hemos recibido del
+servidor.&lt;/p>
+&lt;h2 id="otros-proyectos-de-la-solución">Otros proyectos de la solución&lt;/h2>
+&lt;p>Aparte del proyecto &lt;code>LibSmtpServer&lt;/code> en la solución hay dos proyectos más:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>DevelopSmtpServer:&lt;/strong> es una aplicación que puede utilizarse como consola o como servicio de Windows y que
+utiliza &lt;code>LibSmtpServer&lt;/code> para implementar el servidor de STMP.&lt;/li>
+&lt;li>&lt;strong>TestSmtpserver:&lt;/strong> es una aplicación WindowsForms para pruebas tanto de la consola como directamente de la librería. Esta aplicación
+utiliza las otras dos librerías de la solución:
+&lt;ul>
+&lt;li>&lt;strong>LibHelper:&lt;/strong> clases de ayuda y extensores.&lt;/li>
+&lt;li>&lt;strong>BauControls:&lt;/strong> controles de usuario para Windows Forms.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ampliación-del-proyecto">Ampliación del proyecto&lt;/h2>
+&lt;p>Ya que tenemos una librería con un servidor SMTP, si queremos un servidor SMTP de desarrollo 'comercial' podemos ampliar el proyecto
+para permitir ver los correos enviados desde nuestras aplicaciones desde y hacia los diferentes usuarios. Lo único que habría que
+programar en este caso sería la lógica de servidor, por ejemplo en ASP.Net, para acceder a los correos enviados.&lt;/p>
+&lt;p>De hecho, aunque en este artículo hemos supuesto que la librería nos servía para escribir un servidor SMTP para desarrollo
+se puede ampliar para crear un servidor SMTP real, habría que implementar la lógica de reenvío de correos a un servidor
+real y el mantenimiento de usuarios.&lt;/p>
+&lt;p>Si lo que tenemos hasta el momento es archivos de texto con el correo que hemos recibido y las direcciones de origen y destino, nada
+nos impide reenviar este texto utilizando SMTP a un servidor real. Esto nos permite por ejemplo liberar el servidor real o
+preprocesar los correos para evitar los filtros de spam lanzando sólo correos cada cierto tiempo o paralelizar el envío de
+correos entre diferentes hilos o servidores STMP.&lt;/p>
+&lt;p>Quién sabe... quizá en un futuro.&lt;/p></description></item><item><title>Soporte para WebSockets de HTML 5 en ASP.Net 4.5</title><link>http://jbautistam.github.io/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</guid><description>
+&lt;p>El protocolo de &lt;strong>WebSocket&lt;/strong> es un protocolo estándar para comunicaciones seguras, bidireccionales
+y en tiempo real entre cliente / servidor utilizando HTTP y facilita las tareas de transferencia
+de datos entre diferentes ordenadores.&lt;/p>
+&lt;p>&lt;strong>WebSocket&lt;/strong> apareció acompañando al nuevo &lt;strong>HTML 5&lt;/strong> aunque puede utilizarse sobre cualquier cliente
+no únicamente para los navegadores.&lt;/p>
+&lt;p>La nueva versión de ASP.Net (ASP.Net 4.5) junto con IIS 8 incluye la posiblidad de utilizar el
+protocolo de &lt;strong>WebSockets&lt;/strong> a bajo nivel con APIs administradas que permiten leer y enviar datos
+tanto en forma de cadena como binarios de forma asíncrona. Para ello se ha incluído un nuevo espacio
+de nombres &lt;strong>System.Web.WebSockets&lt;/strong> que trata este prococolo.&lt;/p>
+&lt;p>Desde el navegador (por ejemplo) se puede establecer una conexión que apunte a una URL de una aplicación
+ASP.Net de la siguiente forma:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">socket&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">WebSocket&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ws://server.com/Aplicacion.ashx&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En la parte de la aplicación ASP.Net se pueden establecer puntos de entrada utilizando módulos con archivos
+ashx.&lt;/p>
+&lt;p>La aplicación ASP.Net debe aceptar la solicitud de abrir una conexión &lt;strong>WebSockets&lt;/strong> de esta forma:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">HttpContext&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Current&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">AcceptWebSocketRequest&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fncDelegado&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El método &lt;strong>AcceptWebSocketRequest&lt;/strong> utiliza un delegado al que transferir el control una vez
+que llegan los datos de &lt;strong>WebSocket&lt;/strong>. Una vez establecida la comunicación entre el cliente y el servidor,
+ASP.Net realizará las llamadas oporturnas al delegado. La siguiente función muestra cómo lograr un eco de lo que
+se manda a través de &lt;strong>WebSocket&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">async&lt;/span> &lt;span class="n">Task&lt;/span> &lt;span class="n">MyWebSocket&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">AspNetWebSocketContext&lt;/span> &lt;span class="n">context&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="n">WebSocket&lt;/span> &lt;span class="n">socket&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">context&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WebSocket&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">true&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="n">ArraySegment&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="kt">byte&lt;/span>&lt;span class="p">&amp;gt;&lt;/span> &lt;span class="n">buffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">ArraySegment&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="kt">byte&lt;/span>&lt;span class="p">&amp;gt;(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="m">1024&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Espera que llegue un mensaje del cliente
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">WebSocketReceiveResult&lt;/span> &lt;span class="n">result&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ReceiveAsync&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CancellationToken&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">None&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="c1">// Si el socket está abierto, recoge el mensaje del cliente
+&lt;/span>&lt;span class="ln">12&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">State&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="n">WebSocketState&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Open&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">userMessage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Encoding&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UTF8&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Array&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">result&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Count&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">15&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="c1">// Recoge el mensaje
+&lt;/span>&lt;span class="ln">17&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">userMessage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;Se envió: &amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">userMessage&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="s">&amp;#34; a &amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">DateTime&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Now&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToLongTimeString&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="n">buffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">ArraySegment&lt;/span>&lt;span class="p">&amp;lt;&lt;/span>&lt;span class="kt">byte&lt;/span>&lt;span class="p">&amp;gt;(&lt;/span>&lt;span class="n">Encoding&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UTF8&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetBytes&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">userMessage&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="c1">// Envía un mensaje asíncrono al cliente
+&lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SendAsync&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">buffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">WebSocketMessageType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Text&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">CancellationToken&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">None&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="k">else&lt;/span> &lt;span class="c1">//... sale del bucle de espera de mensajes
+&lt;/span>&lt;span class="ln">23&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">break&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">25&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En el ejemplo se utilizan las palabras clave &lt;strong>await&lt;/strong> y &lt;strong>asynchronous&lt;/strong> de las operaciones
+para el tratamiento asíncrono de tareas. La aplicación espera el mensaje enviado por el cliente llamando a
+&lt;strong>await socket.ReceiveAsync&lt;/strong>. Del mismo modo se puede enviar un mensaje al cliente utilizando
+&lt;strong>await socket.SendAsync&lt;/strong>.&lt;/p>
+&lt;p>En el navegador (o la aplicación cliente) se reciben los mensajes de &lt;strong>WebSocket&lt;/strong> a través de
+la función &lt;strong>onmessage&lt;/strong>. Para enviar un mensaje desde el navegador, se puede llamar al método
+&lt;strong>send&lt;/strong> del tipo &lt;strong>WebSocket&lt;/strong> de DOM como en este ejemplo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="c1">// Recibe una cadena desde el servidor
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">onmessage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">function&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">msg&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;serverData&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">innerHTML&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">msg&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">data&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="p">};&lt;/span>
+&lt;span class="ln">6&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="c1">// Envía una cadena desde el navegador
+&lt;/span>&lt;span class="ln">8&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Texto del mensaje enviado al servidor&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Fuente: &lt;a href="http://www.asp.net/vnext/whats-new">ASP.Net&lt;/a>&lt;/p></description></item><item><title>Subir un archivo a un servidor FTP utilizando C#</title><link>http://jbautistam.github.io/articles/development/subir-archivo-ftp/subir-archivo-ftp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/subir-archivo-ftp/subir-archivo-ftp/</guid><description>
+&lt;p>Si deseamos subir archivos a un servidor &lt;strong>FTP&lt;/strong> con C#, podemos utilizar la clase &lt;strong>FtpWebRequest&lt;/strong> del
+espacio de nombre &lt;strong>System.Net&lt;/strong> del &lt;strong>.NET Framework&lt;/strong>.&lt;/p>
+&lt;p>La utilización es bastante sencilla, simplemente creamos una solicitud sobre el servidor &lt;strong>FTP&lt;/strong> indicando
+el nombre de archivo que tendrá el servidor remoto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">FtpWebRequest&lt;/span> &lt;span class="n">ftpRequest&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FtpWebRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">WebRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ftp://servidorFTP/directorio/archivo.txt&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez creada la conexión asignamos las credenciales e indicamos que deseamos enviar un archivo y algunas propiedades básicas:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="c1">// Asigna las credenciales
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Credentials&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">NetworkCredential&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;usuario&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Password&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="c1">// Asigna las propiedades
+&lt;/span>&lt;span class="ln">4&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Method&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">WebRequestMethods&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Ftp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UploadFile&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UsePassive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UseBinary&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">KeepAlive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y por último leemos el archivo en un &lt;strong>stream&lt;/strong> y lo escribimos en el stream de FTP (para obtener el stream de
+comunicaciones utilizamos el método &lt;strong>GetRequestStream&lt;/strong> del objeto &lt;strong>FtpWebRequest&lt;/strong> ):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">stmFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">File&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">OpenRead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="c1">// Obtiene el stream sobre la comunicación FTP
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Stream&lt;/span> &lt;span class="n">stmFTP&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetRequestStream&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Lee y escribe el archivo en el stream de comunicaciones
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">intRead&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="n">stmFTP&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="c1">// Cierra el stream FTP
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFTP&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="c1">// Cierra el stream del archivo
+&lt;/span>&lt;span class="ln">16&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">17&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El siguiente bloque muestra el código completo en un único método:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">/// Envía un archivo por FTP
+&lt;/span>&lt;span class="ln"> 3&lt;/span>&lt;span class="c1">/// &amp;lt;/summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Upload&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strServer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strUser&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strPassword&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strPathFTP&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="n">FtpWebRequest&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Crea el objeto de conexión del servidor FTP
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">ftpRequest&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FtpWebRequest&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="n">WebRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;ftp://{0}/{1}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strServer&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="n">Path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Combine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strPathFTP&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Path&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetFileName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">))));&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="c1">// Asigna las credenciales
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Credentials&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">NetworkCredential&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strUser&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strPassword&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="c1">// Asigna las propiedades
+&lt;/span>&lt;span class="ln">15&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Method&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">WebRequestMethods&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Ftp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UploadFile&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UsePassive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UseBinary&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">KeepAlive&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="c1">// Lee el archivo y lo envía
+&lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">stmFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">File&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">OpenRead&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileNameLocal&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="c1">// Obtiene el stream sobre la comunicación FTP
+&lt;/span>&lt;span class="ln">23&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Stream&lt;/span> &lt;span class="n">stmFTP&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">ftpRequest&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetRequestStream&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">27&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="c1">// Lee y escribe el archivo en el stream de comunicaciones
+&lt;/span>&lt;span class="ln">29&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">while&lt;/span> &lt;span class="p">((&lt;/span>&lt;span class="n">intRead&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">cnstIntLengthBuffer&lt;/span>&lt;span class="p">))&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">30&lt;/span> &lt;span class="n">stmFTP&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intRead&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="c1">// Cierra el stream FTP
+&lt;/span>&lt;span class="ln">32&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFTP&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">33&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">34&lt;/span> &lt;span class="c1">// Cierra el stream del archivo
+&lt;/span>&lt;span class="ln">35&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">36&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">37&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> si desea información sobre cómo descargar un archivo de un servidor FTP
+lea el artículo: &lt;a href="http://jbautistam.github.io/articles/development/descargar-archivo-ftp/descargar-archivo-ftp">descargar archivo FTP&lt;/a>.&lt;/p></description></item><item><title>Trazas de comunicaciones en C#</title><link>http://jbautistam.github.io/articles/development/trazas-comunicaciones/trazas-comunicaciones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/trazas-comunicaciones/trazas-comunicaciones/</guid><description>
+&lt;p>Estos días, he tenido que enfrentarme a una aplicación para transmitir archivos
+por &lt;a href="https://es.wikipedia.org/wiki/SSH_File_Transfer_Protocol">sFTP&lt;/a>.&lt;/p>
+&lt;p>El problema principal, aunque parezca lo contrario, no ha sido la implementación del protocolo en sí, si no
+averiguar porqué fallaban ciertas rutinas de comunicaciones y saber qué estaba pasando por debajo, es decir,
+qué intentaba hacer.NET cuando le pedía abrir un stream o cambiarlo por un stream SSL.&lt;/p>
+&lt;p>Una de las opciones era utilizar &lt;a href="http://www.telerik.com/fiddler">Fiddler&lt;/a> o
+alguna herramienta similar para ver las comunicaciones entre mi máquina y el servidor pero no encontraba información
+real sobre lo que estaba haciendo mal.&lt;/p>
+&lt;p>No sé muy bien cómo (suele pasarme), llegué a un
+&lt;a href="https://blogs.msdn.microsoft.com/dgorti/2005/09/18/using-system-net-tracing/">artículo muy interesante&lt;/a>
+en la MSDN sobre trazas de comunicaciones en una aplicación en.NET, es decir, sobre cómo se podía obtener un archivo de log
+de las rutinas por las que pasaba la aplicación mientras se establecen las comunicaciones. Justo lo que necesitaba.&lt;/p>
+&lt;p>Y de hecho, es bastante sencillo, simplemente hay que añadir ciertos parámetros al &lt;strong>app.config&lt;/strong> de nuestra aplicación
+de pruebas (en mi caso, una consola):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="ln"> 1&lt;/span>&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34; ?&amp;gt;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="nt">&amp;lt;configuration&amp;gt;&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="nt">&amp;lt;startup&amp;gt;&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="nt">&amp;lt;supportedRuntime&lt;/span> &lt;span class="na">version=&lt;/span>&lt;span class="s">&amp;#34;v4.0&amp;#34;&lt;/span> &lt;span class="na">sku=&lt;/span>&lt;span class="s">&amp;#34;.NETFramework,Version=v4.5.2&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="nt">&amp;lt;/startup&amp;gt;&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="nt">&amp;lt;system.diagnostics&amp;gt;&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="nt">&amp;lt;trace&lt;/span> &lt;span class="na">autoflush=&lt;/span>&lt;span class="s">&amp;#34;true&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="nt">&amp;lt;sources&amp;gt;&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="nt">&amp;lt;source&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;System.Net&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="nt">&amp;lt;listeners&amp;gt;&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;MyTraceFile&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="nt">&amp;lt;/listeners&amp;gt;&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="nt">&amp;lt;/source&amp;gt;&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="nt">&amp;lt;source&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;System.Net.Sockets&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="nt">&amp;lt;listeners&amp;gt;&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;MyTraceFile&amp;#34;&lt;/span>&lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="nt">&amp;lt;/listeners&amp;gt;&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="nt">&amp;lt;/source&amp;gt;&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="nt">&amp;lt;/sources&amp;gt;&lt;/span>
+&lt;span class="ln">20&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="nt">&amp;lt;sharedListeners&amp;gt;&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="nt">&amp;lt;add&lt;/span>
+&lt;span class="ln">23&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;MyTraceFile&amp;#34;&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="na">type=&lt;/span>&lt;span class="s">&amp;#34;System.Diagnostics.TextWriterTraceListener&amp;#34;&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="na">initializeData=&lt;/span>&lt;span class="s">&amp;#34;System.Net.trace.log&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="nt">&amp;lt;/sharedListeners&amp;gt;&lt;/span>
+&lt;span class="ln">27&lt;/span> &lt;span class="nt">&amp;lt;switches&amp;gt;&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;System.Net&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;Verbose&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">29&lt;/span> &lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">name=&lt;/span>&lt;span class="s">&amp;#34;System.Net.Sockets&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;Verbose&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">30&lt;/span> &lt;span class="nt">&amp;lt;/switches&amp;gt;&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="nt">&amp;lt;/system.diagnostics&amp;gt;&lt;/span>
+&lt;span class="ln">32&lt;/span>&lt;span class="nt">&amp;lt;/configuration&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez modificado el archivo de configuración simplemente tenemos que ejecutar la aplicación y nos genera automáticamente un archivo de log
+con el nombre &lt;strong>System.Net.Trace.Log&lt;/strong> en el directorio de ejecución con toda la información de traza de las comunicaciones.&lt;/p></description></item></channel></rss>

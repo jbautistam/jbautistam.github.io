@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>spark on jbautistam</title><link>http://jbautistam.github.io/tags/spark/</link><description>Recent content in spark on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sat, 10 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/spark/index.xml" rel="self" type="application/rss+xml"/><item><title>Cosas que me gustaría que me hubiesen explicado sobre databricks</title><link>http://jbautistam.github.io/articles/big-data/cositas-databricks/cositas-databricks/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/cositas-databricks/cositas-databricks/</guid><description>
+&lt;p>Llevo algunos meses trabajando con &lt;a href="https://databricks.com/">DataBricks&lt;/a> en local y me he encontrado algunas rarezas que he tenido que ir puliendo poco a poco.&lt;/p>
+&lt;p>Me habría ahorrado un montón de dolores de cabeza si alguien me las hubiese contado previamente, por eso escribo este
+artículo. Por si ayuda a alguien en una situación parecida.&lt;/p>
+&lt;p>En primer lugar me gustaría explicar nuestro método de desarrollo con &lt;strong>DataBricks&lt;/strong>.&lt;/p>
+&lt;p>Si no lo has utilizado, simplemente comentar que, a grandes rasgos, Databricks es una herramienta montada sobre
+Spark que facilita el trabajo (y mucho) a la hora de creación y mantenimiento de clusters y manejo de notebooks.&lt;/p>
+&lt;p>Databricks está muy orientado a entornos de ciencia de datos utilizando notebooks en Python, SQL, Scala o R.&lt;/p>
+&lt;p>No tengo nada en contra de programar a base de notebooks pero cuando llevas un par de horas con ellos comienzas a echar de menos
+un editor como dios manda. No sólo por la depuración si no también porque los scroll hacen cosas, por ser suaves, raras, la edición
+a base de celdas es, digámoslo así, ligeramente complicada, la búsqueda tiene detalles en los que preferiría no ahondar, la
+integración con el control de versiones y las ramas es algo peculiar, etc, etc.&lt;/p>
+&lt;p>Además tiene un segundo problema mucho más grave: el coste. Depurar contra clusters cuando estamos escribiendo una aplicación
+que probamos paso a paso veinte veces al día puede llegar a resultar bastante caro.&lt;/p>
+&lt;p>Nuestra solución pasa por programar directamente en &lt;a href="http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark">Spark Sql en local&lt;/a>
+utilizando una aplicación que desarrollamos nosotros: &lt;a href="Aplicaciones%5CBauDbStudio%5CManual">BauDbStudio&lt;/a>.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> El manual no está completo aún y la versión en la Web está algo desactualizada, prometo
+ponerme las pilas con ello pero últimamente el tiempo me puede.&lt;/p>
+&lt;p>Por concretar: escribimos scripts en Spark Sql en BauDbStudio, los lanzamos con ODBC contra Spark en local mientras que dearrollamos
+y probamos. Cuando terminamos, le pasamos un proceso que transforma estos scripts a notebooks que entienda DataBricks,
+lo subimos a un repositorio especial y utilizamos Azure DevOps para desplegar sobre DataBricks.&lt;/p>
+&lt;p>Sencillo ¿no?&lt;/p>
+&lt;p>¿Por qué Spark Sql y no Python? Me gusta Python, de hecho, algunos módulos de nuestros procesos como el lanzador de
+notebooks de SQL están escritos en Python (no ha habido otro remedio, por cierto) pero para tratar datos, creo que SQL
+es bastante más natural.&lt;/p>
+&lt;p>Y si todo funciona ¿qué puede ir mal?&lt;/p>
+&lt;p>Como comentaba, DataBricks está basado en Spark pero a la hora de desplegar nuestros scripts a notebooks nos encontramos con
+algunos problemas.&lt;/p>
+&lt;p>La primera vez que subimos un notebook desde nuestro repositorio, nos dimos cuenta que, al abrirlo en DataBricks nos escribía un
+punto en rojo delante del primer texto. De hecho, se negaba a ejecutarlo a menos que borrásemos a mano ese punto rojo
+que identificaba como un carácter extraño.&lt;/p>
+&lt;p>¿Por qué? Bueno, esa fue la primera cosa que nadie me explicó.&lt;/p>
+&lt;p>En principio parecía un problema de codificación: probé con UTF-8 (el correcto), con ASCII, con UTF-16 y obtuve diferentes errores
+y muchos acentos y años escritos raro (sí, mis comentarios están en español ¿algún problema?).&lt;/p>
+&lt;p>El caso es que el error no es de la codificación aunque sí tiene que ver con la codificación: cuando se escribe un archivo UTF-8, los
+primeros caracteres identifican el archivo. Es lo que se llama &lt;a href="https://es.wikipedia.org/wiki/Marca_de_orden_de_bytes">BOM&lt;/a>.
+Databricks no reconoce estos caracteres en sus notebooks así que para que funcione, nuestros archivos se deben escribir en UTF-8 pero
+sin los caracteres de BOM.&lt;/p>
+&lt;p>¿Cómo me di cuenta? Descargando un notebook válido de Databricks y comparándolo con los míos utilizando un editor hexadecimal.
+Sí, como en los viejos tiempos.&lt;/p>
+&lt;p>Otro problema: en Spark SQL para leer un archivo parquet utilizamos sentencias de este estilo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">raw&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">CustomerOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Probándolo en local (en mi máquina con WSL sobre Windows) funciona perfectamente. Al ejecutarlo en Databricks nos daba un error similar a
+&amp;quot;no existe el archivo CustomerOrders.parquet&amp;quot;&lt;/p>
+&lt;p>Pero en mi storage está el archivo &lt;code>customerOrders.parquet&lt;/code> ¿cuál puede ser el problema?&lt;/p>
+&lt;p>El lector avispado ya se habrá dado cuenta: Unix.&lt;/p>
+&lt;p>Unix es sensible a mayúsculas, por tanto debemos poner los nombres de archivos
+exactamente igual a como estén en el storage. Y más vale que no te equivoques. Nunca. Te puedo asegurar que si ejecutas un proceso
+en un cluster de ocho nodos durante dos horas y falla en la última lectura de un archivo porque no está correctamente escrito no
+te hace ninguna gracia. Le ha pasado a un amigo.&lt;/p>
+&lt;p>Dado que es bastante difícil que nos acordemos de escribir correctamente todos los nombres de archivos (en mi caso, unos doscientos),
+tomamos una decisión salomónica: en el storage todos los nombres de archivos se escriben en minúsculas y modificamos el proceso de generación
+de los notebooks de Databricks para que buscara en nuestros scripts todo lo que estuviera entre acentos y lo pusiera en minúsculas.
+Esta fue fácil.&lt;/p>
+&lt;p>El siguiente problema vino con los argumentos y también está relacionado con las mayúsculas y minúsculas. En Spark Sql puedo escribir
+algo así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">raw&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">CustomerOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="n">Customer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">CustomerId&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Donde &lt;code>$CustomerId&lt;/code> es un parámetro de la consulta.&lt;/p>
+&lt;p>Si tenemos este script en un notebook y lo queremos ejecutar desde otro escrito por ejemplo en Python,
+lo que tenemos que hacer es pasarle este argumento en la instrucción &lt;code>run&lt;/code> de &lt;code>dbutils&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln">1&lt;/span>&lt;span class="c1"># Crea el diccionario de parámetros de ejecución&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">parameters&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="s2">&amp;#34;customerId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">28&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">5&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="c1"># Ejecuta el script de SQL&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">notebook&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;./Script.sql&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3600&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">parameters&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En este caso, como decíamos antes, Databricks también es sensible a mayúsculas y la ejecución de la sentencia SQL nos da un error
+similar a &lt;em>no puedo encontrar el parámetro CustomerId&lt;/em>. Por tanto: siempre que utilicemos un argumento tiene que estar capitalizado
+exactamente igual que en el diccionario de parámetros.&lt;/p>
+&lt;p>Por supuesto, también nos resulta bastante difícil obligar a todo el equipo a que escriba los parámetros con el mismo nombre constantemente
+más cuando en local, Spark Sql no nos da ningún error (y particularmente no me apetecía escribir un intérprete de SQL para éso).
+Por eso, al convertir los scripts a notebooks otra de las cosas que hacemos es cambiar los
+nombres de los argumentos a minúsculas. En el diccionario en Python están también escritos en minúsculas, por supuesto.&lt;/p>
+&lt;p>Una de las cosas que me costó más trabajo fue precisamente entender cómo trabaja Databricks con los argumentos de SQL. En concreto
+tenía una sentencia SQL como ésta:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Name&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">separator&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">LastName&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">raw&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">CustomerOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="n">Customer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">CustomerId&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Curiosamente cuando le pasaba el argumento &lt;code>separator&lt;/code> con un punto, por ejemplo, me daba un error y me indicaba la SQL que estaba
+intentando ejecutar. Concretamente ésta:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Name&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="p">.&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">LastName&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">raw&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">CustomerOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="n">Customer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">CustomerId&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>¿Qué ha pasado? ¿Por qué razón ha sustituido directamente el argumento en la SQL sin ponerle apóstrofes alrededor? Gran misterio
+pero así fue.&lt;/p>
+&lt;p>El caso es que la documentación te dice que no utilices &lt;code>$argumento&lt;/code> si no la función &lt;code>getargument&lt;/code> dado que la primera forma
+va a dejar de funcionar en breve. Es decir, la sentencia anterior debería ser:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Name&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">getArgument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;separator&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">LastName&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">raw&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">CustomerOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="n">Customer&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">getArgument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;CustomerId&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Pero teníamos el mismo problema que antes: en Spark Sql funciona correctamente así que, por comodidad, decidimos dejar todos nuestros
+scripts de SQL utilizando argumentos a la forma antigua (con un carácter dólar por delante) y modificar el proceso de generación de
+notebooks para que sustituyese las cadenas &lt;code>$parameter&lt;/code> por &lt;code>getArgument(&amp;quot;parameter&amp;quot;)&lt;/code> (por supuesto, en minúsculas todo).&lt;/p>
+&lt;p>Por cierto, tengo que avisarte que he hecho trampa. Cuando escribía ésto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln">1&lt;/span>&lt;span class="c1"># Ejecuta el script de SQL&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">notebook&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;./Script.sql&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3600&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">parameters&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En realidad no funciona. Databricks se niega a ejecutarlo. Dice que no existe ese notebook. Pero existe, lo estoy viendo. Y
+está bien escrito, no me vas a pillar otra vez con lo de mayúsculas y minúsculas.&lt;/p>
+&lt;p>La verdad es que para que funcione tienes que escribir ésto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln">1&lt;/span>&lt;span class="c1"># Ejecuta el script de SQL&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">notebook&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;./Script&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3600&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">parameters&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Es decir: cuando ejecutas un notebook con extensión SQL no puedes poner la extensión &lt;strong>.sql&lt;/strong> en la intrucción `run. Si lo
+pones te va a dar un error.&lt;/p>
+&lt;p>No ocurre lo mismo si el notebook está escrito en Python y tiene extensión &lt;strong>.py&lt;/strong>. En ese caso, tienes que escribir la extensión
+en la instrucción &lt;code>run&lt;/code>. Si no te va a dar un error de que no encuentra el archivo.&lt;/p>
+&lt;p>¿Por qué funciona diferente? ... ¿Realmente me lo estás preguntando a mí?&lt;/p>
+&lt;p>Una cosa que me resultó curiosa. Si ejecutas ésto en Spark Sql no hay ningún problema:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">Customers&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Pero en Databricks da una excepción si no existe. ¿Cómo? ¿Una excepción? Sí, no me mires así, a mí también me sorprendió.&lt;/p>
+&lt;p>Cualquier servidor de base de datos que se precie, cuando ejecuta esa instrucción comprueba si existe la tabla y si existe
+la elimina, si no existe continúa con la siguiente instrucción.&lt;/p>
+&lt;p>Bueno, pues Databricks no, Databricks da un error. Bueno,
+realmente da un error de vez en cuando. Veamos la documentación de la instrucción
+&lt;a href="https://docs.databricks.com/spark/latest/spark-sql/language-manual/drop-table.html">DROP TABLE&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/cositas-databricks/images/Error-drop-table.jpg" alt="DROP TABLE en Databricks" title="Instrucción DROP TABLE en Databricks">&lt;/p>
+&lt;p>Lo dice bien claro: si la tabla no existe, lanza una excepción. A veces.&lt;/p>
+&lt;p>Os cuento. En la práctica puedes utilizar bases de datos en Databricks (para mí no son bases
+de datos si no esquemas pero para el caso es lo mismo). En caso que utilices un nombre de base de datos creado
+previamente (no la base de datos &lt;strong>default&lt;/strong> que se utiliza cuando no le ponemos nombre de base de datos),
+la instrucción funciona sin problemas:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">DbOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Customers&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y una última cosa: esta es difícil y posiblemente me equivoque pero vamos a hablar de niveles de aislamiento.&lt;/p>
+&lt;p>Databricks nos permite ejecutar trabajos sobre un cluster. En nuestro caso, lanzo esos trabajos utilizando la librería de
+Azure Databricks pero es exactamente igual cuando utilizamos la API REST. El caso es que cada trabajo se ejecuta en
+un cluster y cada trabajo debe ejecutarse contra un blob storage diferente porque cada uno va con datos diferentes,
+es decir, un multitenant de libro.&lt;/p>
+&lt;p>La teoría es que estos cluster deben poder ejecutarse a la vez y en teoría deberían ser aislados pero ¿cómo ejecuta
+databricks estos cluster? ¿cuál es su nivel de aislamiento? Bueno, pues digamos simplemente que
+&lt;a href="https://docs.databricks.com/notebooks/notebooks-use.html">depende&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/cositas-databricks/images/Isolation-levels.jpg" alt="Databricks Isolation levels" title="Isolation levels">&lt;/p>
+&lt;p>¿Os ha quedado claro? A mí no.&lt;/p>
+&lt;p>Hagamos una prueba. Vamos a montar un storage sobre un directorio de DBFS utilizando Python:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1"># Obtiene los parámetros&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="n">containerName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">getArgument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;containername&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="n">storageAccountName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">getArgument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;storageaccountname&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 4&lt;/span>&lt;span class="n">mountPoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;/mnt/engine/raw&amp;#34;&lt;/span>
+&lt;span class="ln"> 5&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="c1"># Crea la cadena de configuración&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="n">confKey&lt;/span>&lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;fs.azure.account.key.&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">storageAccountName&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;.blob.core.windows.net&amp;#34;&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span>&lt;span class="c1"># Monta la unidad&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="k">try&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">fs&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">mount&lt;/span>&lt;span class="p">(&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="n">source&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;wasbs://&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">containerName&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;@&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">storageAccountName&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;.blob.core.windows.net&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="n">mount_point&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">mountPoint&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="n">extra_configs&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span> &lt;span class="n">confKey&lt;/span> &lt;span class="p">:&lt;/span> &lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">secrets&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">get&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">scope&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;KeyVaultScope&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">key&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;blob-storage-access-key&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="p">)&lt;/span>
+&lt;span class="ln">16&lt;/span>&lt;span class="k">except&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln">17&lt;/span> &lt;span class="k">print&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;Cant mount the storage. Continue&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Más o menos como dicen todos los ejemplos. Lo único reseñable es que utilizamos nuestro amigo &lt;code>getargument&lt;/code> para recoger los
+argumentos del job.&lt;/p>
+&lt;p>Ahora bien ¿qué ocurre cuando ejecutamos dos clusters a la vez con ese código?&lt;/p>
+&lt;p>Pues que el segundo que ejecute nos va a dar un error diciendo que no puede montar la unidad. ¿Por qué si el nombre de contenedor
+es diferente? Pues creo que porque el nombre del &amp;quot;punto de montaje&amp;quot; (variable &lt;code>mountPoint&lt;/code>) es igual en ambos casos.&lt;/p>
+&lt;p>Reconozco que en este caso aún tengo mis dudas. En todas mis pruebas me ha dado el mismo error
+pero me extraña tanto que me pregunto si algo estaré haciendo mal. Así que si alguien sabe porqué ocurre ésto por favor que
+no dude en corregirme.&lt;/p>
+&lt;p>¿Y la solución? En mi caso: cambiar el contenido de la variable &lt;code>mountPoint&lt;/code> para que fuera diferente en cada ejecución
+(en este caso incluyendo el nombre de contenedor).&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln">1&lt;/span>&lt;span class="c1"># Obtiene los parámetros&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">containerName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">getArgument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;containername&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">storageAccountName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="n">getArgument&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;storageaccountname&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="n">mountPoint&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;/mnt/&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">containerName&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="s2">&amp;#34;/raw&amp;#34;&lt;/span>
+&lt;span class="ln">5&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="c1"># .... el resto del código es igual al ejemplo anterior ...&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Digamos simplemente que en mi cluster funciona... por ahora.&lt;/p>
+&lt;p>Vamos a dar un pasito más...&lt;/p>
+&lt;p>Como decíamos antes, en Spark Sql tenemos una instrucción para crear una base de datos, de hecho, si no creamos una base de datos
+los &lt;code>DROP TABLE&lt;/code> se van a comportar de una forma extraña, por eso, mejor montar una base de datos. Lo vamos a hacer así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">DbCustomer&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;/mnt/engine/raw/DbCustomer&amp;#39;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>¿Veis el problema? Mirad de nuevo.&lt;/p>
+&lt;p>El problema es la ubicación: &lt;code>/mnt/engine/raw/DbCustomer&lt;/code>. Antes no fallaba pero dado que hemos cambiado en Python el
+nombre del directorio de montaje por &lt;code>&amp;quot;/mnt/&amp;quot; + containerName + &amp;quot;/raw&amp;quot;&lt;/code>, la creación de base de datos no va a funcionar en la
+vida.&lt;/p>
+&lt;p>Tenemos un segundo problema (o duda): ¿cuál es el nivel de aislamiento de bases de datos en los clusters? ¿cuando ejecuto
+dos cluster los dos con el mismo nombre de base de datos entienden que son bases de datos separadas o la consideran
+global para todos ellos? Es decir, si yo ejecuto ésto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">DbCustomer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Orders&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>en dos clusters al mismo tiempo ¿van a la misma base de datos / esquema o entienden que son diferentes?&lt;/p>
+&lt;p>Pues he buscado en Google y no he encontrado documentación al respecto. Parece que la documentación de Spark no dice nada
+y la de Databricks menos. De nuevo: si alguien sabe qué ocurre estoy ansioso de aprender.&lt;/p>
+&lt;p>El caso es que, por mis pruebas, parece que si dos cluster se ejecutan a la vez con el mismo nombre de base de datos, la comparten.
+Por supuesto, no es lo que quiero.&lt;/p>
+&lt;p>Pero eso me supone un problema: ¿cómo puedo escribir un script en SQL que se ejecute para diferentes clientes con nombres diferentes
+de base de datos?&lt;/p>
+&lt;p>Vayamos por partes. En primer lugar vamos a solucionar el problema del &lt;code>LOCATION&lt;/code> en la instrucción &lt;code>CREATE TABLE&lt;/code>.&lt;/p>
+&lt;p>Para ello, tenemos que enviar a nuestra SQL el valor de la variable &lt;code>mountPoint&lt;/code>. Más o menos así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln">1&lt;/span>&lt;span class="c1"># Crea el diccionario de parámetros de ejecución&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">parameters&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="s2">&amp;#34;customerId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">28&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="s2">&amp;#34;mountpoint&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">mountPoint&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">6&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="c1"># Ejecuta el script de SQL&lt;/span>
+&lt;span class="ln">8&lt;/span>&lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">notebook&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;./Script&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3600&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">parameters&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>y vamos a cambiar nuestra sentencia de creación de base de datos por ésto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">DbCustomer&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;$mountpoint/DbCustomer&amp;#39;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>¿Habéis visto? Ponemos &lt;code>mountpoint&lt;/code> como argumento y nos aprovechamos de la forma de trabajar de Databricks con los parámetros
+que al principio nos dio tantos quebraderos de cabeza. Dado que se va a sustituir &lt;code>mountpoint&lt;/code> por la cadena sin poner
+apóstrofes alrededor, nuestra sentencia se va a traducir en ésto:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">DbCustomer&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;/mnt/nombrecontenedor/raw/DbCustomer&amp;#39;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Me gusta esta forma de aprovechar los errores a nuestro favor aunque habrá que ver qué pasa cuando los argumentos ya no puedan
+escribirse con un dólar por delante y sea obligatorio utilizar &lt;code>getargument&lt;/code> ¿seguirá funcionando?&lt;/p>
+&lt;p>De cualquier forma, tenemos el mismo problema con el nombre de base de datos así que
+vamos a hacer algo similar, le vamos a pasar un argumento más a nuestro script de SQL con el nombre de base de datos:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1"># Creamos un nombre único de base de datos con el nombre del contenedor&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="n">dbName&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;DbCustomer&amp;#34;&lt;/span> &lt;span class="o">+&lt;/span> &lt;span class="n">containerName&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="c1"># Crea el diccionario de parámetros de ejecución&lt;/span>
+&lt;span class="ln"> 4&lt;/span>&lt;span class="n">parameters&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="s2">&amp;#34;customerId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">28&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="s2">&amp;#34;mountpoint&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="n">mountPoint&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="s2">&amp;#34;dbname&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">dbName&lt;/span>
+&lt;span class="ln"> 8&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln"> 9&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="c1"># Ejecuta el script de SQL&lt;/span>
+&lt;span class="ln">11&lt;/span>&lt;span class="n">dbutils&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">notebook&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">run&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;./Script&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="mi">3600&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">parameters&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y ahora sólo tenemos que utilizar ese argumento en todas nuestras consultas (incluyendo la creación):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">dbname&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;$mountpoint/$dbname&amp;#39;&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">dbname&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Orders&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Perfecto, ahora funciona correcta e independientemente en los clusters.&lt;/p>
+&lt;p>Aún así, tenemos un problema: ¿qué pasa en local? En Spark Sql los nombres de argumentos
+utilizan, digámoslo así, el método SQL. Por tanto, me pondrá apóstrofes alrededor del valor del argumento y me estropeará todo mi código.&lt;/p>
+&lt;p>En realidad, dado que BauDbStudio lo desarrollamos nosotros, no nos cuesta demasiado &amp;quot;trucar&amp;quot; un poco el código de ejecución.
+Esa es una ventaja de desarrollar nuestras propias herramientas (hay muchas desventajas pero por ahora centrémonos en lo bueno).&lt;/p>
+&lt;p>Digamos simplemente que en nuestro código en local tenemos estas sentencias:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbName&lt;/span>&lt;span class="err">}}&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;{{MountPoint}}/{{DbName}}&amp;#39;&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbName&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Orders&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="k">WHERE&lt;/span> &lt;span class="n">CustomerId&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">CustomerId&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y tenemos un archivo de parámetros de este estilo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;Constant.MountPath&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/mnt/c/Data&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="nt">&amp;#34;Constant.DbCompute&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;DbCompute_Cust&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="nt">&amp;#34;CustomerId&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;PER_20&amp;#34;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Cuando se ejecuta desde BauDbStudio, se sustituyen las cadenas de tipo &lt;code>{{argumento}}&lt;/code> por los parámetros identificados como
+constantes en el JSON (en este caso &lt;code>Constant.argumento&lt;/code>) y los argumentos como &lt;code>CustomerId&lt;/code> por los parámetros con
+el mismo nombre en el archivo JSON (en este caso &lt;code>CustomerId&lt;/code>).&lt;/p>
+&lt;p>Nuestro proceso de conversión a notebooks hace algo similar, sustituye las constantes por el nombre del argumento que se
+le va a pasar en el archivo Python y los parámetros por llamadas a &lt;code>getArgument&lt;/code> como hemos visto antes.&lt;/p>
+&lt;p>Eso nos permite tanto ejecutar en local como en los clusters sin hacer modificaciones a nuestro código.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> Por supuesto, esto debería estar explicado en el manual de BauDbStudio. Un poco de paciencia, por favor.&lt;/p>
+&lt;h2 id="conclusiones">Conclusiones&lt;/h2>
+&lt;p>Para terminar: Databricks es una gran herramienta pero como toda gran herramienta tiene sus cosas.&lt;/p>
+&lt;p>Este es nuestro modo de trabajo, así hemos solucionado los errores que nos hemos ido encontrando a lo largo de estos dos últimos
+meses creando un entorno local para nuestros desarrollos en Spark Sql y ejecutando con clusters y notebooks de Databricks.
+Espero que sirva de ayuda a quienes se encuentre con problemas similares.&lt;/p>
+&lt;p>Como decía en varios puntos del artículo, si alguien tiene mejores soluciones o me he equivocado en algo, por favor, estoy más
+que dispuesto a corregir este texto con sus comentarios.&lt;/p>
+&lt;p>Y por supuesto, si alguien quiere más información, sólo tiene que pedirla.&lt;/p></description></item><item><title>Experimentando con Spark.Net</title><link>http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net/</guid><description>
+&lt;p>Sé que últimamente lo digo mucho, pero estoy aprendiendo a programar con Spark utilizando sobre todo
+Spark Sql y algo de PySpark.&lt;/p>
+&lt;p>Llevo unos meses viendo de lejos la posibilidad de utilizar C# con Spark mediante el nuevo (para mí) proyecto de Microsoft
+&lt;a href="https://dotnet.microsoft.com/apps/data/spark">.Net for Apache Spark&lt;/a> (a partir de ahora Spark.Net).&lt;/p>
+&lt;p>Hasta ahora parecía demasiado básico, pero tras ver los últimos vídeos y, sobre todo, la integración con Databricks que
+parece tener buena pinta, me he decidido a experimentar un poco. No tengo problema en programar con Python o Scala, pero
+me siento mucho más cómodo con C#, por tanto, para mí al menos, escribir aplicaciones en mi lenguage preferido es una
+ventaja (siempre y cuando funcione, por supuesto).&lt;/p>
+&lt;p>Mi intención era seguir el &lt;a href="https://docs.microsoft.com/es-es/dotnet/spark/tutorials/get-started">primer tutorial&lt;/a>,
+un ejemplo que todo el que haya trabajado con PySpark conoce: contar las palabras de un archivo. Sencillo.&lt;/p>
+&lt;p>El tutorial está bien, excepto que ya tengo &lt;a href="http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark">instalado Spark en WSL&lt;/a> y
+por tanto las instrucciones de cómo instalar Spark.Net sobre Windows no me sirven, de hecho me han confundido más que ayudar, así
+que comencemos por instalar Spark.Net en nuestro WSL.&lt;/p>
+&lt;h2 id="instalación-de-net-for-apache-spark-sobre-wsl">Instalación de .Net for Apache Spark sobre WSL&lt;/h2>
+&lt;p>Supongo que los programadores de .Net en Linux ya habrán pasado por ésto, pero yo que soy nuevo en esto de WSL aún no había instalado
+.Net Core en mi sistema. Por tanto lo primero es instalarlo. Las instrucciones de instalación son las mismas que la
+&lt;a href="https://docs.microsoft.com/en-gb/dotnet/core/install/linux-ubuntu">instalación de .Net Core en Ubuntu&lt;/a>,
+por tanto, sigamos las instrucciones.&lt;/p>
+&lt;p>Lo primero que tenemos que hacer es añadir la clave de Microsoft a la lista de claves de confianza para el administrador de paquetes:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>wget https://packages.microsoft.com/config/ubuntu/20.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+&lt;span class="ln">2&lt;/span>sudo dpkg -i packages-microsoft-prod.deb
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y posteriormente, instalar el runtime de Net Core 3.1 (por supuesto, si queréis compilar utilizando WSL, deberéis instalar
+el SDK no el runtime):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>sudo apt-get update&lt;span class="p">;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="se">&lt;/span>sudo apt-get install -y apt-transport-https &lt;span class="p">&amp;amp;&lt;/span>amp&lt;span class="p">;&amp;amp;&lt;/span>amp&lt;span class="p">;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="ln">3&lt;/span>&lt;span class="se">&lt;/span>sudo apt-get update &lt;span class="p">&amp;amp;&lt;/span>amp&lt;span class="p">;&amp;amp;&lt;/span>amp&lt;span class="p">;&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="ln">4&lt;/span>&lt;span class="se">&lt;/span>sudo apt-get install -y dotnet-runtime-3.1
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En teoría eso es todo, si ejecutáis el comando &lt;code>dotnet&lt;/code> debería aparecer ya la información sobre la versión de .Net Core.&lt;/p>
+&lt;p>En mi máquina, lo anterior no funcionó. No debo ser el único porque hay una sección de problemas con APT en esta misma página de la que obtuve
+los siguientes comandos:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>sudo dpkg --purge packages-microsoft-prod &lt;span class="p">&amp;amp;&lt;/span>amp&lt;span class="p">;&amp;amp;&lt;/span>amp&lt;span class="p">;&lt;/span> sudo dpkg -i packages-microsoft-prod.deb
+&lt;span class="ln">2&lt;/span>sudo apt-get update
+&lt;span class="ln">3&lt;/span>sudo apt-get install dotnet-runtime-3.1
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Afortunadamente, esta vez funcionó sin problema y no tuve que utilizar el párrafo que continuaba el artículo
+que parecía mucho más preocupante.&lt;/p>
+&lt;p>Así pues, ya tenemos .Net Core instalado en nuestro sistema WSL, lo siguiente es descargar la versión de Linux de .Net for Apache Spark.&lt;/p>
+&lt;p>Podemos conseguir la última versión de la librería en la sección de releases de
+&lt;a href="https://github.com/dotnet/spark/releases">GitHub&lt;/a>, en concreto, podemos utilizar
+los siguientes comandos para descargar, descomprimir y mover los archivos descomprimidos a una carpeta:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>wget https://github.com/dotnet/spark/releases/download/v0.11.0/Microsoft.Spark.Worker.netcoreapp3.1.linux-x64-0.11.0.tar.gz
+&lt;span class="ln">2&lt;/span>tar xvf Microsoft.Spark.Worker.netcoreapp3.1.linux-x64-0.11.0.tar.gz
+&lt;span class="ln">3&lt;/span>sudo mv Microsoft.Spark.Worker-0.11.0/ /opt/SparkNetWorker
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>He dejado la librería sobre &lt;code>/opt/SparkNetWorker&lt;/code> pero siéntase libre de moverlo a cualquier otro lugar.&lt;/p>
+&lt;p>Por último tenemos que añadir una variable de entorno (&lt;code>DOTNET_WORKER_DIR&lt;/code>) con el directorio donde se encuentra .Net for Apache Spark. Para
+eso editamos el archivo de configuración:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>nano ~/.bashrc
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Al final de ese archivo, añadimos la variable con la siguiente línea:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">DOTNET_WORKER_DIR&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="s2">&amp;#34;/opt/SparkNetWorker&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, recuerde cambiar el nombre de directorio si ha dejado las librerías en otro lugar.&lt;/p>
+&lt;p>Por último sólo debemos refrescar la configuración:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nb">source&lt;/span> ~/.bashrc
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En teoría, ya está todo instalado, sólo nos queda crear una aplicación que podamos ejecutar.&lt;/p>
+&lt;h2 id="creación-de-una-aplicación-con-sparknet">Creación de una aplicación con Spark.Net&lt;/h2>
+&lt;p>Para este ejemplo, he seguido los pasos del &lt;a href="https://docs.microsoft.com/es-es/dotnet/spark/tutorials/get-started">tutorial&lt;/a> que mencionaba al principio
+del artículo, pero por si acaso no lo tiene a mano:&lt;/p>
+&lt;ul>
+&lt;li>Cree un nuevo proyecto de consola con .Net Core 3.1 (yo lo he llamado &lt;strong>TestSparkNet&lt;/strong> pero de nuevo...)&lt;/li>
+&lt;li>Añada el paquete Nuget &lt;code>Microsoft.Spark&lt;/code>.&lt;/li>
+&lt;li>Sobrescriba el contenido del archivo &lt;code>Program.cs&lt;/code> con este código:&lt;/li>
+&lt;/ul>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">Microsoft.Spark.Sql&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 3&lt;/span>
+&lt;span class="ln"> 4&lt;/span>&lt;span class="k">namespace&lt;/span> &lt;span class="nn">TestSparkNet&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="k">class&lt;/span> &lt;span class="nc">Program&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">args&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="c1">// Create a Spark session.
+&lt;/span>&lt;span class="ln">11&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">SparkSession&lt;/span> &lt;span class="n">spark&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">SparkSession&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">Builder&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">AppName&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;word_count_sample&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">GetOrCreate&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">15&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="c1">// Create initial DataFrame.
+&lt;/span>&lt;span class="ln">17&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">DataFrame&lt;/span> &lt;span class="n">dataFrame&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">spark&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">Text&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;input.txt&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">18&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="c1">// Count words.
+&lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">DataFrame&lt;/span> &lt;span class="n">words&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">dataFrame&lt;/span>
+&lt;span class="ln">21&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">Select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Functions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Split&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Functions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Col&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;value&amp;#34;&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="s">&amp;#34; &amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">Alias&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;words&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">Select&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Functions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Explode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Functions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Col&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;words&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">23&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">Alias&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;word&amp;#34;&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">GroupBy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;word&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">Count&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="p">.&lt;/span>&lt;span class="n">OrderBy&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Functions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Col&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;count&amp;#34;&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">Desc&lt;/span>&lt;span class="p">());&lt;/span>
+&lt;span class="ln">27&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="c1">// Show results.
+&lt;/span>&lt;span class="ln">29&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">words&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Show&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">30&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="c1">// Stop Spark session.
+&lt;/span>&lt;span class="ln">32&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">spark&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Stop&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">33&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">34&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">35&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El código anterior lee un archivo llamado &lt;code>input.txt&lt;/code>, así que una vez compilado, cree ese archivo en el directorio de depuración
+e introduzca algunas líneas de texto.&lt;/p>
+&lt;p>Antes de continuar, echemos un vistazo a los archivos del proyecto:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/experimento-spark-net/images/Archivos-proyecto.jpg" alt="Archivos de proyecto" title="Archivos del proyecto de ejemplo">&lt;/p>
+&lt;p>Si nos fijamos, vemos que el paquete Nuget ha añadido dos paquetes jar a nuestro
+proyecto: uno de ellos es importante en la ejecución de la aplicación que veremos en el siguiente paso.&lt;/p>
+&lt;h2 id="último-paso-ejecutar-sobre-spark">Último paso: ejecutar sobre Spark&lt;/h2>
+&lt;p>Lo último que nos queda es compilar y ejecutar la aplicación en Spark. Para ello, nos colocamos en el directorio donde se ha
+compilado la aplicación y utilizamos el comando &lt;code>spark-submit&lt;/code> de esta forma:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>spark-submit &lt;span class="se">\
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="se">&lt;/span> --class org.apache.spark.deploy.dotnet.DotnetRunner &lt;span class="se">\
+&lt;/span>&lt;span class="ln">3&lt;/span>&lt;span class="se">&lt;/span> --master &lt;span class="nb">local&lt;/span> &lt;span class="se">\
+&lt;/span>&lt;span class="ln">4&lt;/span>&lt;span class="se">&lt;/span> microsoft-spark-2.4.x-0.11.0.jar &lt;span class="se">\
+&lt;/span>&lt;span class="ln">5&lt;/span>&lt;span class="se">&lt;/span> dotnet TestSparkNet.dll
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Si os fijáis, &lt;code>microsoft-spark-2.4.x-0.11.0.jar&lt;/code> es uno de los paquetes jar que nos ha instalado el paquete Nuget. Parece previsible
+pensar que en el futuro esta versión cambie. Téngalo en cuenta si lee este artículo dentro de un par de meses.&lt;/p>
+&lt;p>Y tras unos segundos de incertidumbre con infinidad de líneas de log en la pantalla (Spark puede ser bastante dicharachero en algunos casos),
+podemos ver el resultado de la aplicación:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/experimento-spark-net/images/Resultado-aplicacion.jpg" alt="Resultado de la aplicación Spark.Net" title="Resultados de la aplicación de ejemplo">&lt;/p>
+&lt;p>Sí, sé que no parece muy impresionante, pero para ser el primer experimento no está mal y al fin y al cabo parece demostrado que podemos
+ejecutar aplicaciones .Net sobre Spark en WSL sin complicarnos demasiado la vida.&lt;/p>
+&lt;p>Seguiré estudiando un poco más y preparando aplicaciones más complejas. Continuaremos informando.&lt;/p></description></item><item><title>Instalación de Spark en local</title><link>http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark/</guid><description>
+&lt;p>En estos últimos meses, me he tenido que enfrentar con mayor o menor éxito con &lt;a href="https://spark.apache.org/">Spark&lt;/a>.&lt;/p>
+&lt;p>A muy alto nivel, Spark es un motor de proceso distribuido al que podemos mandar trabajos utilizando Python, Scala, R y SQL.&lt;/p>
+&lt;p>Estos días he estado instalándolo sobre mi equipo con WSL y creo que es interesante detallar los pasos seguidos (sobre todo
+para no olvidarme).&lt;/p>
+&lt;p>En primer lugar, aunque se puede instalar directamente sobre Windows, me interesaba configurarlo sobre WSL más que nada por
+no 'ensuciar' mi sistema. Si algo sale mal, simplemente puedo desinstalar el sistema Linux sin tener que hacer nada más. Supongo
+que alguien lo considerará una herejía pero en este caso he utilizado WSL más como contenedor que como herramienta de trabajo.&lt;/p>
+&lt;p>Lo primero que tenemos que hacer por tanto es instalar WSL, para ello vamos a &lt;strong>Configuración &amp;gt; Aplicaciones &amp;gt;
+Programas y características&lt;/strong> y seleccionamos *&lt;em>Activar o desactivar las características de Windows&lt;/em>, donde debemos
+activar, por supuesto, el &lt;strong>Subsistema de Windows para Linux&lt;/strong> (que no sé vosotros, pero opino que debería
+llamarse al revés).&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Caracteristicas-de-Windows.jpg" alt="Activar o desactivar las características de Windows" title="Activar o desactivar las características de Windows">&lt;/p>
+&lt;p>Una vez instalado (que si no me equivoco, necesita un reinicio)source-code/big-data/big-data/al Store de Windows y seleccionamos un sistema
+Linux. Yo he elegido Ubuntu, más que nada por el instalador de paquetes, pero sentíos libres:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Ubuntu.jpg" alt="Ubuntu" title="Ubuntu">&lt;/p>
+&lt;p>Cuando esté instalado, al ejecutarlo, nos pedirá el usuario y la clave del administrador y a partir de ese momento podemos trabajar
+con el shell sin problemas.&lt;/p>
+&lt;p>Supongo que es cosa de costumbre, pero particularmente prefiero trabajar con &lt;a href="https://cmder.net/">cmder&lt;/a> abriendo una consola de tipo WSL en lugar de directamente
+con la propia consola de Ubuntu, más que nada por los comandos de copiar / pegar y cosas por el estilo pero supongo que es cuestión
+de gustos.&lt;/p>
+&lt;p>A partir de ahora, podemos ejecutar los comandos de instalación.&lt;/p>
+&lt;p>Primero vamos a actualizar tanto el instalador de paquetes como el sistema:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>sudo apt update
+&lt;span class="ln">2&lt;/span>sudo apt -y upgrade
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y ahora vamos a instalar Java (recordemos que Spark está escrito en Scala, por tanto necesitamos el JVM):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>sudo apt install default-jre
+&lt;span class="ln">2&lt;/span>sudo apt install openjdk-11-jre-headless
+&lt;span class="ln">3&lt;/span>sudo apt install openjdk-8-jre-headless
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Ahora ya podemos instalar Spark. Para ello vamos a seleccionar la versión desde la
+&lt;a href="https://spark.apache.org/downloads.html">página de descargas&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Download-spark.jpg" alt="Página de descargas de Spark" title="Página de descargas de Spark">&lt;/p>
+&lt;p>Yo he elegido la versión 2.4.4 con Hadoop2.7 (spark-2.4.4-bin-hadoop2.7) así que vamos a descargarlo, descomprimirlo y dejarlo
+en un directorio un poco más amigable:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>wget https://www-us.apache.org/dist/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz
+&lt;span class="ln">2&lt;/span>tar xvf spark-2.4.4-bin-hadoop2.7.tgz
+&lt;span class="ln">3&lt;/span>sudo mv spark-2.4.4-bin-hadoop2.7/ /opt/spark
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por si alguien se lo pregunta, Spark no necesita Hadoop instalado para funcionar, pero sí que necesita las clases dsource-code/big-data/big-data/eso es lo que hace referencia el nombre de archivo. Si queréis utilizar Hadoop lo tenéis que instalar aparte y en ese
+caso sí podríais descargar la versión de Spark sin Hadoop en el nombre.&lt;/p>
+&lt;p>Pues vamos a configurar Spark, para ello abrimos el archivo de configuración:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>nano ~/.bashrc
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> si tenéis instalado Visual Studio Code también podéis ejecutar code ~/.bashrc&lt;/p>
+&lt;p>Al final de este archivo debemos insertar estas líneas:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">SPARK_HOME&lt;/span>&lt;span class="o">=&lt;/span>/opt/spark
+&lt;span class="ln">2&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">PATH&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="nv">$PATH&lt;/span>:&lt;span class="nv">$SPARK_HOME&lt;/span>/bin:&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin
+&lt;span class="ln">3&lt;/span>&lt;span class="nb">export&lt;/span> &lt;span class="nv">JAVA_HOME&lt;/span>&lt;span class="o">=&lt;/span>&lt;span class="s2">&amp;#34;/usr/lib/jvm/java-8-openjdk-amd64&amp;#34;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Las dos primeras configuran el directorio de Spark y lo añaden al entorno. La última configura la versión de Java, parece ser
+que Spark 2.4 no se lleva bien con Java 11.&lt;/p>
+&lt;p>Sólo nos queda refrescar la configuración:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nb">source&lt;/span> ~/.bashrc
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y estamos ya preparados. Spark ya está instalado, sólo nos queda ponerlo en marcha.&lt;/p>
+&lt;p>Primero vamos a arrancar un nodo master:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>start-master.sh
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>A partir de este momento podemos abrir un navegador para ver la interface de usuario sobre &lt;code>localhost:8080&lt;/code>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-UI-master.jpg" alt="Interface de usuario de master" title="Interface de usuario de master">&lt;/p>
+&lt;p>Abrir el navegador (al menos la primera vez), es importante porque nos va a dar la dirección del nodo master que vamos
+a necesitar a la hora de añadir nodos al cluster. En mi caso: &lt;code>spark://jbautistam-PC.localdomain:7077&lt;/code> que podéis ver
+en la cabecera en negrita.&lt;/p>
+&lt;p>Ahora ya podemos añadir un nodo de trabajo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>start-slave.sh spark://dirección del nodo master:7077
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, este es un nodo que corre sobre mi máquina pero para añadir nodos en otras máquinas el proceso es el mismo.&lt;/p>
+&lt;p>Y ya podemos ver el nodo worker en la UI:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-UI-Worker.jpg" alt="Interface de usuario con un nodo master y otro worker" title="Interface de usuario con un nodo master y otro worker">&lt;/p>
+&lt;p>Para el futuro, cuando queramos detener los nodos utilizaremos estas instrucciones:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/stop-slave.sh
+&lt;span class="ln">2&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/stop-master.sh
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Un par de cosas más, podéis abrir la consola de Spark con:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>spark-shell
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-shell.jpg" alt="Shell de Spark" title="Shell de Spark">&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> para salir, escribid &lt;code>:quit&lt;/code> (de nada).&lt;/p>
+&lt;p>Esta es la consola predefinida, con Scala, pero si sois más de Python, podéis instalar PySpark utilizando pip:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>sudo apt install python-pip
+&lt;span class="ln">2&lt;/span>pip install pyspark
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> la primera instrucción es precisamente para instalar pip.&lt;/p>
+&lt;p>Para ejecutar la consola de Python, simplemente ejecutad &lt;code>pyspark&lt;/code>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Pyspark.jpg" alt="Pyspark" title="Pyspark">&lt;/p>
+&lt;p>Por cierto, tenéis un directorio &lt;code>examples&lt;/code> con ejemplos de aplicaciones en Scala, Python y R y algunos archivos CSV, parquet,
+Avro y json para pruebas.&lt;/p>
+&lt;h2 id="conectando-a-spark-con-jdbc">Conectando a Spark con JDBC&lt;/h2>
+&lt;p>Como hemos dicho, podemos acceder a Spark utilizando Psource-code/big-data/big-data/ y R, pero si sois como yo habréis escuchado hablar de
+Spark Sql, por eso empezó todo precisamente.&lt;/p>
+&lt;p>El caso es que la documentación de Spark es muy buena y puedes utilizar sin problemas SQL desde Python pero no hay una forma
+sencilla de ejecutar sentencias SQL sin tener que definir dataframes, RDD, UDF y todas esas cosas extrañas que le gustan a la
+gente que trabaja con datos.&lt;/p>
+&lt;p>No dudo de su utilidad, pero yo lo único que quiero es conectame a Spark y lanzarle sentencias SQL y para ello tengo que dar un
+par de pasos más.&lt;/p>
+&lt;p>Concretamente, tenemos que lanzar el servidor JDBC / ODBC ejecutando la siguiente instrucción:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/start-thriftserver.sh
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Un comentario sobre ésto, el resultado de este comando es algo así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>starting org.apache.spark.sql.hive.thriftserver.HiveThriftServer2,
+&lt;span class="ln">2&lt;/span>logging to /opt/spark/logs/spark-jbautistam-org.apache.spark.sql.hive.thriftserver.HiveThriftServer2-1-jbautistam-PC.out
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>No da ningún error aunque no funcione (al menos a mí no me lo ha dado), los errores los encontraréis en el archivo de log. Tardé
+un par de horas en encontrar que no levantaba el servicio porque la versión de Java estaba mal definida.&lt;/p>
+&lt;p>El caso es que si todo ha ido bien, ya podéis entrar en la interface de usuario de Thrift en &lt;code>localhost:4040&lt;/code>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Thrift-UI.jpg" alt="Interface de usuario Thrift" title="Interface de usuario Thrift">&lt;/p>
+&lt;p>Que parece muy interesante pero en realidad no nos permite lanzar ninguna consulta, sólo ver el estado de los trabajos (y creedme,
+la consultaréis a menudo).&lt;/p>
+&lt;p>Siempre podemos utilizar la consola con &lt;code>spark-sql&lt;/code>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-sql.jpg" alt="Spark Sql" title="Spark Sql">&lt;/p>
+&lt;p>Que francamente, acostumbrado al manager de SQL Server, tampoco me entusiasma. Pero ya que tenemos un servidor JDBC vamos a abrir
+&lt;a href="https://dbeaver.io/">DBeaver&lt;/a> contra él.&lt;/p>
+&lt;p>Si no lo habéis utilizado nunca, Dbeaver es un aplicación para administrar todo tipo de base de datos: Postgres,
+MySql, Sql Server, SqLite y sobre todo (y por lo que nos interesa) Spark.&lt;/p>
+&lt;p>Así que abrimos Dbeaver y creamos una conexión a Spark:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Conexion-dbeaver.jpg" alt="Conexión a Spark con Dbeaver" title="Conexión a Spark con Dbeaver">&lt;/p>
+&lt;p>y la configuramos:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Configuracion-dbeaver.jpg" alt="Configuracion de la conexión con Dbeaver" title="Configuracion de la conexión con Dbeaver">&lt;/p>
+&lt;p>En este caso, que voy a conectarme a mi equipo, no me hace falta usuario y contraseña pero por supuesto, se puede configurar
+en el servidor.&lt;/p>
+&lt;p>Cuando pulsemos sobre &lt;strong>Aceptar&lt;/strong>, la primera vez se descargará los drivers JDBC adecuados y nos abrirá la conexión a
+nuestro servidor:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Dbeaver-con-Spark.jpg" alt="Dbeaver conectado a Spark" title="Dbeaver conectado a Spark">&lt;/p>
+&lt;p>Ahora, ya podemos lanzar consultas SQL contra nuestro servidor Spark, por ejemplo, vamos a consultar con SQL uno de esos
+archivos parquet de ejemplo de los que hablábamos hace un rato:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">examples&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">src&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">resources&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>y vemos el resultado:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/dbeaver-query.jpg" alt="Resultado consulta con Dbeaver" title="Resultado consulta con Dbeaver">&lt;/p>
+&lt;p>También podemos ir a la consola de Thrift para ver cómo se ha ejecutado todo:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Thrift-jobs.jpg" alt="Información sobre procesos de Thrift" title="Información sobre procesos de Thrift">&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> la documentación de Spark Sql en la propia web de Spark es bastante reducida,
+simplemente nos redirigen a la de Hive pero para mi gusto la de
+&lt;a href="https://docs.databricks.com/spark/latest/spark-sql/index.html#sql-language-manual">Databricks&lt;/a>
+está bastante más cuidada.&lt;/p>
+&lt;p>Pues eso es todo, en poco más de 20 minutos tenemos un entorno de Spark montado al que podemos acceder no sólo con
+Python y Scala si no también con SQL.&lt;/p></description></item><item><title>Intérprete de scripts SQL</title><link>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</guid><description>
+&lt;p>Siempre he defendido SQL como un lenguaje ideal para el tratamiento de datos con una salvedad: la falta de instrucciones
+imperativas en el estándar.&lt;/p>
+&lt;p>SQL es un lenguaje declarativo, de ahí viene realmente su potencia: ejecutar una instrucción indicando lo que deseo obtener no
+cómo se va a obtener.&lt;/p>
+&lt;p>Funciona aunque a los programadores, acostumbrados a lenguajes imperativos, se nos suele dar bastante mal cuando nos quitan &lt;code>for&lt;/code>,
+&lt;code>if&lt;/code> y similares. Una vez te das cuenta que para trabajar con SQL debes olvidar los bucles y pensar en bloques de datos, todo va rodado.&lt;/p>
+&lt;p>Desgraciadamente, en ocasiones necesitamos instrucciones como &lt;code>if&lt;/code>, &lt;code>while&lt;/code>, declaraciones de variables, etc...
+Hay formas de hacerlo utilizando SQL puro pero suelen ser bastante complicadas, por ejemplo, ¿quién sabría
+decirme qué hace esta instrucción escrita en Spark Sql?&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">date_add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">Date&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CONCAT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">CAST&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">Year&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">Current_Date&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">string&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="s1">&amp;#39;-01-01&amp;#39;&lt;/span>&lt;span class="p">)),&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">Counter&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="nb">Date&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">Counter&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp1&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp2&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp3&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp4&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp5&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Aunque no lo parezca, es sencillo: está obteniendo los días entre el uno de enero de hace cinco años hasta una fecha indeterminada (tendría
+que ponerme a contar, lo siento). Es decir, esa serie de &lt;code>SELECT / CROSS JOIN / UNION ALL&lt;/code>, junto con la función de ventana
+&lt;code>Row_Number&lt;/code> sirven para definir un contador de 1 a n (de nuevo, me tendría que poner a contar).&lt;/p>
+&lt;p>Pero que se pueda, no implica que sea fácil, por eso la mayoría de los gestores de bases de datos relacionales avanzados incorporan
+un lenguaje imperativo: SQL Server tiene TSql, Oracle tiene su PL/SQL, etc...&lt;/p>
+&lt;p>Spark lo soluciona de una forma diferente, además de escribir sentencias en Spark Sql, podemos embeber Spark Sql en scripts de Python, la
+combinación perfecta. Siempre que sepas Python, claro. No es nuevo, es lo que hacemos en la mayoría de los lenguajes cuando lanzamos
+una sentencia SQL contra una conexión a base de datos.&lt;/p>
+&lt;p>Pero dejémonos de introducciones ¿a qué viene todo ésto? Pues todo esto viene a que mientras programo
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">BauDbStudio&lt;/a>, cuánto más ejecuto contra Spark Sql, más me
+doy cuenta que necesito un lenguaje imperativo. Echo de menos los &lt;code>if&lt;/code>, &lt;code>for&lt;/code>, &lt;code>while&lt;/code> y demás. No siempre, pero cuando
+hace falta, tengo que reconocer que cuesta horrores pasarlo por alto.&lt;/p>
+&lt;p>Podría haber elegido la opción de ejecutar Python en &lt;strong>BauDbStudio&lt;/strong>, hay librerías para hacerlo pero ¿qué ocurriría con
+otros gestores de bases de datos como SqLite o Postgress?, no me acababa de convencer (aunque no descarto acabar haciéndolo).&lt;/p>
+&lt;p>La otra forma era definir mi propio lenguaje imperativo e interpretarlo desde &lt;strong>BauDbStudio&lt;/strong>. Esa fue la opción que elegí, por cacharrear, ya sabéis.&lt;/p>
+&lt;p>Aún está en fase de pruebas, pero ya podemos escribir scripts como éste:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="ln"> 1&lt;/span>declare int valor = 20;
+&lt;span class="ln"> 2&lt;/span>
+&lt;span class="ln"> 3&lt;/span>if valor &amp;gt; 10
+&lt;span class="ln"> 4&lt;/span>{
+&lt;span class="ln"> 5&lt;/span> &amp;lt;%
+&lt;span class="ln"> 6&lt;/span> DROP TABLE IF EXISTS {{DbCompute}}.TestScript
+&lt;span class="ln"> 7&lt;/span> GO
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> CREATE TABLE {{DbCompute}}.TestScript AS
+&lt;span class="ln">10&lt;/span> SELECT *
+&lt;span class="ln">11&lt;/span> FROM {{DbCompute}}.Ventas
+&lt;span class="ln">12&lt;/span> WHERE Cantidad &amp;gt; #valor
+&lt;span class="ln">13&lt;/span> GO
+&lt;span class="ln">14&lt;/span> %&amp;gt;
+&lt;span class="ln">15&lt;/span>}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como se puede ver, es una mezcla entre los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> que teníamos
+hasta ahora en &lt;strong>BauDbStudio&lt;/strong> con instrucciones SQL separadas por comandos &lt;code>GO&lt;/code>.&lt;/p>
+&lt;p>Por el momento el lenguaje permite lo básico:&lt;/p>
+&lt;ul>
+&lt;li>Declaración de variables tipadas&lt;/li>
+&lt;li>Cálculo de expresiones&lt;/li>
+&lt;li>Definición de funciones&lt;/li>
+&lt;li>Instrucciones condicionales (if, else)&lt;/li>
+&lt;li>Instrucciones iterativas (for, while, do... while)&lt;/li>
+&lt;li>Llamada a funciones&lt;/li>
+&lt;li>Declaración de funciones predefinidas, es decir, aquellas que va a ejecutar el programa principal, no el intérprete (por ejemplo, print, dateAdd, ...)&lt;/li>
+&lt;li>Ejecución de sentencias SQL&lt;/li>
+&lt;/ul>
+&lt;p>Suficiente para tener un lenguaje iterativo con SQL embebido para, en teoría, cualquier gestor de base de datos integrado en
+&lt;strong>BauDbStudio&lt;/strong> (en este momento, SqLite, SQL Server, PostgreSql, MySql y, por supuesto, Spark).&lt;/p>
+&lt;p>Estoy en fase de pruebas y moderadamente esperanzado. En un mes (modificando otros intérpretes que había desarrollado en el pasado), el
+código ha avanzado mucho, ejecuta correctamente aunque le falta pulir algunos detalles como el paso de parámetros y cosas por
+el estilo que aún dan algo de guerra.&lt;/p>
+&lt;p>Digamos que por ahora, el lenguaje ha quedado un poco &lt;em>primitivo&lt;/em>, tenemos sentencias &lt;code>declare&lt;/code> o &lt;code>let&lt;/code> o &lt;code>call&lt;/code> en lugar de inferir
+que estamos en una declaración de tipos o una variable o una llamada a función (ahora interpreta el código a partir de palabras reservadas).
+También obliga a que las sentencias iterativas y condicionales (&lt;code>if&lt;/code>, &lt;code>while&lt;/code>, ...) estén dentro de un bloque de sentencias (con llaves) aunque
+sólo tengan una sentencia. Supongo que el lenguaje evolucionará, pero por ahora era la forma más sencilla.&lt;/p>
+&lt;h2 id="dónde-nos-deja-esto-con-databricks">¿Dónde nos deja esto con &lt;strong>DataBricks&lt;/strong>?&lt;/h2>
+&lt;p>Actualmente puedo ejecutar en local las instrucciones de mi programa sin problema pero esto jamás va a poder subir a &lt;strong>Databricks&lt;/strong>. Es
+imposible que mi nuevo lenguaje se ejecute en ese entorno.&lt;/p>
+&lt;p>Podríamos hacer una cosa: reproducir el intérprete en Python de forma que recogiera el script y lo interpretara en tiempo de ejecución en
+Databricks. Por supuesto no lo voy a hacer, entre otras cosas porque Python no es mi fuerte. También lo podríamos hacer utilizando
+&lt;a href="http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net">Spark.Net&lt;/a> con C# pero no creo que por hoy por hoy tenga los conocimientos
+suficientes como para meterme en ese sembrao.&lt;/p>
+&lt;p>La segunda opción (que me parece la mejor) es transpilar.&lt;/p>
+&lt;p>Como sabemos, la primera fase de la interpretación es el análisis sintáctico que devuelve una colección de sentencias y
+expresiones en un lenguaje interno. La idea es transpilar este grupo de sentencias a un notebook de Python para databricks
+con Spark Sql inmerso. Algo así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-Python" data-lang="Python">&lt;span class="ln"> 1&lt;/span>&lt;span class="n">valor&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">20&lt;/span>
+&lt;span class="ln"> 2&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">valor&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="n">spark&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sql&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;DROP TABLE IF EXISTS DbCompute.TestScript&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="n">spark&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sql&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&amp;#39;&amp;#39;CREATE TABLE {{DbCompute}}.TestScript AS
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="s1"> SELECT *
+&lt;/span>&lt;span class="ln"> 7&lt;/span>&lt;span class="s1"> FROM {{DbCompute}}.Ventas
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="s1"> WHERE Cantidad &amp;gt; {}
+&lt;/span>&lt;span class="ln"> 9&lt;/span>&lt;span class="s1"> &amp;#39;&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="n">valor&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Ni que decir tiene que eso todavía ni lo he empezado pero la teoría es que debería funcionar.&lt;/p>
+&lt;h2 id="pruebas-unitarias">Pruebas unitarias&lt;/h2>
+&lt;p>Y una pregunta lanzada al viento ¿cómo se crean pruebas unitarias para un intérprete?&lt;/p>
+&lt;p>La teoría es que a partir de un script de entrada debemos obtener una lista de sentencias que vienen del analizador léxico y sintáctico.
+Podemos comprobar que esas sentencias sean las que esperamos, pero así estaríamos comprobando los analizadores, no el intérprete.&lt;/p>
+&lt;p>¿Cómo probamos entonces que la ejecución de un programa interpretado pasa por todos los puntos y obtiene los resultados correctos?&lt;/p>
+&lt;p>Pues no me parece fácil. En mi caso lo he solucionado aprovechando la forma en que está concebido el intérprete.&lt;/p>
+&lt;p>El intérprete en realidad no sabe nada de SQL. Por dos razones: en primer lugar porque el SQL de cada gestor de base de datos es
+ligeramente diferente (los estándares, ya sabéis), por tanto escribir un intérprete común es prácticamente imposible.
+El intérprete sólo reconocer cadenas de comandos SQL (las que van entre &lt;code>&amp;lt;%&lt;/code> y &lt;code>%&lt;/code>&amp;gt;) y lanza una petición al procesador principal.&lt;/p>
+&lt;p>Lo mismo ocurre con las funciones intrínsecas como &lt;code>print&lt;/code>, simplemente lanza una llamada al procesador.&lt;/p>
+&lt;p>Por tanto, en este código:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="ln"> 1&lt;/span>declare int valor = 20;
+&lt;span class="ln"> 2&lt;/span>
+&lt;span class="ln"> 3&lt;/span>if valor &amp;gt; 10
+&lt;span class="ln"> 4&lt;/span>{
+&lt;span class="ln"> 5&lt;/span> &amp;lt;%
+&lt;span class="ln"> 6&lt;/span> DROP TABLE IF EXISTS {{DbCompute}}.TestScript
+&lt;span class="ln"> 7&lt;/span> GO
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> CREATE TABLE {{DbCompute}}.TestScript AS
+&lt;span class="ln">10&lt;/span> SELECT *
+&lt;span class="ln">11&lt;/span> FROM {{DbCompute}}.Ventas
+&lt;span class="ln">12&lt;/span> WHERE Cantidad &amp;gt; #valor
+&lt;span class="ln">13&lt;/span> GO
+&lt;span class="ln">14&lt;/span> %&amp;gt;
+&lt;span class="ln">15&lt;/span>}
+&lt;span class="ln">16&lt;/span>
+&lt;span class="ln">17&lt;/span>call print(&amp;#34;valor: &amp;#34; + valor);
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Se va a llamar al procesador principal dos veces: la primera con el comando SQL, la segunda con un mensaje a imprimir.&lt;/p>
+&lt;p>Pero ¿quién es este procesador principal? En mi caso, cualquier clase que cumpla con una &lt;strong>interface&lt;/strong> con, por ahora, dos métodos:
+ejecutar SQL y ejecutar función.&lt;/p>
+&lt;p>Así que para hacer las pruebas unitarias, simplemente tengo que definir una clase que cumpla con la interface y vaya almacenando las
+sentencias lanzadas con sus parámetros y compararlas con un resultado.&lt;/p>
+&lt;p>Por ahora, mis pruebas unitarias consisten en métodos que recogen dos archivos: el script de entrada y los resultados previstos.&lt;/p>
+&lt;p>Para hacer la prueba, simplemente se carga el script, se ejecuta y se comprueba que los resultados ejecutados sean los mismos que
+los resultados previstos.&lt;/p>
+&lt;p>En este momento aún es sencillo, los scripts de pruebas son bastante pequeños pero no sé si evolucionará adecuadamente para
+scripts más grandes o si necesito probar realmente scripts más grandes o sólo pequeños trozos de programas.&lt;/p>
+&lt;p>¿Alguna idea sobre esta cuestión en particular?&lt;/p>
+&lt;h2 id="final">Final&lt;/h2>
+&lt;p>Pues gracias por llegar hasta aquí.&lt;/p>
+&lt;p>Aún estoy trabajando en ello, supongo que estos quince días pasará por todas las pruebas necesarias, corregiré los flecos y comenzaré
+el transpilador.&lt;/p>
+&lt;p>Hasta entonces, perdonadme que aún no muestre el código, de alguna forma desconocida he acabado con tres intérpretes:
+uno para sentencias SQL normales, otro para ETLs y otro para scripts del nuevo lenguaje (que por ahora he llamado SQLx). Un poco de
+limpieza no le va a venir mal antes de salir al público.&lt;/p></description></item></channel></rss>

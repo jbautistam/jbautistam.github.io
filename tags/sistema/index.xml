@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Sistema on jbautistam</title><link>http://jbautistam.github.io/tags/sistema/</link><description>Recent content in Sistema on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/sistema/index.xml" rel="self" type="application/rss+xml"/><item><title>Añadir una aplicación al inicio de Windows en C#</title><link>http://jbautistam.github.io/articles/development/inicio-windows-c/inicio-windows-c/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/inicio-windows-c/inicio-windows-c/</guid><description>
+&lt;p>Para que una de nuestras aplicaciones (o cualquier ejecutable) se ejecute al &lt;strong>inicio de Windows&lt;/strong> lo único realmente
+necesario es añadir la ruta de la aplicación a la clave &lt;code>HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run&lt;/code>
+del registro.&lt;/p>
+&lt;p>Así, podríamos utilizar una rutina como esta:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">AddStartApp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strExecutable&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">RegistryKey&lt;/span> &lt;span class="n">objKey&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Registry&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentUser&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">OpenSubKey&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="n">objKey&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SetValue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strName&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strExecutable&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En la rutina anterior tenemos dos parámetros:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>strName&lt;/code>: es el nombre del elemento dentro de la rama con el que vamos a identificar al ejecutable. Este nombre debe ser
+único, si ya existe en esa rama del &lt;strong>registro&lt;/strong> lo que ocurriría es que sobreescribiríamos el valor.&lt;/li>
+&lt;li>&lt;code>strExecutable&lt;/code>: es el nombre del archivo ejecutable (incluyendo el directorio) que deseamos ejecutar al inicio de Windows.&lt;/li>
+&lt;/ul>
+&lt;p>Eliminar la aplicación del inicio es igualmente sencillo, simplemente tenemos que eliminar el valor de la clave de registro anterior:&lt;/p>
+&lt;p>Hay que tener en cuenta que al utilizar &lt;code>Registry.CurrentUser&lt;/code> estamos obteniendo la rama de registro del usuario, es decir,
+añadimos la aplicación al inicio de la sesión de ese usuario, si lo que deseamos es añadir la aplicación al inicio de sesión
+de todos los usuarios de la máquina, debemos utilizar la misma clave pero con &lt;code>Registry.LocalMachine&lt;/code>.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">DeleteStartApp&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strName&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">RegistryKey&lt;/span> &lt;span class="n">objKey&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Registry&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">LocalMachine&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">OpenSubKey&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="n">objKey&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">deletevalue&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Borrar un archivo y enviarlo la papelera de reciclaje en C#</title><link>http://jbautistam.github.io/articles/development/papelera-reciclaje/papelera-reciclaje/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/papelera-reciclaje/papelera-reciclaje/</guid><description>
+&lt;p>Las funciones de C# para borrar archivos y directorio sólo permiten eliminar los datos, no nos permiten
+enviarlos a la &lt;strong>papelera de reciclaje&lt;/strong>.&lt;/p>
+&lt;p>Para borrar el archivo enviándolo a la papelera de reciclaje, debemos utilizar las funciones de la API, en concreto
+el método &lt;strong>SHFileOperation&lt;/strong>.&lt;/p>
+&lt;p>Para ello, primero definimos las funciones y las constantes que se utilizan en la llamada a la API:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="na">[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto, Pack = 1)]&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">struct&lt;/span> &lt;span class="nc">SHFILEOPSTRUCT&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="n">IntPtr&lt;/span> &lt;span class="n">hwnd&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="na"> [MarshalAs(UnmanagedType.U4)]&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">wFunc&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">pFrom&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">pTo&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">short&lt;/span> &lt;span class="n">fFlags&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="na"> [MarshalAs(UnmanagedType.Bool)]&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="n">fAnyOperationsAborted&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="n">IntPtr&lt;/span> &lt;span class="n">hNameMappings&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="k">public&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">lpszProgressTitle&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">14&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">15&lt;/span>&lt;span class="na">
+&lt;/span>&lt;span class="ln">16&lt;/span>&lt;span class="na">[DllImport(&amp;#34;shell32.dll&amp;#34;, CharSet = CharSet.Auto)]&lt;/span>
+&lt;span class="ln">17&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">extern&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">SHFileOperation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">ref&lt;/span> &lt;span class="n">SHFILEOPSTRUCT&lt;/span> &lt;span class="n">FileOp&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">18&lt;/span>
+&lt;span class="ln">19&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">FO_DELETE&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">3&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">20&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">FOF_ALLOWUNDO&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="n">x40&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">21&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">const&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">FOF_NOCONFIRMATION&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="n">x10&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// No pregunta al usuario
+&lt;/span>&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez definidas las funciones y las constantes, se puede borrar el archivo o directorio enviándolo a la &lt;strong>papelera de reciclaje&lt;/strong>
+de esta forma:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">SHFILEOPSTRUCT&lt;/span> &lt;span class="n">shf&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">Win32&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SHFILEOPSTRUCT&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">2&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">shf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">wFunc&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Win32&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FO_DELETE&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="n">shf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">fFlags&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Win32&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FOF_ALLOWUNDO&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="n">shf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">pFrom&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">@&amp;#34;c:\archivo.txt&amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="sc">&amp;#39;\0&amp;#39;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="sc">&amp;#39;\0&amp;#39;&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">6&lt;/span>&lt;span class="n">Win32&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SHFileOperation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">ref&lt;/span> &lt;span class="n">shf&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El parámetro &lt;strong>pFrom&lt;/strong> puede ser tanto un archivo como un directorio.&lt;/p></description></item><item><title>Codificación de archivos en Base64 C#</title><link>http://jbautistam.github.io/articles/development/conversion-base64/conversion-base64/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/conversion-base64/conversion-base64/</guid><description>
+&lt;p>Codificar una cadena en &lt;strong>Base64&lt;/strong> utilizando CSharp es un proceso bastante sencillo.&lt;/p>
+&lt;p>Simplemente debemos utilizar la función &lt;strong>ToBase64String&lt;/strong> de la clase &lt;strong>Convert&lt;/strong>.&lt;/p>
+&lt;p>Por ejemplo, para codificar el contenido de un archivo en Base64 utilizamos este
+código:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">Encode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strFileTarget&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strEncoded&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">fs&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">FileStream&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileTarget&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FileMode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Open&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FileAccess&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">filebytes&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">fs&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Length&lt;/span>&lt;span class="p">];&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="n">fs&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Read&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">filebytes&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Convert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToInt32&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">fs&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Length&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="n">strEncoded&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Convert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToBase64String&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">filebytes&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Base64FormattingOptions&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">InsertLineBreaks&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">strEncoded&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">13&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">14&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="n">pre&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>A este método, le pasamos como parámetro el archivo que deseamos codificar y nos devuelve la
+cadena codificada en Base64.&lt;/p>
+&lt;p>Decodificar una cadena en Base64 a un array de bytes es un proceso igualmente sencillo aunque
+en este caso utilizamos la función &lt;strong>FromBase64&lt;/strong> de la clase &lt;strong>Convert&lt;/strong>.&lt;/p>
+&lt;p>Si por ejemplo, deseamos grabar los datos codificados como una cadena en Base64 en un archivo decodificado,
+podemos utilizar este código:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Decode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strFileTarget&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strEncoded&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="kt">byte&lt;/span>&lt;span class="p">[]&lt;/span> &lt;span class="n">arrBytFilebytes&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Convert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FromBase64String&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strEncoded&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">stmFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">FileStream&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileTarget&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FileMode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CreateNew&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FileAccess&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">FileShare&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">None&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Write&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytFilebytes&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">arrBytFilebytes&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Length&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">11&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Contadores rendimiento</title><link>http://jbautistam.github.io/articles/development/contadores-rendimiento/contadores-rendimiento/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/contadores-rendimiento/contadores-rendimiento/</guid><description>
+&lt;p>Los contadores de rendimiento proporcionan información numérica sobre el estado de una operación del sistema operativo o
+una aplicación. Estos contadores se pueden grabar y monitorizar utilizando herramientas estándar del sistema
+(concretamente la aplicación de rendimiento de Windows que puede ejecutarse con la orden: perfmon.msc /s).&lt;/p>
+&lt;p>Aparte de visualizar los contadores del sistema, desde.NET podemos crear &lt;strong>contadores de rendimiento&lt;/strong> propios
+para nuestras aplicaciones (siempre que tengamos los permisos de administración necesarios) así como consultar los datos de
+rendimiento o eliminarlos.&lt;/p>
+&lt;p>El resto del artículo se centra en las diferentes acciones relacionadas con los &lt;strong>contadores de rendimiento&lt;/strong> a las que podemos
+acceder desde.NET:&lt;/p>
+&lt;h2 id="comprobar-si-existe-un-contador-de-rendimiento">Comprobar si existe un contador de rendimiento&lt;/h2>
+&lt;p>Cada &lt;strong>contador de rendimiento&lt;/strong> pertenece a una categoría. Tanto la categoría como sus contadores se crean al mismo tiempo,
+no es posible añadir contadores a una categoría existente.&lt;/p>
+&lt;p>Antes de crear una categoría se debería comprobar si existe, si es así, no se puede crear otra con el mismo nombre (el resultado
+será una excepción).&lt;/p>
+&lt;p>Para comprobar si existe una categoría se puede llamar el método estático &lt;strong>Exists&lt;/strong> de la clase &lt;strong>PerformanceCounterCategory&lt;/strong>.
+El valor de retorno nos indica si existe o no la categoría:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="kt">bool&lt;/span> &lt;span class="n">blnExists&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">PerformanceCounterCategory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Exists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Categoria&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="creación-de-un-contador-de-rendimiento-entero">Creación de un contador de rendimiento entero&lt;/h2>
+&lt;p>Uno de los tipos de contadores de rendimiento más habituales es del tipo de datos &lt;strong>NumberOfItems32&lt;/strong>. Este tipo de contador
+permite almacenar un valor entero de 32bits cada vez que se necesite. Si lo que deseamos es crear un único contador de este
+tipo en una categoría lo único que necesitamos es utilizar el método &lt;strong>Create&lt;/strong> de la clase &lt;strong>PerformanceCounterCategory&lt;/strong>.&lt;/p>
+&lt;p>La primera versión de este método acepta cinco argumentos: los dos primeros son cadenas para dar nombre y un texto descriptivo
+a la categoría, el tercero indica si se va a utilizar la categoría con un único contador o varios, los últimos dos
+argumentos se utilizan para añadir un nombre y un texto descriptivo para el contador.&lt;/p>
+&lt;p>En el siguiente código utilizamos el método &lt;strong>Create&lt;/strong> para añadir un contador de rendimiento en la categoría &amp;quot;Facturas&amp;quot;
+con el contador &amp;quot;Ventas facturadas&amp;quot;. Después seleccionamos el contador de rendimiento donde introducimos un valor:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">PerformanceCounterCategory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="s">&amp;#34;Contadores de rendimiento para facturación&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">PerformanceCounterCategoryType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SingleInstance&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="s">&amp;#34;Ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="s">&amp;#34;Valor de ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">6&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="n">PerformanceCounter&lt;/span> &lt;span class="n">objCounter&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">PerformanceCounter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">8&lt;/span>&lt;span class="n">objCounter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RawValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">50&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Normalmente los &lt;strong>contadores de rendimiento&lt;/strong> deberían crearse durante la instalación y asignar los valores cuando se ejecuta
+el programa. Esto nos asegura que el contador de rendimiento ya se ha dado de alta en el momento que se va a añadir un valor.&lt;/p>
+&lt;h2 id="creación-de-una-categoría-de-contadores-múltiples">Creación de una categoría de contadores múltiples&lt;/h2>
+&lt;p>Aparte de las categorías con contadores únicos también se pueden crear categorías para contadores múltiples. En estas
+categorías se crean conjuntos de contadores sobre el grupo cada uno de ellos con un nombre de instancia. El valor
+de cada uno de ellos se puede monitorizar a través de la aplicación de rendimiento.&lt;/p>
+&lt;p>El siguiente código crea una categoría (con el mismo nombre anterior) y le añade un contador, como el contador se
+define con varias instancias podemos añadir más de una sección por cada contador si utilizamos nombres diferentes.
+En este caso, se añaden dos instancias al contador &amp;quot;Ventas facturadas&amp;quot; una para la &amp;quot;Zona centro&amp;quot; y otra para
+&amp;quot;Zona norte&amp;quot;:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="n">PerformanceCounterCategory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 2&lt;/span> &lt;span class="s">&amp;#34;Contadores de rendimiento para facturación&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="n">PerformanceCounterCategoryType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">MultiInstance&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="s">&amp;#34;Ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="s">&amp;#34;Valor de ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 6&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="n">PerformanceCounter&lt;/span> &lt;span class="n">objCounterCenter&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">PerformanceCounter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Zona centro&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 8&lt;/span>&lt;span class="n">objCounterCenter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RawValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">50&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 9&lt;/span>&lt;span class="n">PerformanceCounter&lt;/span> &lt;span class="n">objCounterNorth&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">PerformanceCounter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Ventas facturadas&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Zona norte&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="n">objCounterNorth&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RawValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">80&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="creación-de-otros-tipos-de-contadores-de-rendimiento">Creación de otros tipos de contadores de rendimiento&lt;/h2>
+&lt;p>Si se desea crea más de un contador de rendimiento en un crupo o necesitamos otros tipos de contadores aparte de
+&lt;strong>NumberOfItems32&lt;/strong>, se puede utilizar una versión sobrecargada del método &lt;strong>Create&lt;/strong>. Esta versión requiere
+crear una instancia de &lt;strong>CounterCreationDataCollection&lt;/strong>, que mantiene los detalles de los contadores.&lt;/p>
+&lt;p>Para comenzar se debe crear una colección de contadores vacía utilizando el constructor predeterminado:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">CounterCreationDataCollection&lt;/span> &lt;span class="n">objColCounters&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">CounterCreationDataCollection&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez exista la colección, se le pueden añadir contadores. Cada uno de ellos tiene un nombre y un texto descriptivo igual que
+en los métodos anteriores aunque se puede indicar el tipo de datos que se va a utilizar en el monitor.&lt;/p>
+&lt;p>En el siguiente ejemplo añade dos contadores a la colección, el primero muestra el número de pedidos mientras que el
+segundo almacena el número de pedidos por segundo. El primero de ellos utiliza el tipo de contador
+&lt;strong>RateOfCountsPerSecond32&lt;/strong> para controlar el número de pedidos por segundo.&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">objColCounters&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="n">CounterCreationData&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Número de pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="n">PerformanceCounterType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">NumberOfItems32&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">objColCounters&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">new&lt;/span> &lt;span class="n">CounterCreationData&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Pedidos por segundo&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Número de pedidos por segundo&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">PerformanceCounterType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RateOfCountsPerSecond32&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez se ha creado y rellenado la colección, utilizamos la versión sobrecargada del método &lt;strong>Create&lt;/strong> cambiando el
+cuarto parámetro por la colección de contadores creada anteriormente:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">PerformanceCounterCategory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Rendimiento pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="s">&amp;#34;Contadores de rendimiento para los pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">PerformanceCounterCategoryType&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SingleInstance&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">objColCounters&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Para asignar valores a los contadores creados se puede utilizar un método similar al anterior:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">PerformanceCounter&lt;/span> &lt;span class="n">objOrders&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">PerformanceCounter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Rendimiento pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="n">objOrders&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RawValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">253912&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="n">PerformanceCounter&lt;/span> &lt;span class="n">objOrdersSecond&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">PerformanceCounter&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Rendimiento pedidos&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Pedidos por segundo&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="n">objOrdersSecond&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">RawValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">10&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="borrado-de-categorías-de-contadores-de-rendimiento">Borrado de categorías de contadores de rendimiento&lt;/h2>
+&lt;p>El método &lt;strong>Delete&lt;/strong> de la clase &lt;strong>PerformanceCounterCategory&lt;/strong> permite eliminar una categoría simplemente indicando el nombre
+de la categoría a eliminar:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">PerformanceCounterCategory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Cómo capturar la pantalla utilizando C#</title><link>http://jbautistam.github.io/articles/development/capturar-pantalla/capturar-pantalla/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/capturar-pantalla/capturar-pantalla/</guid><description>
+&lt;p>&lt;strong>Capturar una imagen&lt;/strong> utilizando C# es un procedimiento bastante sencillo, simplemente debemos
+crear una imagen con el tamaño de la pantalla y copiar la imagen de la pantalla utilizando el método
+&lt;code>CopyFromScreen&lt;/code> que nos ofrece el objeto &lt;code>Graphics&lt;/code>.&lt;/p>
+&lt;p>Lo primero que debemos hacer es incorporar los espacios de nombres &lt;code>Drawing&lt;/code> y &lt;code>Drawing.Imaging&lt;/code> para
+el tratamiento de las imágenes:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Drawing&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">System.Drawing.Imaging&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En segundo lugar, creamos el objeto en el que vamos a dejar las imágenes con el tamaño apropiado
+a nuestra resolución de pantalla:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">Bitmap&lt;/span> &lt;span class="n">objImage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">Bitmap&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Screen&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">PrimaryScreen&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Bounds&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Width&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Screen&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">PrimaryScreen&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Bounds&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Height&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Creamos un objeto &lt;code>Graphics&lt;/code> para utilizar el método &lt;code>CopyFromScreen()&lt;/code> para copiar la imagen
+de pantalla en el bitmap que acabamos de crear:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">Graphics&lt;/span> &lt;span class="n">objGraphics&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Graphics&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FromImage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objBitmap&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">2&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="n">objGraphics&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CopyFromScreen&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">objBitmap&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Size&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El último paso sería grabar la imagen final en un archivo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">objBitmap&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Save&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;c:\\screen.gif&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Drawing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Imaging&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ImageFormat&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Gif&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Obtener las aplicaciones instaladas en Windows con C#</title><link>http://jbautistam.github.io/articles/development/aplicaciones-instaladas/aplicaciones-instaladas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/aplicaciones-instaladas/aplicaciones-instaladas/</guid><description>
+&lt;p>En ocasiones resulta muy útil saber qué aplicaciones tenemos instaladas en el ordenador bien porque deseamos ver incompabilidades o crear
+un log extenso en caso de error o simplemente porque deseemos crear un inventario de éstas.&lt;/p>
+&lt;p>Podemos saber las aplicaciones instaladas en un ordenador de dos formas: utilizando el registro o
+&lt;a href="http://msdn.microsoft.com/en-us/library/aa394582(v=vs.85).aspx">WMI&lt;/a> (Windows Management Instrumentation).&lt;/p>
+&lt;p>En este artículo utilizaremos &lt;strong>WMI&lt;/strong> simplemente por perderle el miedo a esta tecnología y porque (para mi gusto) resulta bastante más sencillo.&lt;/p>
+&lt;p>&lt;strong>WMI&lt;/strong> es una tecnología de Microsoft que lleva presente en nuestras máquinas practicamente desde Windows 2000 y ofrece un API sencillo
+de acceso prácticamente a cualquier información de sistema a partir de consultas similares al SQL o mediante enumerados.&lt;/p>
+&lt;p>Para acceder a información de &lt;strong>WMI&lt;/strong> desde nuestra aplicación.NET debemos utilizar el espacio de nombres &lt;code>System.Management&lt;/code>
+que ofrece cuatro clases:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>ManagementObject&lt;/code> o &lt;code>ManagementClass&lt;/code>: que presenta un objeto o clase de administración.&lt;/li>
+&lt;li>&lt;code>ManagementObjectSearcher&lt;/code>: que permite consultar una colección de &lt;code>ManagementObject&lt;/code> o &lt;code>ManagementClass&lt;/code> a partir de
+una consulta SQL o un enumerado.&lt;/li>
+&lt;li>&lt;code>ManagementEventWatcher&lt;/code>: que se utilizapara suscribirse a notificaciones de eventos de &lt;strong>WMI&lt;/strong>.&lt;/li>
+&lt;li>&lt;code>ManagementQuery&lt;/code>: utilizado como base para todas las clases de consulta.&lt;/li>
+&lt;/ul>
+&lt;p>En nuestro caso, para obtener la información sobre las aplicaciones instaladas en nuestro equipo debemos utilizar la clase
+&lt;a href="http://msdn.microsoft.com/en-us/library/aa394378%28v=vs.85%29.aspx">Win32_Product&lt;/a>
+que presenta información sobre los productos instalados utilizando el &lt;strong>Windows Installer&lt;/strong>.&lt;/p>
+&lt;p>La función es tan simple como realizar la consulta en SQL y recorrer la colección devuelta mostrando el nombre en la consola:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">ShowInstalledApplications&lt;/span>&lt;span class="p">()&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">ManagementObjectSearcher&lt;/span> &lt;span class="n">objColProducts&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">ManagementObjectSearcher&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;SELECT * FROM Win32_Product&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="c1">// Recorremos los elementos obtenidos mostrándolos en la consola
+&lt;/span>&lt;span class="ln">6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">foreach&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">ManagementObject&lt;/span> &lt;span class="n">objProduct&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="n">objColProducts&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Get&lt;/span>&lt;span class="p">())&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="n">Console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objProduct&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;Name&amp;#34;&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="ln">8&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Si desea más información sobre cómo utilizar &lt;strong>WMI&lt;/strong> desde el Framework de.NET nada mejor que este artículo en la
+&lt;a href="http://msdn.microsoft.com/en-us/library/aa720264.aspx">MSDN&lt;/a>.&lt;/p></description></item><item><title>Registros de eventos con .NET</title><link>http://jbautistam.github.io/articles/development/registros-de-eventos-con-.net/registros-de-eventos-con-.net/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/registros-de-eventos-con-.net/registros-de-eventos-con-.net/</guid><description>
+&lt;p>Uno de los asuntos pendientes en el desarrollo de la aplicación suele ser la información que proporcionamos
+sobre el funcionamiento de la aplicación tanto para los usuarios como para los departamentos de sistema.&lt;/p>
+&lt;p>Si nuestra aplicación tiene algún problema ¿cómo sabe el usuario o el responsable de sistemas qué es lo que
+se estaba haciendo y dónde ha fallado? Si no se conoce esta información es muy complicado diagnosticar y
+corregir el problema.&lt;/p>
+&lt;p>Uno de los lugares más útiles para registrar los errores y el funcionamiento de nuestra aplicación es
+el &lt;strong>Registro de Eventos&lt;/strong> de Windows (accesible desde las &lt;strong>Herramientas administrativas&lt;/strong> desde
+el &lt;strong>Panel de Control&lt;/strong> ). Aquí se debería indicar información detallada que nos permita
+saber exactamente lo que está pasando y recuperarnos del problema.&lt;/p>
+&lt;p>La verdad es que la utilización del &lt;strong>registro de eventos&lt;/strong> desde.NET es bastante sencillo. Una vez
+importada la librería de acceso al registro de eventos ( #i System.Diagnostics # ) Sólo tenemos
+que hacer dos cosas:&lt;/p>
+&lt;ul>
+&lt;li>Registrar una rama de aplicación en el &lt;strong>registro de sucesos&lt;/strong>.&lt;/li>
+&lt;li>Añadir nuestro &lt;strong>registros de log&lt;/strong> sobre la rama de la aplicación.&lt;/li>
+&lt;/ul>
+&lt;h2 id="creación-de-un-registro-de-eventos">Creación de un registro de eventos&lt;/h2>
+&lt;p>Para crear el &lt;strong>registro de eventos&lt;/strong> podemos utilizar este método&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">CreateEventSoure&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strProject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strLogName&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(!&lt;/span>&lt;span class="n">EventLog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SourceExists&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Project&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">EventLog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CreateEventSource&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Project&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">LogName&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="escritura-de-un-evento-sobre-el-registro">Escritura de un evento sobre el registro&lt;/h2>
+&lt;p>Para enviar una línea de log al &lt;strong>registro de eventos&lt;/strong> podemos utilizar el siguiente método:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">EventLogEntryType&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strProject&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">EventLogEntryType&lt;/span> &lt;span class="n">intTypeLog&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strMessage&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">EventLog&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteEntry&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Project&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">strMessage&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intTypeLogSystem&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Donde &lt;strong>EventLogEntryType&lt;/strong> es un enumerado con el tipo de mensaje que estamos añadiendo al &lt;strong>registro de sucesos&lt;/strong>.
+En este enumerado podemos indicar tres valores:&lt;/p>
+&lt;ul>
+&lt;li>&lt;code>EventLogEntryType.Information&lt;/code>: línea de registro informativa.&lt;/li>
+&lt;li>&lt;code>EventLogEntryType.Warning&lt;/code>: línea de registro con una advertencia de la aplicación.&lt;/li>
+&lt;li>&lt;code>EventLogEntryType.Error&lt;/code>: línea de registro con un error de la aplicación.&lt;/li>
+&lt;/ul></description></item><item><title>Tratamiento de la excepción AppDomain.CurrentDomain.UnhandledException en Windows Forms y WPF</title><link>http://jbautistam.github.io/articles/development/tratamiento-unhandledexception/tratamiento-unhandledexception/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/tratamiento-unhandledexception/tratamiento-unhandledexception/</guid><description>
+&lt;p>Cuando programamos una aplicación, normalmente tratamos las excepciones más o menos habituales en nuestros
+métodos, sin embargo, hay excepciones, que bien por su rareza o bien porque nunca se nos ha dado en las
+pruebas de desarrollo, no tenemos localizadas.&lt;/p>
+&lt;p>En estos casos, cuando las aplicaciones &lt;strong>Windows Form&lt;/strong> o &lt;strong>WPF&lt;/strong> encuentran una &lt;strong>excepción no controlada&lt;/strong>
+simplemente finalizan la ejecución del programa mostrando un error al usuario (bastante críptico por cierto).&lt;/p>
+&lt;p>Por supuesto, existen formas de capturar esas &lt;strong>excepciones no controladas&lt;/strong> para que no le aparezcan al usuario
+o bien les aparezca un mensaje más amigable. También podemos crear métodos que manejen esa excepción y nos envíen
+por correo información de log de lo que estaba haciendo el usuario en ese momento para poder corregir el error
+en futuras versiones de la aplicación.&lt;/p>
+&lt;p>Para conseguirlo, debemos tratar el evento &lt;strong>AppDomain.CurrentDomain.UnhandledException&lt;/strong> desde nuestra clase
+&lt;strong>Program&lt;/strong> o similar, es decir, la clase de entrada a nuestra aplicación. Para un mayor control de todas las
+&lt;strong>excepciones no controladas&lt;/strong>, también podemos tratar el evento &lt;strong>Application.ThreadException&lt;/strong> que se
+lanza cuando ocurre algún error dentro del hilo principal.&lt;/p>
+&lt;p>El código es bastante sencillo, simplemente debemos escribir las siguientes líneas en el método &lt;strong>Main&lt;/strong> (el método de
+inicio de la aplicación marcado con el atributo &lt;strong>STAThread&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">/// Punto de entrada a la aplicación
+&lt;/span>&lt;span class="ln"> 3&lt;/span>&lt;span class="c1">/// &amp;lt;/summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="na">[STAThread]&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Main&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="p">[]&lt;/span> &lt;span class="n">arrStrFileNames&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="c1">// Captura las excepciones de aplicación
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Application&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ThreadException&lt;/span> &lt;span class="p">+=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Threading&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ThreadExceptionEventHandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Application_ThreadException&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Añade el manejador de eventos para tratar las excepciones de procesos no relacionados con la interface
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">AppDomain&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CurrentDomain&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UnhandledException&lt;/span> &lt;span class="p">+=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">UnhandledExceptionEventHandler&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CurrentDomain_UnhandledException&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="c1">// Configura el modo de tratamiento de las excepciones no tratadas para que todos los errores vayan a través
+&lt;/span>&lt;span class="ln">12&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="c1">// del manejador
+&lt;/span>&lt;span class="ln">13&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">Application&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SetUnhandledExceptionMode&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">UnhandledExceptionMode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">CatchException&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="c1">// Resto de métodos para inicializar la aplicación
+&lt;/span>&lt;span class="ln">15&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="p">.....&lt;/span>
+&lt;span class="ln">16&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">17&lt;/span>
+&lt;span class="ln">18&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
+&lt;/span>&lt;span class="ln">19&lt;/span>&lt;span class="c1">/// Evento de tratamiento de excepciones en la aplicación
+&lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">/// &amp;lt;/summary&amp;gt;
+&lt;/span>&lt;span class="ln">21&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">Application_ThreadException&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">object&lt;/span> &lt;span class="n">sender&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Threading&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ThreadExceptionEventArgs&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">22&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">23&lt;/span> &lt;span class="n">TreatError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">null&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Excepción no controlada&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Exception&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">24&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;span class="ln">25&lt;/span>
+&lt;span class="ln">26&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
+&lt;/span>&lt;span class="ln">27&lt;/span>&lt;span class="c1">/// Evento de tratamiento de excepciones en la aplicación
+&lt;/span>&lt;span class="ln">28&lt;/span>&lt;span class="c1">/// &amp;lt;/summary&amp;gt;
+&lt;/span>&lt;span class="ln">29&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">CurrentDomain_UnhandledException&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">object&lt;/span> &lt;span class="n">sender&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">UnhandledExceptionEventArgs&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">30&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="n">TreatError&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">null&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s">&amp;#34;Excepción no controlada&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">e&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ExceptionObject&lt;/span> &lt;span class="k">as&lt;/span> &lt;span class="n">Exception&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">32&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En el método &lt;code>TreatError&lt;/code> pondremos las instrucciones necesarias para tratar el error, puede ser desde
+una grabación de log o el envío de correos al departamento de sistemas o simplemente mostrarle un mensaje al
+usuario con la descripción de la excepción.&lt;/p>
+&lt;p>Este método depende realmente de nuestra aplicación por eso no lo mostramos aquí, eso sí, deberíamos procurar que
+fuese una rutina lo más rápida posible para que no interrumpa demasiado el trabajo del interface de usuario.&lt;/p></description></item></channel></rss>

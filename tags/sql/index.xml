@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>sql on jbautistam</title><link>http://jbautistam.github.io/tags/sql/</link><description>Recent content in sql on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/sql/index.xml" rel="self" type="application/rss+xml"/><item><title>Buscando intervalos consecutivos en SQL</title><link>http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/</link><pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/</guid><description>
+&lt;p>Por mucho que SQL sea un gran lenguaje de consulta de datos hay que reconocer que existen ciertos problemas
+realmente complicados de resolver.&lt;/p>
+&lt;p>Uno de estos problemas me surge de vez en cuando: buscar intervalos consecutivos de fechas en una tabla.&lt;/p>
+&lt;p>Imaginad una tabla de ventas básica: productos, fechas y cantidad vendida.&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesIntervalTable.jpg" title="Tabla de ventas">&lt;/p>
+&lt;p>La pregunta a las que nos enfrentamos es ¿cuál es el producto que se ha vendido un número mayor de días consecutivos?&lt;/p>
+&lt;p>En primer lugar, veamos nuestros datos con más detalle, para un producto, partimos de una tabla cómo ésta (las cantidades en realidad no nos interesan, sólo necesitamos
+las fechas):&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesTable.jpg" title="Fechas de venta para un producto">&lt;/p>
+&lt;p>Lo primero que queremos saber, son las fechas consecutivas, es decir, nos interesa una tabla más de éste estilo:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesIntervalTable.jpg" alt="IntervalTable.jpg" title="Intervalos de fechas con venta">&lt;/p>
+&lt;p>Pero, ¿cómo lo logramos a partir de la tabla inicial?&lt;/p>
+&lt;p>Antes de empezar, permitidme una pequeña licencia: voy a reducir un poco la tabla anterior y me voy a quedar únicamente con el número de día de octubre.
+Esto no es realmente necesario, luego lo veremos con fechas y nos daremos cuenta que no hay ninguna diferencia, pero creo que para la explicación
+es más fácil verlo así:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/content/articles/development/slq-strings-hollows/images/DaySalesTable.jpg" alt="DaySalesTable.jpg" title="Días de octubre con ventas">&lt;/p>
+&lt;p>Lo primero que vamos a hacer es numerar las filas:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El resultado de esta tabla es el siguiente:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlRowNumber.jpg" alt="SqlRowNumber.jpg" title="Numerando las filas">&lt;/p>
+&lt;p>&lt;strong>Row_Number&lt;/strong> es una función de ventana. Nos va a dar es el número de fila consecutivo particionando por producto, es decir,
+si en lugar de un único producto, nuestra tabla tuviera más de un producto (como es de suponer), nos comenzará a numerar de nuevo las filas desde uno
+cada vez que cambie de producto.&lt;/p>
+&lt;p>Con esto no hemos solucionado nada, pero observemos los datos: si restamos el día del número de fila, en caso que sean consecutivos,
+nos va a dar el mismo valor. ¿No me creéis?&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">RowNumber&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlGroupNumber.jpg" alt="SqlGroupNumber.jpg" title="Agrupando días consecutivos">&lt;/p>
+&lt;p>Fijáos en la columna &lt;strong>GroupNumber&lt;/strong>: es el mismo valor siempre que los datos sean consecutivos. Los días 18, 19 y 20 están en el grupo 17, el día 23 (que no es
+consecutivo con los anteriores) está en el grupo 19 y los días 25 a 31 están en el grupo 20.&lt;/p>
+&lt;p>Es decir, son días consecutivos aquellos que están en el mismo grupo, por tanto ya podemos agrupar para obtener la fecha mínima y máxima de ese intervalo
+(la consulta, por supuesto, se puede simplificar pero así creo que es más sencilla a la hora de explicarlo):&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">MIN&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">Day&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">StartDay&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">MAX&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">Day&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">EndDay&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">RowNumber&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmpGroup&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Que nos da el resultado buscado:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlInterval.jpg" alt="SqlInterval.jpg" title="Intervalos">&lt;/p>
+&lt;p>Sencillo y elegante ¿verdad? Como decía al principio, la solución no es mía, es un problema relativamente común en las consultas SQL. Se
+suelen llamar problemas de cadenas y huecos porque resuelven esas consultas en las que buscamos hechos consecutivos o huecos, es decir, o bien intervalos
+de cosas que ocurren de forma consecutiva o bien intervalos de cosas que no ocurren.&lt;/p>
+&lt;p>En nuestro ejemplo hemos buscando una cadena, fechas consecutivas con ventas, pero también podríamos haber buscado huecos, es decir, días consecutivos
+sin ventas que aunque lo parezca, no es trivial.&lt;/p>
+&lt;p>Para terminar, veamos cómo hacerlo con fechas en lugar de enteros. Todo se reduce a un poco de aritmética con fechas para obtener los grupos,
+lo demás es exactamente igual:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">MIN&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">Date&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">StartDate&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">MAX&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">Date&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">EndDate&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">Date&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">Date_Diff&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;day&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GetDate&lt;/span>&lt;span class="p">(),&lt;/span> &lt;span class="nb">Date&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="n">RowNumber&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="nb">Date&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nb">Date&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmpGroup&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>¿Ahora comprendéis por qué me gusta el SQL?&lt;/p>
+&lt;p>Por cierto, no he respondido a la pregunta, os la dejo a vosotros: ¿cuál es el producto que se ha vendido durante un número mayor de días consecutivos?&lt;/p></description></item><item><title>Intérprete de scripts SQL</title><link>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</guid><description>
+&lt;p>Siempre he defendido SQL como un lenguaje ideal para el tratamiento de datos con una salvedad: la falta de instrucciones
+imperativas en el estándar.&lt;/p>
+&lt;p>SQL es un lenguaje declarativo, de ahí viene realmente su potencia: ejecutar una instrucción indicando lo que deseo obtener no
+cómo se va a obtener.&lt;/p>
+&lt;p>Funciona aunque a los programadores, acostumbrados a lenguajes imperativos, se nos suele dar bastante mal cuando nos quitan &lt;code>for&lt;/code>,
+&lt;code>if&lt;/code> y similares. Una vez te das cuenta que para trabajar con SQL debes olvidar los bucles y pensar en bloques de datos, todo va rodado.&lt;/p>
+&lt;p>Desgraciadamente, en ocasiones necesitamos instrucciones como &lt;code>if&lt;/code>, &lt;code>while&lt;/code>, declaraciones de variables, etc...
+Hay formas de hacerlo utilizando SQL puro pero suelen ser bastante complicadas, por ejemplo, ¿quién sabría
+decirme qué hace esta instrucción escrita en Spark Sql?&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">date_add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nb">Date&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">CONCAT&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">CAST&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">Year&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">Current_Date&lt;/span>&lt;span class="p">())&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">5&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">string&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="s1">&amp;#39;-01-01&amp;#39;&lt;/span>&lt;span class="p">)),&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">Counter&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="o">-&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="nb">Date&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">Counter&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp1&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp2&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp3&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp4&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">CROSS&lt;/span> &lt;span class="k">JOIN&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span> &lt;span class="k">UNION&lt;/span> &lt;span class="k">ALL&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp5&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Aunque no lo parezca, es sencillo: está obteniendo los días entre el uno de enero de hace cinco años hasta una fecha indeterminada (tendría
+que ponerme a contar, lo siento). Es decir, esa serie de &lt;code>SELECT / CROSS JOIN / UNION ALL&lt;/code>, junto con la función de ventana
+&lt;code>Row_Number&lt;/code> sirven para definir un contador de 1 a n (de nuevo, me tendría que poner a contar).&lt;/p>
+&lt;p>Pero que se pueda, no implica que sea fácil, por eso la mayoría de los gestores de bases de datos relacionales avanzados incorporan
+un lenguaje imperativo: SQL Server tiene TSql, Oracle tiene su PL/SQL, etc...&lt;/p>
+&lt;p>Spark lo soluciona de una forma diferente, además de escribir sentencias en Spark Sql, podemos embeber Spark Sql en scripts de Python, la
+combinación perfecta. Siempre que sepas Python, claro. No es nuevo, es lo que hacemos en la mayoría de los lenguajes cuando lanzamos
+una sentencia SQL contra una conexión a base de datos.&lt;/p>
+&lt;p>Pero dejémonos de introducciones ¿a qué viene todo ésto? Pues todo esto viene a que mientras programo
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">BauDbStudio&lt;/a>, cuánto más ejecuto contra Spark Sql, más me
+doy cuenta que necesito un lenguaje imperativo. Echo de menos los &lt;code>if&lt;/code>, &lt;code>for&lt;/code>, &lt;code>while&lt;/code> y demás. No siempre, pero cuando
+hace falta, tengo que reconocer que cuesta horrores pasarlo por alto.&lt;/p>
+&lt;p>Podría haber elegido la opción de ejecutar Python en &lt;strong>BauDbStudio&lt;/strong>, hay librerías para hacerlo pero ¿qué ocurriría con
+otros gestores de bases de datos como SqLite o Postgress?, no me acababa de convencer (aunque no descarto acabar haciéndolo).&lt;/p>
+&lt;p>La otra forma era definir mi propio lenguaje imperativo e interpretarlo desde &lt;strong>BauDbStudio&lt;/strong>. Esa fue la opción que elegí, por cacharrear, ya sabéis.&lt;/p>
+&lt;p>Aún está en fase de pruebas, pero ya podemos escribir scripts como éste:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="ln"> 1&lt;/span>declare int valor = 20;
+&lt;span class="ln"> 2&lt;/span>
+&lt;span class="ln"> 3&lt;/span>if valor &amp;gt; 10
+&lt;span class="ln"> 4&lt;/span>{
+&lt;span class="ln"> 5&lt;/span> &amp;lt;%
+&lt;span class="ln"> 6&lt;/span> DROP TABLE IF EXISTS {{DbCompute}}.TestScript
+&lt;span class="ln"> 7&lt;/span> GO
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> CREATE TABLE {{DbCompute}}.TestScript AS
+&lt;span class="ln">10&lt;/span> SELECT *
+&lt;span class="ln">11&lt;/span> FROM {{DbCompute}}.Ventas
+&lt;span class="ln">12&lt;/span> WHERE Cantidad &amp;gt; #valor
+&lt;span class="ln">13&lt;/span> GO
+&lt;span class="ln">14&lt;/span> %&amp;gt;
+&lt;span class="ln">15&lt;/span>}
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como se puede ver, es una mezcla entre los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> que teníamos
+hasta ahora en &lt;strong>BauDbStudio&lt;/strong> con instrucciones SQL separadas por comandos &lt;code>GO&lt;/code>.&lt;/p>
+&lt;p>Por el momento el lenguaje permite lo básico:&lt;/p>
+&lt;ul>
+&lt;li>Declaración de variables tipadas&lt;/li>
+&lt;li>Cálculo de expresiones&lt;/li>
+&lt;li>Definición de funciones&lt;/li>
+&lt;li>Instrucciones condicionales (if, else)&lt;/li>
+&lt;li>Instrucciones iterativas (for, while, do... while)&lt;/li>
+&lt;li>Llamada a funciones&lt;/li>
+&lt;li>Declaración de funciones predefinidas, es decir, aquellas que va a ejecutar el programa principal, no el intérprete (por ejemplo, print, dateAdd, ...)&lt;/li>
+&lt;li>Ejecución de sentencias SQL&lt;/li>
+&lt;/ul>
+&lt;p>Suficiente para tener un lenguaje iterativo con SQL embebido para, en teoría, cualquier gestor de base de datos integrado en
+&lt;strong>BauDbStudio&lt;/strong> (en este momento, SqLite, SQL Server, PostgreSql, MySql y, por supuesto, Spark).&lt;/p>
+&lt;p>Estoy en fase de pruebas y moderadamente esperanzado. En un mes (modificando otros intérpretes que había desarrollado en el pasado), el
+código ha avanzado mucho, ejecuta correctamente aunque le falta pulir algunos detalles como el paso de parámetros y cosas por
+el estilo que aún dan algo de guerra.&lt;/p>
+&lt;p>Digamos que por ahora, el lenguaje ha quedado un poco &lt;em>primitivo&lt;/em>, tenemos sentencias &lt;code>declare&lt;/code> o &lt;code>let&lt;/code> o &lt;code>call&lt;/code> en lugar de inferir
+que estamos en una declaración de tipos o una variable o una llamada a función (ahora interpreta el código a partir de palabras reservadas).
+También obliga a que las sentencias iterativas y condicionales (&lt;code>if&lt;/code>, &lt;code>while&lt;/code>, ...) estén dentro de un bloque de sentencias (con llaves) aunque
+sólo tengan una sentencia. Supongo que el lenguaje evolucionará, pero por ahora era la forma más sencilla.&lt;/p>
+&lt;h2 id="dónde-nos-deja-esto-con-databricks">¿Dónde nos deja esto con &lt;strong>DataBricks&lt;/strong>?&lt;/h2>
+&lt;p>Actualmente puedo ejecutar en local las instrucciones de mi programa sin problema pero esto jamás va a poder subir a &lt;strong>Databricks&lt;/strong>. Es
+imposible que mi nuevo lenguaje se ejecute en ese entorno.&lt;/p>
+&lt;p>Podríamos hacer una cosa: reproducir el intérprete en Python de forma que recogiera el script y lo interpretara en tiempo de ejecución en
+Databricks. Por supuesto no lo voy a hacer, entre otras cosas porque Python no es mi fuerte. También lo podríamos hacer utilizando
+&lt;a href="http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net">Spark.Net&lt;/a> con C# pero no creo que por hoy por hoy tenga los conocimientos
+suficientes como para meterme en ese sembrao.&lt;/p>
+&lt;p>La segunda opción (que me parece la mejor) es transpilar.&lt;/p>
+&lt;p>Como sabemos, la primera fase de la interpretación es el análisis sintáctico que devuelve una colección de sentencias y
+expresiones en un lenguaje interno. La idea es transpilar este grupo de sentencias a un notebook de Python para databricks
+con Spark Sql inmerso. Algo así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-Python" data-lang="Python">&lt;span class="ln"> 1&lt;/span>&lt;span class="n">valor&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">20&lt;/span>
+&lt;span class="ln"> 2&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="k">if&lt;/span> &lt;span class="n">valor&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="mi">10&lt;/span>&lt;span class="p">:&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="n">spark&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sql&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s2">&amp;#34;DROP TABLE IF EXISTS DbCompute.TestScript&amp;#34;&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="n">spark&lt;/span>&lt;span class="o">.&lt;/span>&lt;span class="n">Sql&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;&amp;#39;&amp;#39;CREATE TABLE {{DbCompute}}.TestScript AS
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="s1"> SELECT *
+&lt;/span>&lt;span class="ln"> 7&lt;/span>&lt;span class="s1"> FROM {{DbCompute}}.Ventas
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="s1"> WHERE Cantidad &amp;gt; {}
+&lt;/span>&lt;span class="ln"> 9&lt;/span>&lt;span class="s1"> &amp;#39;&amp;#39;&amp;#39;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="n">valor&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Ni que decir tiene que eso todavía ni lo he empezado pero la teoría es que debería funcionar.&lt;/p>
+&lt;h2 id="pruebas-unitarias">Pruebas unitarias&lt;/h2>
+&lt;p>Y una pregunta lanzada al viento ¿cómo se crean pruebas unitarias para un intérprete?&lt;/p>
+&lt;p>La teoría es que a partir de un script de entrada debemos obtener una lista de sentencias que vienen del analizador léxico y sintáctico.
+Podemos comprobar que esas sentencias sean las que esperamos, pero así estaríamos comprobando los analizadores, no el intérprete.&lt;/p>
+&lt;p>¿Cómo probamos entonces que la ejecución de un programa interpretado pasa por todos los puntos y obtiene los resultados correctos?&lt;/p>
+&lt;p>Pues no me parece fácil. En mi caso lo he solucionado aprovechando la forma en que está concebido el intérprete.&lt;/p>
+&lt;p>El intérprete en realidad no sabe nada de SQL. Por dos razones: en primer lugar porque el SQL de cada gestor de base de datos es
+ligeramente diferente (los estándares, ya sabéis), por tanto escribir un intérprete común es prácticamente imposible.
+El intérprete sólo reconocer cadenas de comandos SQL (las que van entre &lt;code>&amp;lt;%&lt;/code> y &lt;code>%&lt;/code>&amp;gt;) y lanza una petición al procesador principal.&lt;/p>
+&lt;p>Lo mismo ocurre con las funciones intrínsecas como &lt;code>print&lt;/code>, simplemente lanza una llamada al procesador.&lt;/p>
+&lt;p>Por tanto, en este código:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="ln"> 1&lt;/span>declare int valor = 20;
+&lt;span class="ln"> 2&lt;/span>
+&lt;span class="ln"> 3&lt;/span>if valor &amp;gt; 10
+&lt;span class="ln"> 4&lt;/span>{
+&lt;span class="ln"> 5&lt;/span> &amp;lt;%
+&lt;span class="ln"> 6&lt;/span> DROP TABLE IF EXISTS {{DbCompute}}.TestScript
+&lt;span class="ln"> 7&lt;/span> GO
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span> CREATE TABLE {{DbCompute}}.TestScript AS
+&lt;span class="ln">10&lt;/span> SELECT *
+&lt;span class="ln">11&lt;/span> FROM {{DbCompute}}.Ventas
+&lt;span class="ln">12&lt;/span> WHERE Cantidad &amp;gt; #valor
+&lt;span class="ln">13&lt;/span> GO
+&lt;span class="ln">14&lt;/span> %&amp;gt;
+&lt;span class="ln">15&lt;/span>}
+&lt;span class="ln">16&lt;/span>
+&lt;span class="ln">17&lt;/span>call print(&amp;#34;valor: &amp;#34; + valor);
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Se va a llamar al procesador principal dos veces: la primera con el comando SQL, la segunda con un mensaje a imprimir.&lt;/p>
+&lt;p>Pero ¿quién es este procesador principal? En mi caso, cualquier clase que cumpla con una &lt;strong>interface&lt;/strong> con, por ahora, dos métodos:
+ejecutar SQL y ejecutar función.&lt;/p>
+&lt;p>Así que para hacer las pruebas unitarias, simplemente tengo que definir una clase que cumpla con la interface y vaya almacenando las
+sentencias lanzadas con sus parámetros y compararlas con un resultado.&lt;/p>
+&lt;p>Por ahora, mis pruebas unitarias consisten en métodos que recogen dos archivos: el script de entrada y los resultados previstos.&lt;/p>
+&lt;p>Para hacer la prueba, simplemente se carga el script, se ejecuta y se comprueba que los resultados ejecutados sean los mismos que
+los resultados previstos.&lt;/p>
+&lt;p>En este momento aún es sencillo, los scripts de pruebas son bastante pequeños pero no sé si evolucionará adecuadamente para
+scripts más grandes o si necesito probar realmente scripts más grandes o sólo pequeños trozos de programas.&lt;/p>
+&lt;p>¿Alguna idea sobre esta cuestión en particular?&lt;/p>
+&lt;h2 id="final">Final&lt;/h2>
+&lt;p>Pues gracias por llegar hasta aquí.&lt;/p>
+&lt;p>Aún estoy trabajando en ello, supongo que estos quince días pasará por todas las pruebas necesarias, corregiré los flecos y comenzaré
+el transpilador.&lt;/p>
+&lt;p>Hasta entonces, perdonadme que aún no muestre el código, de alguna forma desconocida he acabado con tres intérpretes:
+uno para sentencias SQL normales, otro para ETLs y otro para scripts del nuevo lenguaje (que por ahora he llamado SQLx). Un poco de
+limpieza no le va a venir mal antes de salir al público.&lt;/p></description></item></channel></rss>

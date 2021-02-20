@@ -1,0 +1,345 @@
+<!doctype html><html lang=en data-figures class=page><head><title>Pruebas de base de datos - Preparando el entorno | jbautistam</title><meta charset=utf-8><meta name=generator content="Hugo 0.80.0"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"><meta http-equiv=x-ua-compatible content="IE=edge"><script async src="https://www.googletagmanager.com/gtag/js?id=XXXXXXXXXX"></script><script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());gtag('config','XXXXXXXXXX');</script><meta property="og:locale" content="en"><meta property="og:type" content="article"><meta name=description content="A vueltas con las pruebas de base de datos: preparación del entorno, creación de bases de datos e inserción de datos de prueba"><meta name=twitter:card content="summary"><meta name=twitter:creator content="@jbautistam"><meta name=twitter:title content="Pruebas de base de datos - Preparando el entorno"><meta property="og:url" content="http://jbautistam.github.io/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/"><meta property="og:title" content="Pruebas de base de datos - Preparando el entorno"><meta property="og:description" content="A vueltas con las pruebas de base de datos: preparación del entorno, creación de bases de datos e inserción de datos de prueba"><meta property="og:image" content="http://jbautistam.github.io/articles/source-code/pruebas-base-datos/pruebas-base-datos.jpg"><link rel=apple-touch-icon sizes=180x180 href=http://jbautistam.github.io/icons/apple-touch-icon.png><link rel=icon type=image/png sizes=32x32 href=http://jbautistam.github.io/icons/favicon-32x32.png><link rel=manifest href=http://jbautistam.github.io/icons/site.webmanifest><link rel=mask-icon href=http://jbautistam.github.io/safari-pinned-tab.svg color=#002538><meta name=msapplication-TileColor content="#002538"><meta name=theme-color content="#002538"><link rel=canonical href=http://jbautistam.github.io/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/><link rel=preload href=http://jbautistam.github.io/css/styles.782bf96a82b3cc5b3cee4c47a42cc81321f16960a6d41fab3277c4abe047bc7ae044ea1bb7ae4d237c12baa0143e02f95969e5e8b6e68d9dcfd14158cfa244ac.css integrity="sha512-eCv5aoKzzFs87kxHpCzIEyHxaWCm1B+rMnfEq+BHvHrgROobt65NI3wSuqAUPgL5WWnl6LbmjZ3P0UFYz6JErA==" as=style crossorigin=anonymous><link rel=preload href=http://jbautistam.github.io/js/bundle.min.89fba5b7de3b6f716f751291cf4509057de9c0a1b9e2a75870c8a08aa7b8f2902cf8494b48739e9c4d2922bb410c0b6dae7dc183d61e62d49f95b3691380c76a.js as=script integrity="sha512-ifult947b3FvdRKRz0UJBX3pwKG54qdYcMigiqe48pAs+ElLSHOenE0pIrtBDAttrn3Bg9YeYtSflbNpE4DHag==" crossorigin=anonymous><link rel=stylesheet type=text/css href=http://jbautistam.github.io/css/styles.782bf96a82b3cc5b3cee4c47a42cc81321f16960a6d41fab3277c4abe047bc7ae044ea1bb7ae4d237c12baa0143e02f95969e5e8b6e68d9dcfd14158cfa244ac.css integrity="sha512-eCv5aoKzzFs87kxHpCzIEyHxaWCm1B+rMnfEq+BHvHrgROobt65NI3wSuqAUPgL5WWnl6LbmjZ3P0UFYz6JErA==" crossorigin=anonymous></head><body data-code=7 data-lines=false id=documentTop><header class=nav_header><nav class=nav><a href=http://jbautistam.github.io/ class="nav_brand nav_item" title=jbautistam><img src=http://jbautistam.github.io/logos/logo.png class=logo alt=jbautistam><div class=nav_close><div><svg class="icon"><use xlink:href="#open-menu"/></svg><svg class="icon"><use xlink:href="#closeme"/></svg></div></div></a><div class="nav_body nav_body_left"><div class=nav_parent><a href=http://jbautistam.github.io/ class=nav_item title=Inicio>Inicio</a></div><div class=nav_parent><a href=http://jbautistam.github.io/articles class=nav_item title=Artículos>Artículos</a></div><div class=nav_parent><a href=http://jbautistam.github.io/applications class=nav_item title=Aplicaciones>Aplicaciones</a></div><div class=nav_parent><a href=http://jbautistam.github.io/about/ class=nav_item title="Acerca de">Acerca de</a></div><div class=follow><a href=https://github.com/jbautistam><svg class="icon"><use xlink:href="#github"/></svg></a><a href=https://twitter.com/jbautistam><svg class="icon"><use xlink:href="#twitter"/></svg></a><a href=https://www.linkedin.com/in/jbautistam><svg class="icon"><use xlink:href="#linkedin"/></svg></a><a href=http://jbautistam.github.io/index.xml><svg class="icon"><use xlink:href="#rss"/></svg></a><div class=color_mode><input type=checkbox class=color_choice id=mode></div></div></div></nav></header><main><div class="grid-inverse wrap content"><article class=post_content><h1 class=post_title>Pruebas de base de datos - Preparando el entorno</h1><div class=post_meta><svg class="icon"><use xlink:href="#calendar"/></svg><span class=post_date>Oct 11, 2019</span>
+<a href=http://jbautistam.github.io/tags/programaci%C3%B3n title=Programación class="post_tag button button_translucent">Programación</a></div><div class=post_share>Share on:
+<a href="https://twitter.com/intent/tweet?text=Pruebas%20de%20base%20de%20datos%20-%20Preparando%20el%20entorno&url=http%3a%2f%2fjbautistam.github.io%2farticles%2fsource-code%2fpruebas-base-datos-ii%2fpruebas-base-datos-ii%2f&tw_p=tweetbutton" class=twitter title="Share on Twitter" target=_blank rel=nofollow><svg class="icon"><use xlink:href="#twitter"/></svg></a><a href="https://www.facebook.com/sharer.php?u=http%3a%2f%2fjbautistam.github.io%2farticles%2fsource-code%2fpruebas-base-datos-ii%2fpruebas-base-datos-ii%2f&t=Pruebas%20de%20base%20de%20datos%20-%20Preparando%20el%20entorno" class=facebook title="Share on Facebook" target=_blank rel=nofollow><svg class="icon"><use xlink:href="#facebook"/></svg></a><a href=#linkedinshare id=linkedinshare class=linkedin title="Share on LinkedIn" rel=nofollow><svg class="icon"><use xlink:href="#linkedin"/></svg></a><a href=http://jbautistam.github.io/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/ title="Copy Link" class="link link_yank"><svg class="icon"><use xlink:href="#copy"/></svg></a></div><p>Continuando con el <a href=/articles/source-code/pruebas-base-datos/pruebas-base-datos>motor de pruebas de base de datos</a>
+del que hablábamos la semana pasada, hoy pasaremos a la creación de las bases de datos y dejaremos para
+el próximo día la inserción de datos de pruebas.</p><p>Aunque el proyecto ha avanzado mucho, aún no tenemos código fuente en GitHub, quién sabe si la próxima semana sea la definitiva.</p><h2 id=creación-de-bases-de-datos>Creación de bases de datos</h2><p>Hoy explicaré cómo se crean las bases de datos que vamos a utilizar en estas pruebas.
+El sistema en teoría debería funcionar con una base de datos semilla creada previamente y otra base de datos sobre
+la que realizaremos las pruebas pero para que el ejemplo sea más completo, vamos a crear ambas bases de datos
+al vuelo.</p><p>El archivo de conexiones que utilizaremos en esta ocasión es el siguiente:</p><div class=highlight><pre class=chroma><code class=language-XML data-lang=XML><span class=ln> 1</span><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class=ln> 2</span><span class=nt>&lt;DbScriptsConnections&gt;</span>
+<span class=ln> 3</span>	<span class=nt>&lt;Connection</span> <span class=na>Key=</span><span class=s>&#34;Master&#34;</span> <span class=na>Type =</span> <span class=s>&#34;SqlServer&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 4</span>		<span class=nt>&lt;Name&gt;</span>SqlServer - Master<span class=nt>&lt;/Name&gt;</span>
+<span class=ln> 5</span>		<span class=nt>&lt;Description/&gt;</span>
+<span class=ln> 6</span>		<span class=nt>&lt;ConnectionString&gt;</span>Data Source=localhost;user=sa;password=MiTemporal#1P4ssw0rd;Initial Catalog=master<span class=nt>&lt;/ConnectionString&gt;</span>
+<span class=ln> 7</span>	<span class=nt>&lt;/Connection&gt;</span>
+<span class=ln> 8</span>	<span class=nt>&lt;Connection</span> <span class=na>Key=</span><span class=s>&#34;Sales&#34;</span> <span class=na>Type =</span> <span class=s>&#34;SqlServer&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 9</span>		<span class=nt>&lt;Name&gt;</span>SqlServer - Sales<span class=nt>&lt;/Name&gt;</span>
+<span class=ln>10</span>		<span class=nt>&lt;Description/&gt;</span>
+<span class=ln>11</span>		<span class=nt>&lt;ConnectionString&gt;</span>Data Source=localhost;user=sa;password=MiTemporal#1P4ssw0rd;Initial Catalog=SalesDb<span class=nt>&lt;/ConnectionString&gt;</span>
+<span class=ln>12</span>	<span class=nt>&lt;/Connection&gt;</span>
+<span class=ln>13</span>	<span class=nt>&lt;Connection</span> <span class=na>Key=</span><span class=s>&#34;Test&#34;</span> <span class=na>Type =</span> <span class=s>&#34;SqlServer&#34;</span><span class=nt>&gt;</span>
+<span class=ln>14</span>		<span class=nt>&lt;Name&gt;</span>SqlServer - SalesForTest<span class=nt>&lt;/Name&gt;</span>
+<span class=ln>15</span>		<span class=nt>&lt;Description/&gt;</span>
+<span class=ln>16</span>		<span class=nt>&lt;ConnectionString&gt;</span>Data Source=localhost;user=sa;password=MiTemporal#1P4ssw0rd;Initial Catalog=SalesDbTesting<span class=nt>&lt;/ConnectionString&gt;</span>
+<span class=ln>17</span>	<span class=nt>&lt;/Connection&gt;</span>
+<span class=ln>18</span><span class=nt>&lt;/DbScriptsConnections&gt;</span>
+</code></pre></div><p>En ese archivo, tenemos tres conexiones: <code>Sales</code> es nuestra base de datos semilla (<code>SalesDb</code>) desde dónde recogeremos los datos
+para las pruebas y <code>Test</code> es la base de datos dónde realizaremos las pruebas (<code>SalesDbTesting</code>). La tercera conexión <code>Master</code>
+apunta a la base de datos <code>master</code> necesaria para poder ejecutar el script de creación de base de datos. Si las bases de datos
+estuvieran creadas, no sería necesario pero dado que las bases de datos en teoría no existen, necesitamos poder conectarnos a
+algo.</p><p><strong>Nota:</strong> en realidad, podría trucar el cógio para conectarse a la base de datos master simplemente cambiando
+en ejecución la cadena de conexión pero no quería liar el código con cosas como <code>if key == master</code>, al menos por ahora.</p><p>Una vez definidas las conexiones, veamos nuestro script de pasos para la creación:</p><div class=highlight><pre class=chroma><code class=language-XML data-lang=XML><span class=ln> 1</span><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class=ln> 2</span><span class=nt>&lt;DbScript&gt;</span>
+<span class=ln> 3</span>	<span class=nt>&lt;Name&gt;</span>Test copy data<span class=nt>&lt;/Name&gt;</span>
+<span class=ln> 4</span>	<span class=nt>&lt;PathProject&gt;</span>C:\Test\Scripts\CopyData<span class=nt>&lt;/PathProject&gt;</span>
+<span class=ln> 5</span>
+<span class=ln> 6</span>	<span class=c>&lt;!-- Creación de la base de datos SalesDb --&gt;</span>
+<span class=ln> 7</span>	<span class=nt>&lt;Step</span> <span class=na>StartWithPreviousError =</span> <span class=s>&#34;false&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 8</span>		<span class=nt>&lt;Name&gt;</span>Scripts database process: create database SalesDb<span class=nt>&lt;/Name&gt;</span>
+<span class=ln> 9</span>		<span class=nt>&lt;Script&gt;</span>DbScripts\01_Create_Database_Sales.xml<span class=nt>&lt;/Script&gt;</span>
+<span class=ln>10</span>	<span class=nt>&lt;/Step&gt;</span>
+<span class=ln>11</span>
+<span class=ln>12</span>	<span class=c>&lt;!-- Creación de la base de datos SalesDbTesting --&gt;</span>
+<span class=ln>13</span>	<span class=nt>&lt;Step</span> <span class=na>StartWithPreviousError =</span> <span class=s>&#34;false&#34;</span><span class=nt>&gt;</span>
+<span class=ln>14</span>		<span class=nt>&lt;Name&gt;</span>Scripts database process: create database SalesDbTesting<span class=nt>&lt;/Name&gt;</span>
+<span class=ln>15</span>		<span class=nt>&lt;Script&gt;</span>DbScripts\03_Create_Database_SalesTest.xml<span class=nt>&lt;/Script&gt;</span>
+<span class=ln>16</span>	<span class=nt>&lt;/Step&gt;</span>
+<span class=ln>17</span><span class=nt>&lt;/DbScript&gt;</span>
+</code></pre></div><p>Tenemos la ejecución de dos scripts: uno en teoría para crear la base de datos <code>SalesDb</code> y otro para la base
+de datos <code>SalesDbTesting</code>.</p><p><strong>Nota:</strong> Por ahora, he omitido los pasos para rellenar datos y copiar, los veremos más adelante.</p><p>El script de creación de la base de datos <code>SalesDb</code> (<code>01_Create_Database_Sales.xml</code>) contiene estas instrucciones:</p><div class=highlight><pre class=chroma><code class=language-XML data-lang=XML><span class=ln>  1</span><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class=ln>  2</span><span class=nt>&lt;DbScript&gt;</span>
+<span class=ln>  3</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Drop database if exists&#34;</span><span class=nt>&gt;</span>
+<span class=ln>  4</span>		<span class=nt>&lt;Execute</span> <span class=na>Target =</span><span class=s>&#34;Master&#34;</span><span class=nt>&gt;</span>
+<span class=ln>  5</span>			DROP DATABASE IF EXISTS [SalesDb];
+<span class=ln>  6</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln>  7</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln>  8</span>	
+<span class=ln>  9</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Create database&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 10</span>		<span class=nt>&lt;Execute</span> <span class=na>Target =</span><span class=s>&#34;Master&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 11</span>			CREATE DATABASE [SalesDb]
+<span class=ln> 12</span>			CONTAINMENT = NONE
+<span class=ln> 13</span>			ON  PRIMARY
+<span class=ln> 14</span>			( NAME = N&#39;SalesDb&#39;, FILENAME = N&#39;/var/opt/mssql/data/SalesDb.mdf&#39;, SIZE = 8192KB, MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+<span class=ln> 15</span>			LOG ON
+<span class=ln> 16</span>			( NAME = N&#39;SalesDb_log&#39;, FILENAME = N&#39;/var/opt/mssql/data/SalesDb_log.ldf&#39;, SIZE = 8192KB, MAXSIZE = 2048GB, FILEGROWTH = 65536KB );
+<span class=ln> 17</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln> 18</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln> 19</span>
+<span class=ln> 20</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Create tables&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 21</span>		<span class=nt>&lt;Execute</span> <span class=na>Target=</span><span class=s>&#34;Sales&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 22</span>			ALTER DATABASE [SalesDb] SET ANSI_NULL_DEFAULT OFF;
+<span class=ln> 23</span>
+<span class=ln> 24</span>			ALTER DATABASE [SalesDb] SET ANSI_NULLS OFF;
+<span class=ln> 25</span>
+<span class=ln> 26</span>			ALTER DATABASE [SalesDb] SET ANSI_PADDING OFF;
+<span class=ln> 27</span>
+<span class=ln> 28</span>			ALTER DATABASE [SalesDb] SET ANSI_WARNINGS OFF;
+<span class=ln> 29</span>
+<span class=ln> 30</span>			ALTER DATABASE [SalesDb] SET ARITHABORT OFF;
+<span class=ln> 31</span>
+<span class=ln> 32</span>			ALTER DATABASE [SalesDb] SET AUTO_CLOSE OFF;
+<span class=ln> 33</span>
+<span class=ln> 34</span>			ALTER DATABASE [SalesDb] SET AUTO_SHRINK OFF;
+<span class=ln> 35</span>
+<span class=ln> 36</span>			ALTER DATABASE [SalesDb] SET AUTO_UPDATE_STATISTICS ON;
+<span class=ln> 37</span>
+<span class=ln> 38</span>			ALTER DATABASE [SalesDb] SET CURSOR_CLOSE_ON_COMMIT OFF;
+<span class=ln> 39</span>
+<span class=ln> 40</span>			ALTER DATABASE [SalesDb] SET CURSOR_DEFAULT  GLOBAL;
+<span class=ln> 41</span>
+<span class=ln> 42</span>			ALTER DATABASE [SalesDb] SET CONCAT_NULL_YIELDS_NULL OFF;
+<span class=ln> 43</span>
+<span class=ln> 44</span>			ALTER DATABASE [SalesDb] SET NUMERIC_ROUNDABORT OFF;
+<span class=ln> 45</span>
+<span class=ln> 46</span>			ALTER DATABASE [SalesDb] SET QUOTED_IDENTIFIER OFF;
+<span class=ln> 47</span>
+<span class=ln> 48</span>			ALTER DATABASE [SalesDb] SET RECURSIVE_TRIGGERS OFF;
+<span class=ln> 49</span>
+<span class=ln> 50</span>			ALTER DATABASE [SalesDb] SET  DISABLE_BROKER;
+<span class=ln> 51</span>
+<span class=ln> 52</span>			ALTER DATABASE [SalesDb] SET AUTO_UPDATE_STATISTICS_ASYNC OFF;
+<span class=ln> 53</span>
+<span class=ln> 54</span>			ALTER DATABASE [SalesDb] SET DATE_CORRELATION_OPTIMIZATION OFF;
+<span class=ln> 55</span>
+<span class=ln> 56</span>			ALTER DATABASE [SalesDb] SET TRUSTWORTHY OFF;
+<span class=ln> 57</span>
+<span class=ln> 58</span>			ALTER DATABASE [SalesDb] SET ALLOW_SNAPSHOT_ISOLATION OFF;
+<span class=ln> 59</span>
+<span class=ln> 60</span>			ALTER DATABASE [SalesDb] SET PARAMETERIZATION SIMPLE;
+<span class=ln> 61</span>
+<span class=ln> 62</span>			ALTER DATABASE [SalesDb] SET READ_COMMITTED_SNAPSHOT OFF;
+<span class=ln> 63</span>
+<span class=ln> 64</span>			ALTER DATABASE [SalesDb] SET HONOR_BROKER_PRIORITY OFF;
+<span class=ln> 65</span>
+<span class=ln> 66</span>			ALTER DATABASE [SalesDb] SET RECOVERY SIMPLE;
+<span class=ln> 67</span>
+<span class=ln> 68</span>			ALTER DATABASE [SalesDb] SET  MULTI_USER;
+<span class=ln> 69</span>
+<span class=ln> 70</span>			ALTER DATABASE [SalesDb] SET PAGE_VERIFY CHECKSUM;
+<span class=ln> 71</span>
+<span class=ln> 72</span>			ALTER DATABASE [SalesDb] SET DB_CHAINING OFF;
+<span class=ln> 73</span>
+<span class=ln> 74</span>			ALTER DATABASE [SalesDb] SET FILESTREAM( NON_TRANSACTED_ACCESS = OFF );
+<span class=ln> 75</span>
+<span class=ln> 76</span>			ALTER DATABASE [SalesDb] SET TARGET_RECOVERY_TIME = 60 SECONDS;
+<span class=ln> 77</span>
+<span class=ln> 78</span>			ALTER DATABASE [SalesDb] SET DELAYED_DURABILITY = DISABLED;
+<span class=ln> 79</span>
+<span class=ln> 80</span>			EXEC sys.sp_db_vardecimal_storage_format N&#39;SalesDb&#39;, N&#39;ON&#39;;
+<span class=ln> 81</span>
+<span class=ln> 82</span>			ALTER DATABASE [SalesDb] SET QUERY_STORE = OFF;
+<span class=ln> 83</span>
+<span class=ln> 84</span>			SET ANSI_NULLS ON;
+<span class=ln> 85</span>
+<span class=ln> 86</span>			SET QUOTED_IDENTIFIER ON;
+<span class=ln> 87</span>
+<span class=ln> 88</span>			CREATE TABLE [dbo].[Products](
+<span class=ln> 89</span>			[ProductId] [int] IDENTITY(1,1) NOT NULL,
+<span class=ln> 90</span>			[Name] [varchar](50) NOT NULL,
+<span class=ln> 91</span>			[Price] [float] NOT NULL,
+<span class=ln> 92</span>			CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED
+<span class=ln> 93</span>			(
+<span class=ln> 94</span>			[ProductId] ASC
+<span class=ln> 95</span>			)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+<span class=ln> 96</span>			) ON [PRIMARY];
+<span class=ln> 97</span>
+<span class=ln> 98</span>			CREATE TABLE [dbo].[Sales](
+<span class=ln> 99</span>			[SaleId] [int] IDENTITY(1,1) NOT NULL,
+<span class=ln>100</span>			[StoreId] [int] NOT NULL,
+<span class=ln>101</span>			[ProductId] [int] NOT NULL,
+<span class=ln>102</span>			[Date] [datetime] NOT NULL,
+<span class=ln>103</span>			[Units] [int] NOT NULL,
+<span class=ln>104</span>			[Price] [float] NOT NULL,
+<span class=ln>105</span>			CONSTRAINT [PK_Sales] PRIMARY KEY CLUSTERED
+<span class=ln>106</span>			(
+<span class=ln>107</span>			[SaleId] ASC
+<span class=ln>108</span>			)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+<span class=ln>109</span>			) ON [PRIMARY];
+<span class=ln>110</span>
+<span class=ln>111</span>			CREATE TABLE [dbo].[Stores](
+<span class=ln>112</span>			[StoreId] [int] IDENTITY(1,1) NOT NULL,
+<span class=ln>113</span>			[Name] [varchar](200) NOT NULL,
+<span class=ln>114</span>			CONSTRAINT [PK_Stores] PRIMARY KEY CLUSTERED
+<span class=ln>115</span>			(
+<span class=ln>116</span>			[StoreId] ASC
+<span class=ln>117</span>			)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+<span class=ln>118</span>			) ON [PRIMARY];
+<span class=ln>119</span>
+<span class=ln>120</span>			ALTER TABLE [dbo].[Sales]  WITH CHECK ADD  CONSTRAINT [FK_Sales_Products] FOREIGN KEY([ProductId])
+<span class=ln>121</span>			REFERENCES [dbo].[Products] ([ProductId])
+<span class=ln>122</span>			ON DELETE CASCADE;
+<span class=ln>123</span>
+<span class=ln>124</span>			ALTER TABLE [dbo].[Sales] CHECK CONSTRAINT [FK_Sales_Products];
+<span class=ln>125</span>
+<span class=ln>126</span>			ALTER TABLE [dbo].[Sales]  WITH CHECK ADD  CONSTRAINT [FK_Sales_Stores] FOREIGN KEY([StoreId])
+<span class=ln>127</span>			REFERENCES [dbo].[Stores] ([StoreId])
+<span class=ln>128</span>			ON DELETE CASCADE;
+<span class=ln>129</span>
+<span class=ln>130</span>			ALTER TABLE [dbo].[Sales] CHECK CONSTRAINT [FK_Sales_Stores];
+<span class=ln>131</span>
+<span class=ln>132</span>			ALTER DATABASE [SalesDb] SET  READ_WRITE;
+<span class=ln>133</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln>134</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln>135</span><span class=nt>&lt;/DbScript&gt;</span>
+</code></pre></div><p>Obviamente, ha salido del comando <em>Generar script de base de datos</em> de Sql Server Management Studio, lo único
+que he añadido es el borrado de base de datos si existía previamente.</p><p>Los dos primeros comandos <code>Execute</code> van sobre la conexión <code>Master</code> para borrar la base
+de datos y crearla, mientras que el tercer comando <code>Execute</code> de creación de tablas, claves y relaciones
+va sobre la conexión <code>Sales</code></p><p>Para mantenerlo simple, sólo hemos creado tres tablas: Stores, Products y Sales.</p><p><strong>Nota:</strong> eliminar la base de datos puede dar un error si la base de datos estaba creada y había
+una conexión abierta. Existen formas de eliminar las conexiones antes de eliminar la base de datos pero para no
+complicar el script, he utilizado la forma sencilla, es decir: si da errores, abrid vuestro servidor
+y eliminad la base de datos a mano.</p><p>Ahora nos queda por ver el script de creación de nuestra base de datos de prueba <code>SalesDbTesting</code> (<code>03_Create_Database_SalesTest.xml</code>):</p><div class=highlight><pre class=chroma><code class=language-XML data-lang=XML><span class=ln> 1</span><span class=nt>&lt;DbScript&gt;</span>
+<span class=ln> 2</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Drop database if exists&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 3</span>		<span class=nt>&lt;Execute</span> <span class=na>Target =</span><span class=s>&#34;Master&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 4</span>			DROP DATABASE IF EXISTS [SalesDbTesting];
+<span class=ln> 5</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln> 6</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln> 7</span>	
+<span class=ln> 8</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Create database&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 9</span>		<span class=nt>&lt;Execute</span> <span class=na>Target =</span><span class=s>&#34;Master&#34;</span><span class=nt>&gt;</span>
+<span class=ln>10</span>			CREATE DATABASE [SalesDbTesting]
+<span class=ln>11</span>			CONTAINMENT = NONE
+<span class=ln>12</span>			ON  PRIMARY
+<span class=ln>13</span>			( NAME = N&#39;SalesDbTesting&#39;, FILENAME = N&#39;/var/opt/mssql/data/SalesDbTesting.mdf&#39;, SIZE = 8192KB, MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+<span class=ln>14</span>			LOG ON
+<span class=ln>15</span>			( NAME = N&#39;SalesDbTesting_log&#39;, FILENAME = N&#39;/var/opt/mssql/data/SalesDbTesting_log.ldf&#39;, SIZE = 8192KB, MAXSIZE = 2048GB, FILEGROWTH = 65536KB );
+<span class=ln>16</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln>17</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln>18</span>
+<span class=ln>19</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Create tables&#34;</span><span class=nt>&gt;</span>
+<span class=ln>20</span>		<span class=nt>&lt;Execute</span> <span class=na>Target=</span><span class=s>&#34;Test&#34;</span><span class=nt>&gt;</span>
+<span class=ln>21</span>			ALTER DATABASE [SalesDbTesting] SET ANSI_NULL_DEFAULT OFF;
+<span class=ln>22</span>
+<span class=ln>23</span>			...
+<span class=ln>24</span>
+<span class=ln>25</span>			CREATE TABLE [dbo].[Products](
+<span class=ln>26</span>			[ProductId] [int] IDENTITY(1,1) NOT NULL,
+<span class=ln>27</span>			[Name] [varchar](50) NOT NULL,
+<span class=ln>28</span>			[Price] [float] NOT NULL,
+<span class=ln>29</span>			CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED
+<span class=ln>30</span>			(
+<span class=ln>31</span>			[ProductId] ASC
+<span class=ln>32</span>			)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+<span class=ln>33</span>			) ON [PRIMARY];
+<span class=ln>34</span>
+<span class=ln>35</span>           ...
+<span class=ln>36</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln>37</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln>38</span><span class=nt>&lt;/DbScript&gt;</span>
+</code></pre></div><p>He eliminado gran parte del script porque excepto la creación y las claves de conexiones, son exactamente iguales. Al fin y al cabo
+vamos a hacer pruebas con bases de datos con la misma estructura así que en teoría, deberían tener el mismo esquema.</p><h2 id=mejora-en-la-creación-de-las-bases-de-datos>Mejora en la creación de las bases de datos</h2><p>No sé a vosotros, pero a mí me pone muy nervioso tener dos scripts exactamente iguales en los que únicamente cambian los nombres.
+Así que vamos a refactorizar nuestros scripts para que acepten variables. En un alarde de originalidad,
+se llama <code>01_Create_Database_SalesVariable.xml</code>:</p><div class=highlight><pre class=chroma><code class=language-XML data-lang=XML><span class=ln> 1</span><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class=ln> 2</span><span class=nt>&lt;DbScript&gt;</span>
+<span class=ln> 3</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Drop database if exists&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 4</span>		<span class=nt>&lt;Execute</span> <span class=na>Target =</span><span class=s>&#34;Master&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 5</span>			DROP DATABASE IF EXISTS [{{DbName:WithoutQuote}}];
+<span class=ln> 6</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln> 7</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln> 8</span>
+<span class=ln> 9</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Create database&#34;</span><span class=nt>&gt;</span>
+<span class=ln>10</span>		<span class=nt>&lt;Execute</span> <span class=na>Target =</span><span class=s>&#34;Master&#34;</span><span class=nt>&gt;</span>
+<span class=ln>11</span>			CREATE DATABASE [{{DbName:WithoutQuote}}]
+<span class=ln>12</span>			CONTAINMENT = NONE
+<span class=ln>13</span>			ON  PRIMARY
+<span class=ln>14</span>			( NAME = N&#39;{{DbName:WithoutQuote}}&#39;, FILENAME = N&#39;/var/opt/mssql/data/{{DbName:WithoutQuote}}.mdf&#39;, SIZE = 8192KB, MAXSIZE = UNLIMITED, FILEGROWTH = 65536KB )
+<span class=ln>15</span>			LOG ON
+<span class=ln>16</span>			( NAME = N&#39;{{DbName:WithoutQuote}}_log&#39;, FILENAME = N&#39;/var/opt/mssql/data/{{DbName:WithoutQuote}}_log.ldf&#39;, SIZE = 8192KB, MAXSIZE = 2048GB, FILEGROWTH = 65536KB );
+<span class=ln>17</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln>18</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln>19</span>
+<span class=ln>20</span>	<span class=nt>&lt;Block</span> <span class=na>Name=</span><span class=s>&#34;Create tables&#34;</span><span class=nt>&gt;</span>
+<span class=ln>21</span>		<span class=nt>&lt;Execute</span> <span class=na>Target=</span><span class=s>&#34;{{ConnectionName}}&#34;</span><span class=nt>&gt;</span>
+<span class=ln>22</span>		
+<span class=ln>23</span>			...
+<span class=ln>24</span>			
+<span class=ln>25</span>			ALTER DATABASE [{{DbName:WithoutQuote}}] SET QUERY_STORE = OFF;
+<span class=ln>26</span>
+<span class=ln>27</span>			SET ANSI_NULLS ON;
+<span class=ln>28</span>
+<span class=ln>29</span>			SET QUOTED_IDENTIFIER ON;
+<span class=ln>30</span>
+<span class=ln>31</span>			CREATE TABLE [dbo].[Products](
+<span class=ln>32</span>			[ProductId] [int] IDENTITY(1,1) NOT NULL,
+<span class=ln>33</span>			[Name] [varchar](50) NOT NULL,
+<span class=ln>34</span>			[Price] [float] NOT NULL,
+<span class=ln>35</span>			CONSTRAINT [PK_Products] PRIMARY KEY CLUSTERED
+<span class=ln>36</span>			(
+<span class=ln>37</span>			[ProductId] ASC
+<span class=ln>38</span>			)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+<span class=ln>39</span>			) ON [PRIMARY];
+<span class=ln>40</span>
+<span class=ln>41</span>           ...
+<span class=ln>42</span>
+<span class=ln>43</span>			ALTER DATABASE [{{DbName:WithoutQuote}}] SET  READ_WRITE;
+<span class=ln>44</span>		<span class=nt>&lt;/Execute&gt;</span>
+<span class=ln>45</span>	<span class=nt>&lt;/Block&gt;</span>
+<span class=ln>46</span><span class=nt>&lt;/DbScript&gt;</span>
+</code></pre></div><p>La aplicación que ejecuta los scripts, considera como una variable o expresión, las cadenas que están entre dobles llaves, es decir,
+en nuestro script tenemos dos variables <code>ConnectionName</code> y <code>DbName</code>. La primera de ellas identifica la clave
+de la conexión que se va a utilizar y <code>DbName</code> es la variable con el nombre de base de datos.</p><p>Lo normal es que el motor, sustituya el nombre de variable o la expresión por el valor calculado en tiempo de ejecución. Para que
+sea más fácil, las fechas y las cadenas se ponen siempre entre apóstrofes (lo veremos en detalle en los siguientes artículos pero
+sirva como explicación inicial).</p><p>Sin embargo, en nuestro código tenemos sentencias de este estilo: <code>DbName:WithoutQuote</code>. Como decíamos, lo que hay
+entre llaves es el nombre de variable pero en este caso se le aplica una máscara (lo que sigue a los dos puntos):
+<code>WithoutQuote</code>. Esta máscara indica que en las cadenas no se pongan comillas, así evitamos tener errores
+en tiempo de ejecución como éste:</p><div class=highlight><pre class=chroma><code class=language-SQL data-lang=SQL><span class=ln>1</span><span class=n>FILENAME</span> <span class=o>=</span> <span class=n>N</span><span class=s1>&#39;/var/opt/mssql/data/{{DbName}}.mdf&#39;</span>
+</code></pre></div><p>Esta instrucción sustituye <code>DbName</code> por el valor de la variable entre apóstrofes que nos daría este resultado:</p><div class=highlight><pre class=chroma><code class=language-SQL data-lang=SQL><span class=ln>1</span><span class=n>FILENAME</span> <span class=o>=</span> <span class=n>N</span><span class=s1>&#39;/var/opt/mssql/data/&#39;</span><span class=n>Sales</span><span class=s1>&#39;.mdf&#39;</span>
+</code></pre></div><p>que por supuesto provoca un error en SQL Server, por eso, en su lugar utilizamos la máscara <code>WithoutQuote</code>:</p><div class=highlight><pre class=chroma><code class=language-SQL data-lang=SQL><span class=ln>1</span><span class=n>FILENAME</span> <span class=o>=</span> <span class=n>N</span><span class=s1>&#39;/var/opt/mssql/data/{{DbName:WithoutQuote}}.mdf&#39;</span>
+</code></pre></div><p>que nos devuelve este resultado:</p><div class=highlight><pre class=chroma><code class=language-SQL data-lang=SQL><span class=ln>1</span><span class=n>FILENAME</span> <span class=o>=</span> <span class=n>N</span><span class=s1>&#39;/var/opt/mssql/data/Sales.mdf&#39;</span>
+</code></pre></div><p>que ya sería correcto.</p><p>Lo único que nos falta entonces es ver cómo se modifica el script de ejecución de pasos para añadir las variables:</p><div class=highlight><pre class=chroma><code class=language-XML data-lang=XML><span class=ln> 1</span><span class=cp>&lt;?xml version=&#34;1.0&#34; encoding=&#34;utf-8&#34;?&gt;</span>
+<span class=ln> 2</span><span class=nt>&lt;DbScript&gt;</span>
+<span class=ln> 3</span>	<span class=nt>&lt;Name&gt;</span>Test copy data<span class=nt>&lt;/Name&gt;</span>
+<span class=ln> 4</span>	<span class=nt>&lt;PathProject&gt;</span>C:\Test\Scripts\CopyData<span class=nt>&lt;/PathProject&gt;</span>
+<span class=ln> 5</span>
+<span class=ln> 6</span>	<span class=c>&lt;!-- Creación de la base de datos SalesDb --&gt;</span>
+<span class=ln> 7</span>	<span class=nt>&lt;Step</span> <span class=na>StartWithPreviousError =</span> <span class=s>&#34;false&#34;</span><span class=nt>&gt;</span>
+<span class=ln> 8</span>		<span class=nt>&lt;Name&gt;</span>Scripts database process: create database SalesDb<span class=nt>&lt;/Name&gt;</span>
+<span class=ln> 9</span>		<span class=nt>&lt;Script&gt;</span>DbScripts\01_Create_Database_SalesVariable.xml<span class=nt>&lt;/Script&gt;</span>
+<span class=ln>10</span>		<span class=nt>&lt;Parameter</span> <span class=na>Key=</span><span class=s>&#34;ConnectionName&#34;</span> <span class=na>Type=</span><span class=s>&#34;string&#34;</span> <span class=na>Value=</span><span class=s>&#34;Sales&#34;</span> <span class=nt>/&gt;</span>
+<span class=ln>11</span>		<span class=nt>&lt;Parameter</span> <span class=na>Key=</span><span class=s>&#34;DbName&#34;</span> <span class=na>Type=</span><span class=s>&#34;string&#34;</span> <span class=na>Value=</span><span class=s>&#34;SalesDb&#34;</span> <span class=nt>/&gt;</span>
+<span class=ln>12</span>	<span class=nt>&lt;/Step&gt;</span>
+<span class=ln>13</span>
+<span class=ln>14</span>	<span class=c>&lt;!-- Creación de la base de datos SalesDbTesting --&gt;</span>
+<span class=ln>15</span>	<span class=nt>&lt;Step</span> <span class=na>StartWithPreviousError =</span> <span class=s>&#34;false&#34;</span><span class=nt>&gt;</span>
+<span class=ln>16</span>		<span class=nt>&lt;Name&gt;</span>Scripts database process: create database SalesDbTesting<span class=nt>&lt;/Name&gt;</span>
+<span class=ln>17</span>		<span class=nt>&lt;Script&gt;</span>DbScripts\01_Create_Database_SalesVariable.xml<span class=nt>&lt;/Script&gt;</span>
+<span class=ln>18</span>		<span class=nt>&lt;Parameter</span> <span class=na>Key=</span><span class=s>&#34;ConnectionName&#34;</span> <span class=na>Type=</span><span class=s>&#34;string&#34;</span> <span class=na>Value=</span><span class=s>&#34;Test&#34;</span> <span class=nt>/&gt;</span>
+<span class=ln>19</span>		<span class=nt>&lt;Parameter</span> <span class=na>Key=</span><span class=s>&#34;DbName&#34;</span> <span class=na>Type=</span><span class=s>&#34;string&#34;</span> <span class=na>Value=</span><span class=s>&#34;SalesDbTesting&#34;</span> <span class=nt>/&gt;</span>
+<span class=ln>20</span>	<span class=nt>&lt;/Step&gt;</span>
+<span class=ln>21</span><span class=nt>&lt;/DbScript&gt;</span>
+</code></pre></div><p>Ahora llamamos dos veces a ejecutar el script <code>01_Create_Database_SalesVariable.xml</code>, con dos variables, <code>ConnectionName</code>
+con la clave de conexión y <code>DbName</code> con el nombre de base de datos y así, simplemente cambiando los valores de estas dos
+variables podemos utilizar el mismo script para crear dos bases de datos diferentes.</p><h2 id=conclusión>Conclusión</h2><p>Por ahora eso es todo. En el <a href=/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii>siguiente artículo</a>
+continuaré con los scripts de creación de datos de prueba y de copia de datos y veremos algunas
+sentencias un poco más complejas como los bucles.</p></article><aside class=sidebar><section class=sidebar_inner><h2>Jose Antonio Bautista</h2><div class=sidebar_description>Programación, código fuente, aplicaciones. La Web de un programador en resumen.</div><a href=http://jbautistam.github.io/about/ class="button mt-1" role=button title="Read More">Read More</a><h2 class=mt-4>Featured Posts</h2><ul><li><a href=http://jbautistam.github.io/articles/big-data/cositas-databricks/cositas-databricks/ class=nav-link title="Cosas que me gustaría que me hubiesen explicado sobre databricks">Cosas que me gustaría que me hubiesen explicado sobre databricks</a></li></ul><h2 class=mt-4>Recent Posts</h2><ul class=flex-column><li><a href=http://jbautistam.github.io/applications/baudbstudio/articles/reporting/ class=nav-link title="BauDbStudio: SQL para generación de informes">BauDbStudio: SQL para generación de informes</a></li><li><a href=http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/ class=nav-link title="Buscando intervalos consecutivos en SQL">Buscando intervalos consecutivos en SQL</a></li><li><a href=http://jbautistam.github.io/articles/opinion/abstracciones-aplicacion/abstracciones-aplicacion/ class=nav-link title="Abstracciones de aplicación">Abstracciones de aplicación</a></li><li><a href=http://jbautistam.github.io/articles/big-data/cositas-databricks/cositas-databricks/ class=nav-link title="Cosas que me gustaría que me hubiesen explicado sobre databricks">Cosas que me gustaría que me hubiesen explicado sobre databricks</a></li><li><a href=http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net/ class=nav-link title="Experimentando con Spark.Net">Experimentando con Spark.Net</a></li><li><a href=http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark/ class=nav-link title="Instalación de Spark en local">Instalación de Spark en local</a></li><li><a href=http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/ class=nav-link title="Intérprete de scripts SQL">Intérprete de scripts SQL</a></li><li><a href=http://jbautistam.github.io/articles/curiosidades/carta-bill-gates/carta-bill-gates/ class=nav-link title="Carta de Bill Gates a los aficionados">Carta de Bill Gates a los aficionados</a></li></ul><div><h2 class="mt-4 taxonomy" id=categories-section>Categories</h2><nav class=tags_nav><a href=http://jbautistam.github.io/categories/spark/ class="post_tag button button_translucent" title=spark>SPARK
+<span class=button_tally>4</span></a>
+<a href=http://jbautistam.github.io/categories/curiosidades/ class="post_tag button button_translucent" title=curiosidades>CURIOSIDADES
+<span class=button_tally>3</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=series-section>Series</h2><nav class=tags_nav><a href=http://jbautistam.github.io/series/baudbstudio/ class="post_tag button button_translucent" title=baudbstudio>BAUDBSTUDIO
+<span class=button_tally>23</span></a></nav></div><div><h2 class="mt-4 taxonomy" id=tags-section>Tags</h2><nav class=tags_nav><a href=http://jbautistam.github.io/tags/programaci%C3%B3n/ class="post_tag button button_translucent" title=programación>PROGRAMACIÓN
+<span class=button_tally>57</span></a>
+<a href=http://jbautistam.github.io/tags/aplicaciones/ class="post_tag button button_translucent" title=aplicaciones>APLICACIONES
+<span class=button_tally>33</span></a>
+<a href=http://jbautistam.github.io/tags/baudbstudio/ class="post_tag button button_translucent" title=baudbstudio>BAUDBSTUDIO
+<span class=button_tally>24</span></a>
+<a href=http://jbautistam.github.io/tags/seguridad/ class="post_tag button button_translucent" title=seguridad>SEGURIDAD
+<span class=button_tally>21</span></a>
+<a href=http://jbautistam.github.io/tags/comunicaciones/ class="post_tag button button_translucent" title=comunicaciones>COMUNICACIONES
+<span class=button_tally>10</span></a>
+<a href=http://jbautistam.github.io/tags/opini%C3%B3n/ class="post_tag button button_translucent" title=opinión>OPINIÓN
+<span class=button_tally>8</span></a>
+<a href=http://jbautistam.github.io/tags/sistema/ class="post_tag button button_translucent" title=sistema>SISTEMA
+<span class=button_tally>8</span></a>
+<a href=http://jbautistam.github.io/tags/spark/ class="post_tag button button_translucent" title=spark>SPARK
+<span class=button_tally>4</span></a>
+<a href=http://jbautistam.github.io/tags/utilidades/ class="post_tag button button_translucent" title=utilidades>UTILIDADES
+<span class=button_tally>4</span></a>
+<a href=http://jbautistam.github.io/tags/curiosidades/ class="post_tag button button_translucent" title=curiosidades>CURIOSIDADES
+<span class=button_tally>3</span></a>
+<a href=http://jbautistam.github.io/tags/sql/ class="post_tag button button_translucent" title=sql>SQL
+<span class=button_tally>2</span></a>
+<a href=http://jbautistam.github.io/tags/wsl/ class="post_tag button button_translucent" title=wsl>WSL
+<span class=button_tally>2</span></a>
+<a href=http://jbautistam.github.io/tags/databricks/ class="post_tag button button_translucent" title=databricks>DATABRICKS
+<span class=button_tally>1</span></a>
+<a href=http://jbautistam.github.io/tags/featured/ class="post_tag button button_translucent" title=featured>FEATURED
+<span class=button_tally>1</span></a></nav></div></section></aside></div></main><svg width="0" height="0" class="hidden"><symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="facebook"><path d="M437 0H75C33.648.0.0 33.648.0 75v362c0 41.352 33.648 75 75 75h151V331h-60v-90h60v-61c0-49.629 40.371-90 90-90h91v90h-91v61h91l-15 90h-76v181h121c41.352.0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zm0 0"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18.001 18.001" id="twitter"><path d="M15.891 4.013c.808-.496 1.343-1.173 1.605-2.034a8.68 8.68.0 01-2.351.861c-.703-.756-1.593-1.14-2.66-1.14-1.043.0-1.924.366-2.643 1.078a3.56 3.56.0 00-1.076 2.605c0 .309.039.585.117.819-3.076-.105-5.622-1.381-7.628-3.837-.34.601-.51 1.213-.51 1.846.0 1.301.549 2.332 1.645 3.089-.625-.053-1.176-.211-1.645-.47.0.929.273 1.705.82 2.388a3.623 3.623.0 002.115 1.291c-.312.08-.641.118-.979.118-.312.0-.533-.026-.664-.083.23.757.664 1.371 1.291 1.841a3.652 3.652.0 002.152.743C4.148 14.173 2.625 14.69.902 14.69c-.422.0-.721-.006-.902-.038 1.697 1.102 3.586 1.649 5.676 1.649 2.139.0 4.029-.542 5.674-1.626 1.645-1.078 2.859-2.408 3.639-3.974a10.77 10.77.0 001.172-4.892v-.468a7.788 7.788.0 001.84-1.921 8.142 8.142.0 01-2.11.593z"/></symbol><symbol aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="mail"><path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V4e2c0 26.5-21.5 48-48 48H48c-26.5.0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5.0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="calendar"><path d="M452 40h-24V0h-40v40H124V0H84v40H60C26.916 40 0 66.916.0 1e2v352c0 33.084 26.916 60 60 60h392c33.084.0 60-26.916 60-60V1e2c0-33.084-26.916-60-60-60zm20 412c0 11.028-8.972 20-20 20H60c-11.028.0-20-8.972-20-20V188h432v264zm0-304H40v-48c0-11.028 8.972-20 20-20h24v40h40V80h264v40h40V80h24c11.028.0 20 8.972 20 20v48z"/><path d="M76 230h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 310h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zM76 390h40v40H76zm80 0h40v40h-40zm80 0h40v40h-40zm80 0h40v40h-40zm80-80h40v40h-40z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="github"><path d="M255.968 5.329C114.624 5.329.0 120.401.0 262.353c0 113.536 73.344 209.856 175.104 243.872 12.8 2.368 17.472-5.568 17.472-12.384.0-6.112-.224-22.272-.352-43.712-71.2 15.52-86.24-34.464-86.24-34.464-11.616-29.696-28.416-37.6-28.416-37.6-23.264-15.936 1.728-15.616 1.728-15.616 25.696 1.824 39.2 26.496 39.2 26.496 22.848 39.264 59.936 27.936 74.528 21.344 2.304-16.608 8.928-27.936 16.256-34.368-56.832-6.496-116.608-28.544-116.608-127.008.0-28.064 9.984-51.008 26.368-68.992-2.656-6.496-11.424-32.64 2.496-68 0 0 21.504-6.912 70.4 26.336 20.416-5.696 42.304-8.544 64.096-8.64 21.728.128 43.648 2.944 64.096 8.672 48.864-33.248 70.336-26.336 70.336-26.336 13.952 35.392 5.184 61.504 2.56 68 16.416 17.984 26.304 40.928 26.304 68.992.0 98.72-59.84 120.448-116.864 126.816 9.184 7.936 17.376 23.616 17.376 47.584.0 34.368-.32 62.08-.32 70.496.0 6.88 4.608 14.88 17.6 12.352C438.72 472.145 512 375.857 512 262.353 512 120.401 397.376 5.329 255.968 5.329z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 212 212" id="gitlab"><path d="M12.3 74.7h54L43.3 3c-1-3.6-6.4-3.6-7.6.0L12.3 74.8z"/><path d="M12.3 74.7.5 111c-1 3.2.0 6.8 3 8.8l101.6 74-92.5-119z"/><path d="M105 193.7l-38.6-119h-54l92.7 119z"/><path d="M105 193.7l38.7-119H66.4l38.7 119z"/><path d="M105 193.7l38.7-119H198l-93 119z"/><path d="M198 74.7l11.6 36.2c1 3 0 6.6-3 8.6l-101.5 74 93-119z"/><path d="M198 74.7h-54.3L167 3c1.2-3.6 6.4-3.6 7.6.0L198 74.8z"/></symbol><symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="rss"><circle cx="3.429" cy="20.571" r="3.429"/><path d="M11.429 24h4.57C15.999 15.179 8.821 8.001.0 8v4.572c6.302.001 11.429 5.126 11.429 11.428z"/><path d="M24 24C24 10.766 13.234.0.0.0v4.571c10.714.0 19.43 8.714 19.43 19.429z"/></symbol><symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="linkedin"><path d="M437 0H75C33.648.0.0 33.648.0 75v362c0 41.352 33.648 75 75 75h362c41.352.0 75-33.648 75-75V75c0-41.352-33.648-75-75-75zM181 406h-60V196h60zm0-240h-60v-60h60zm210 240h-60V286c0-16.54-13.46-30-30-30s-30 13.46-30 30v120h-60V196h60v11.309C286.719 202.422 296.93 196 316 196c40.691.043 75 36.547 75 79.688zm0 0"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 612" id="arrow"><path d="M604.501 440.509 325.398 134.956c-5.331-5.357-12.423-7.627-19.386-7.27-6.989-.357-14.056 1.913-19.387 7.27L7.499 440.509c-9.999 10.024-9.999 26.298.0 36.323s26.223 10.024 36.222.0l262.293-287.164L568.28 476.832c9.999 10.024 26.222 10.024 36.221.0 9.999-10.023 9.999-26.298.0-36.323z"/></symbol><symbol viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" id="carly"><path d="M504.971 239.029 448 182.059V84c0-46.317-37.682-84-84-84h-44c-13.255.0-24 10.745-24 24s10.745 24 24 24h44c19.851.0 36 16.149 36 36v108c0 6.365 2.529 12.47 7.029 16.971L454.059 256l-47.029 47.029A24.002 24.002.0 004e2 320v108c0 19.851-16.149 36-36 36h-44c-13.255.0-24 10.745-24 24s10.745 24 24 24h44c46.318.0 84-37.683 84-84v-98.059l56.971-56.971c9.372-9.372 9.372-24.568.0-33.941zM112 192V84c0-19.851 16.149-36 36-36h44c13.255.0 24-10.745 24-24S205.255.0 192 0h-44c-46.318.0-84 37.683-84 84v98.059l-56.971 56.97c-9.373 9.373-9.373 24.568.0 33.941L64 329.941V428c0 46.317 37.682 84 84 84h44c13.255.0 24-10.745 24-24s-10.745-24-24-24h-44c-19.851.0-36-16.149-36-36V320c0-6.365-2.529-12.47-7.029-16.971L57.941 256l47.029-47.029A24.002 24.002.0 00112 192z"/></symbol><symbol viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" id="copy"><path d="M23 2.75A2.75 2.75.0 0020.25.0H8.75A2.75 2.75.0 006 2.75v13.5A2.75 2.75.0 008.75 19h11.5A2.75 2.75.0 0023 16.25zM18.25 14.5h-7.5a.75.75.0 010-1.5h7.5a.75.75.0 010 1.5zm0-3h-7.5a.75.75.0 010-1.5h7.5a.75.75.0 010 1.5zm0-3h-7.5a.75.75.0 010-1.5h7.5a.75.75.0 010 1.5z"/><path d="M8.75 20.5A4.255 4.255.0 014.5 16.25V2.75c0-.086.02-.166.025-.25H3.75A2.752 2.752.0 001 5.25v16A2.752 2.752.0 003.75 24h12a2.752 2.752.0 002.75-2.75v-.75z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512.001 512.001" id="closeme"><path d="M284.286 256.002 506.143 34.144c7.811-7.811 7.811-20.475.0-28.285-7.811-7.81-20.475-7.811-28.285.0L256 227.717 34.143 5.859c-7.811-7.811-20.475-7.811-28.285.0-7.81 7.811-7.811 20.475.0 28.285l221.857 221.857L5.858 477.859c-7.811 7.811-7.811 20.475.0 28.285a19.938 19.938.0 0014.143 5.857 19.94 19.94.0 0014.143-5.857L256 284.287l221.857 221.857c3.905 3.905 9.024 5.857 14.143 5.857s10.237-1.952 14.143-5.857c7.811-7.811 7.811-20.475.0-28.285L284.286 256.002z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="open-menu"><path d="M492 236H20c-11.046.0-20 8.954-20 20s8.954 20 20 20h472c11.046.0 20-8.954 20-20s-8.954-20-20-20zm0-160H20C8.954 76 0 84.954.0 96s8.954 20 20 20h472c11.046.0 20-8.954 20-20s-8.954-20-20-20zm0 320H20c-11.046.0-20 8.954-20 20s8.954 20 20 20h472c11.046.0 20-8.954 20-20s-8.954-20-20-20z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="instagram"><path d="M12 2.163c3.204.0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849.0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204.0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849.0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741.0 8.333.014 7.053.072c-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948s.014 3.668.072 4.948c.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24s3.668-.014 4.948-.072c4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948s-.014-3.667-.072-4.947c-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403.0-6.162 2.759-6.162 6.162S8.597 18.163 12 18.163s6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zM12 16c-2.209.0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796.0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795.0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="youtube"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23.0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23.0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816V8l8 3.993L9 16z"/></symbol><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="stackoverflow"><path d="M21 27v-8h3v11H0V19h3v8h18z"/><path d="M17.1.2 15 1.8l7.9 10.6 2.1-1.6L17.1.2zm3.7 14.7L10.6 6.4l1.7-2 10.2 8.5-1.7 2zM7.2 12.3l12 5.6 1.1-2.4-12-5.6-1.1 2.4zm-1.8 6.8 13.56 1.96.17-2.38-13.26-2.55-.47 2.97zM19 25H5v-3h14v3z"/></symbol></svg><footer class=footer><div class="footer_inner wrap pale"><img src=http://jbautistam.github.io/icons/apple-touch-icon.png class="icon icon_2 transparent" alt=jbautistam><p>Copyright&nbsp;<span class=year></span>&nbsp;JBAUTISTAM. All Rights Reserved</p><a class=to_top href=#documentTop><svg class="icon"><use xlink:href="#arrow"/></svg></a></div></footer><script type=text/javascript src=http://jbautistam.github.io/js/bundle.min.89fba5b7de3b6f716f751291cf4509057de9c0a1b9e2a75870c8a08aa7b8f2902cf8494b48739e9c4d2922bb410c0b6dae7dc183d61e62d49f95b3691380c76a.js integrity="sha512-ifult947b3FvdRKRz0UJBX3pwKG54qdYcMigiqe48pAs+ElLSHOenE0pIrtBDAttrn3Bg9YeYtSflbNpE4DHag==" crossorigin=anonymous></script></body></html>

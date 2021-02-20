@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Utilidades on jbautistam</title><link>http://jbautistam.github.io/tags/utilidades/</link><description>Recent content in Utilidades on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/utilidades/index.xml" rel="self" type="application/rss+xml"/><item><title>5 Profilers para .NET</title><link>http://jbautistam.github.io/articles/development/profilers-net/profilers-net/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/profilers-net/profilers-net/</guid><description>
+&lt;p>Estos días he estado investigando sobre la optimización de aplicaciones.NET y he tenido que buscar herramientas
+para poder medir el rendimiento de las aplicaciones.&lt;/p>
+&lt;p>Entre todas las herramientas que he encontrado, destacan &lt;strong>5 profilers&lt;/strong> para aplicaciones.NET:&lt;/p>
+&lt;h2 id="jetbrains-dottracehttpwwwjetbrainscomprofiler">&lt;a href="http://www.jetbrains.com/profiler/">JetBrains dotTrace&lt;/a>&lt;/h2>
+&lt;p>&lt;strong>JetBrains dotTrace&lt;/strong> es quizá el profiler para.NET más completo de los que he utilizado.&lt;/p>
+&lt;p>Permite medir no sólo el rendimiento del código si no también el de la memoria para detectar cuellos de botella y
+se pueden medir aplicaciones en todas las versiones del Framework desde la 1.0 a la 4.5.&lt;/p>
+&lt;h2 id="ants-performance-profilerhttpwwwred-gatecomproductsdotnet-developmentants-performance-profiler">&lt;a href="http://www.red-gate.com/products/dotnet-development/ants-performance-profiler/">ANTS Performance Profiler&lt;/a>&lt;/h2>
+&lt;p>&lt;strong>ANTS Performance Profiler&lt;/strong> es una aplicación de la prestigiosa &lt;strong>RedGate&lt;/strong> y permite medir y optimizar el rendimiento
+de aplicaciones.NET incluyendo ASP.NET y MVC muy útil para medir los aspectos que siempre pasamos por alto en las aplicaciones.&lt;/p>
+&lt;h2 id="eqatec-profilerhttpwwweqateccomprofilerdownloadaspx">&lt;a href="http://www.eqatec.com/Profiler/Download.aspx">EQATEC Profiler&lt;/a>&lt;/h2>
+&lt;p>&lt;strong>EQATEC Profiler&lt;/strong> es una herramienta sencilla para comenzar con las optimizaciones y medir el rendimiento de
+las aplicaciones.&lt;/p>
+&lt;p>Lo mejor es que dispone de tres versiones, una gratuita, otra profesional y otra corporativa que nos permiten
+evaluar la herramienta antes de invertir en ella.&lt;/p>
+&lt;h2 id="telerik-just-tracehttpwwwtelerikcomjusttraceaspx">&lt;a href="http://www.telerik.com/justtrace.aspx">Telerik Just Trace&lt;/a>&lt;/h2>
+&lt;p>Conocía a &lt;strong>Telerik&lt;/strong> más por sus controles para Windows Form y WPF que por sus herramientas, por eso me ha
+sorprendido agradablemente su profiler, bastante fácil de utilizar como el resto de los controles de la compañía.&lt;/p>
+&lt;p>&lt;strong>Telerik Just Trace&lt;/strong> ayuda a resolver los problemas de rendimiento e identificar y corregir los fallos de memoria.&lt;/p>
+&lt;h2 id="net-memory-profilerhttpmemprofilercom">&lt;a href="http://memprofiler.com/">.NET Memory Profiler&lt;/a>&lt;/h2>
+&lt;p>Una herramienta para examinar la memoria utilizada por.NET y encontrar fallos de memoria.&lt;/p>
+&lt;p>Lo más interesante de esta herramienta es que se pueden automatizar las pruebas de memoria.&lt;/p></description></item><item><title>Crear marca agua en PDF utilizando iTextSharp</title><link>http://jbautistam.github.io/articles/development/marca-agua-pdf/marca-agua-pdf/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/marca-agua-pdf/marca-agua-pdf/</guid><description>
+&lt;p>Una de las preguntas más comunes cuando se commienza a trabajar con &lt;strong>iTextSharp&lt;/strong> es cómo
+crear una marca de agua (watermark) en una página de un PDF.&lt;/p>
+&lt;p>La respuesta es bastante sencilla, simplemente debemos crear una nueva imagen y establecer
+que se debe utilizar como fondo de página.&lt;/p>
+&lt;p>El código sería similar al siguiente:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">WriteWaterMark&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Document&lt;/span> &lt;span class="n">objPdfDocument&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strFileImage&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="n">Image&lt;/span> &lt;span class="n">objImagePdf&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="c1">// Crea la imagen
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objImagePdf&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">Image&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetInstance&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileImage&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 7&lt;/span> &lt;span class="c1">// Cambia el tamaño de la imagen
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objImagePdf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ScaleToFit&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="m">3000&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">770&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln"> 9&lt;/span> &lt;span class="c1">// Se indica que la imagen debe almacenarse como fondo
+&lt;/span>&lt;span class="ln">10&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objImagePdf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Alignment&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">iTextSharp&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">text&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Image&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">UNDERLYING&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="c1">// Coloca la imagen en una posición absoluta
+&lt;/span>&lt;span class="ln">12&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objImagePdf&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SetAbsolutePosition&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="m">7&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">69&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="c1">// Imprime la imagen como fondo de página
+&lt;/span>&lt;span class="ln">14&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objPdfDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objImagePdf&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">15&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Los pasos son muy sencillos, simplemente creamos la imagen leyendo un archivo, escalamos la imagen y cambiarlo
+para establecer el fondo utilizando &lt;strong>Image.UNDERLYING&lt;/strong>. Una vez hecho esto, simplemente debemos añadirlo a la
+página en la posición que deseemos.&lt;/p>
+&lt;p>Por supuesto, podemos dejar la imagen con su tamaño original y colocarla donde queramos, no es necesario
+ajustarla a la página.&lt;/p>
+&lt;p>Si simplemente deseamos establecer el fondo de la página utilizando un color sólido, lo que debemos hacer es crear
+un rectángulo del color deseado que ocupe toda la página y añadir este rectángulo al PDF:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="k">void&lt;/span> &lt;span class="n">WriteWaterMark&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Document&lt;/span> &lt;span class="n">objPdfDocument&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Drawing&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Color&lt;/span> &lt;span class="n">clrColor&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="n">Rectangle&lt;/span> &lt;span class="n">objRectangle&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">Rectangle&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objPdfDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">PageSize&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">4&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="c1">// Asigna el color de fondo
+&lt;/span>&lt;span class="ln">6&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objRectangle&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">BackgroundColor&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">BaseColor&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">clrColor&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="c1">// Añade el rectángulo a la página
+&lt;/span>&lt;span class="ln">8&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objPdfDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Add&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objRectangle&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">9&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, ambas técnicas se pueden combinar, podemos asignar primero el rectángulo con el color
+del fondo de la página y posteriormente añadir la imagen de la marca de agua.&lt;/p></description></item><item><title>Cómo convertir SharpDevelop en una aplicación Portable</title><link>http://jbautistam.github.io/articles/development/sharpdevelop-portable/sharpdevelop-portable/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/sharpdevelop-portable/sharpdevelop-portable/</guid><description>
+&lt;p>En ocasiones, resulta muy útil poder tener instalado en una máquina, como por ejemplo un servidor
+de producción, un IDE para hacer pequeñas pruebas o depuración paso a paso, sin embargo, por
+restricciones de seguridad es posible que no podamos instalarlo sin más. En otros casos lo que
+queremos es llevar un IDE de programación con nosotros en una llave USB para utilizarla en cualquier ordenador.&lt;/p>
+&lt;p>Si utilizamos normalmente tecnologías.NET podemos utilizar el IDE de código abierto
+&lt;a href="http://www.icsharpcode.net/OpenSource/SD/">SharpDevelop&lt;/a> configurándolo para
+que se ejecute como una &lt;strong>aplicación portable&lt;/strong>.&lt;/p>
+&lt;p>Para conseguir que &lt;strong>SharpDevelop&lt;/strong> se ejecute como &lt;strong>aplicación portable&lt;/strong> simplemente debemos seguir estos
+pasos:&lt;/p>
+&lt;ol>
+&lt;li>Obviamente descargar &lt;strong>SharpDevelop&lt;/strong> e instalarlo en nuestra máquina.&lt;/li>
+&lt;li>Copiar el directorio de &lt;strong>SharpDevelop&lt;/strong> completo en la memoria USB o en la máquina en la
+que lo deseemos instalar como aplicación portable.&lt;/li>
+&lt;/ol>
+&lt;p>A partir de aquí, ya necesitamos algo de configuración. Para ello, abrimos el directorio &lt;em>bin&lt;/em> dentro
+del directorio de la aplicación y buscar el archivo &lt;em>SharpDevelop.exe.config&lt;/em>. En la sección
+&lt;em>appSettings&lt;/em> se muestran las opciones básicas:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-XML" data-lang="XML">&lt;span class="ln"> 1&lt;/span>&lt;span class="nt">&amp;lt;appSettings&amp;gt;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="c">&amp;lt;!-- Use this configuration setting to store settings in a directory relative to the location
+&lt;/span>&lt;span class="ln"> 3&lt;/span>&lt;span class="c">of SharpDevelop.exe instead of the user profile directory. --&amp;gt;&lt;/span>
+&lt;span class="ln"> 4&lt;/span>&lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">key=&lt;/span>&lt;span class="s">&amp;#34;settingsPath&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;..\Settings&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln"> 5&lt;/span>
+&lt;span class="ln"> 6&lt;/span>&lt;span class="c">&amp;lt;!-- Use this setting to specify a different path for the code completion cache.
+&lt;/span>&lt;span class="ln"> 7&lt;/span>&lt;span class="c">The cache contains information about referenced assemblies to speed up loading
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c">the information on future SharpDevelop starts. --&amp;gt;&lt;/span>
+&lt;span class="ln"> 9&lt;/span>&lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">key=&lt;/span>&lt;span class="s">&amp;#34;domPersistencePath&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;..\DomCache&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">10&lt;/span>
+&lt;span class="ln">11&lt;/span>&lt;span class="c">&amp;lt;!-- Use this setting to disable the code completion cache. Code completion will still be
+&lt;/span>&lt;span class="ln">12&lt;/span>&lt;span class="c">available, but take longer to load and use more RAM. --&amp;gt;&lt;/span>
+&lt;span class="ln">13&lt;/span>&lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">key=&lt;/span>&lt;span class="s">&amp;#34;domPersistencePath&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;none&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">14&lt;/span>&lt;span class="nt">&amp;lt;/appSettings&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En la configuración debemos quitar el comentario de las claves &lt;code>settingsPath&lt;/code> y &lt;code>domPersistencePath&lt;/code>:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-XML" data-lang="XML">&lt;span class="ln">1&lt;/span>&lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">key=&lt;/span>&lt;span class="s">&amp;#34;settingsPath&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;..\Settings&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="nt">&amp;lt;add&lt;/span> &lt;span class="na">key=&lt;/span>&lt;span class="s">&amp;#34;domPersistencePath&amp;#34;&lt;/span> &lt;span class="na">value=&lt;/span>&lt;span class="s">&amp;#34;..\DomCache&amp;#34;&lt;/span> &lt;span class="nt">/&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>A partir de ese momento ya podemos utilizar el IDE desde nuestra USB sin necesidad de instalarlo en la máquina
+cliente.&lt;/p></description></item><item><title>Mezclar archivos PDF con C# e iTextSharp</title><link>http://jbautistam.github.io/articles/development/combinar-pdf/combinar-pdf/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/combinar-pdf/combinar-pdf/</guid><description>
+&lt;p>La librería &lt;a href="http://sourceforge.net/projects/itextsharp">iTextSharp&lt;/a>, es una traducción en C# del código de
+&lt;strong>iText&lt;/strong> en Java para el tratamiento de archivos &lt;strong>PDF&lt;/strong>.&lt;/p>
+&lt;p>Aparte de permitirnos crear archivos &lt;strong>PDF&lt;/strong> dinámicos, tiene funciones para
+&lt;a href="Aplicaciones%5CiTextSharpSign">firmar PDF&lt;/a> o combinar archivos.&lt;/p>
+&lt;p>Si lo que deseamos es combinar una serie de archivos PDF en primer lugar debemos incluir los espacios de nombres
+de la librería:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">iTextSharp.text&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">using&lt;/span> &lt;span class="nn">iTextSharp.text.pdf&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Y posteriormente ir leyendo uno a uno los archivos que deseemos combinar y grabando las páginas en otro archivo.&lt;/p>
+&lt;p>La siguiente función realiza la combinación de los archivos. Espera dos parámetros, el primero de ellos es el nombre
+del archivo final, el segundo es un array con los nombres de los archivos que deseamos combinar:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">/// Combina una serie de archivos PDF
+&lt;/span>&lt;span class="ln"> 3&lt;/span>&lt;span class="c1">/// &amp;lt;/summary&amp;gt;
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">internal&lt;/span> &lt;span class="k">static&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="n">Merge&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strFileTarget&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="p">[]&lt;/span> &lt;span class="n">arrStrFilesSource&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="kt">bool&lt;/span> &lt;span class="n">blnMerged&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln"> 7&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="c1">// Crea el PDF de salida
+&lt;/span>&lt;span class="ln"> 9&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">try&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">11&lt;/span> &lt;span class="k">using&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FileStream&lt;/span> &lt;span class="n">stmFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FileStream&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileTarget&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">IO&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FileMode&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Create&lt;/span>&lt;span class="p">))&lt;/span>
+&lt;span class="ln">12&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="n">Document&lt;/span> &lt;span class="n">objDocument&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="n">PdfWriter&lt;/span> &lt;span class="n">objWriter&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">null&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">15&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="c1">// Recorre los archivos
+&lt;/span>&lt;span class="ln">17&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">intIndexFile&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">intIndexFile&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="n">arrStrFilesSource&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Length&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">intIndexFile&lt;/span>&lt;span class="p">++)&lt;/span>
+&lt;span class="ln">18&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">19&lt;/span> &lt;span class="n">PdfReader&lt;/span> &lt;span class="n">objReader&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">PdfReader&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrStrFilesSource&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="n">intIndexFile&lt;/span>&lt;span class="p">]);&lt;/span>
+&lt;span class="ln">20&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intNumberOfPages&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objReader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">NumberOfPages&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">21&lt;/span>
+&lt;span class="ln">22&lt;/span> &lt;span class="c1">// La primera vez, inicializa el documento y el escritor
+&lt;/span>&lt;span class="ln">23&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">intIndexFile&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">24&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">25&lt;/span> &lt;span class="c1">// Asigna el documento y el generador
+&lt;/span>&lt;span class="ln">26&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objDocument&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">Document&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objReader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetPageSizeWithRotation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">27&lt;/span> &lt;span class="n">objWriter&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">PdfWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetInstance&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objDocument&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="c1">// Abre el documento
+&lt;/span>&lt;span class="ln">29&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Open&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">30&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">31&lt;/span> &lt;span class="c1">// Añade las páginas
+&lt;/span>&lt;span class="ln">32&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">for&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">intPage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">intPage&lt;/span> &lt;span class="p">&amp;lt;&lt;/span> &lt;span class="n">intNumberOfPages&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="n">intPage&lt;/span>&lt;span class="p">++)&lt;/span>
+&lt;span class="ln">33&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">34&lt;/span> &lt;span class="kt">int&lt;/span> &lt;span class="n">intRotation&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objReader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetPageRotation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">intPage&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="m">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">35&lt;/span> &lt;span class="n">PdfImportedPage&lt;/span> &lt;span class="n">objPage&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetImportedPage&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objReader&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">intPage&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="m">1&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">36&lt;/span>
+&lt;span class="ln">37&lt;/span> &lt;span class="c1">// Asigna el tamaño de la página
+&lt;/span>&lt;span class="ln">38&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SetPageSize&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objReader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetPageSizeWithRotation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">intPage&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="m">1&lt;/span>&lt;span class="p">));&lt;/span>
+&lt;span class="ln">39&lt;/span> &lt;span class="c1">// Crea una nueva página
+&lt;/span>&lt;span class="ln">40&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">NewPage&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">41&lt;/span> &lt;span class="c1">// Añade la página leída
+&lt;/span>&lt;span class="ln">42&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">intRotation&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="m">90&lt;/span> &lt;span class="p">||&lt;/span> &lt;span class="n">intRotation&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="m">270&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">43&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">DirectContent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">AddTemplate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objPage&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">-&lt;/span>&lt;span class="m">1f&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">1f&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">44&lt;/span> &lt;span class="n">objReader&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetPageSizeWithRotation&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">intPage&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="m">1&lt;/span>&lt;span class="p">).&lt;/span>&lt;span class="n">Height&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">45&lt;/span> &lt;span class="k">else&lt;/span>
+&lt;span class="ln">46&lt;/span> &lt;span class="n">objWriter&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">DirectContent&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">AddTemplate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objPage&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">1f&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">1f&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="m">0&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">47&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">48&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">49&lt;/span> &lt;span class="c1">// Cierra el documento
+&lt;/span>&lt;span class="ln">50&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">if&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">objDocument&lt;/span> &lt;span class="p">!=&lt;/span> &lt;span class="k">null&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">51&lt;/span> &lt;span class="n">objDocument&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">52&lt;/span> &lt;span class="c1">// Cierra el stream del archivo
+&lt;/span>&lt;span class="ln">53&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">stmFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
+&lt;span class="ln">54&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">55&lt;/span> &lt;span class="c1">// Indica que se ha creado el documento
+&lt;/span>&lt;span class="ln">56&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">blnMerged&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="k">true&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">57&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">58&lt;/span> &lt;span class="k">catch&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Exception&lt;/span> &lt;span class="n">objException&lt;/span>&lt;span class="p">)&lt;/span>
+&lt;span class="ln">59&lt;/span> &lt;span class="p">{&lt;/span>
+&lt;span class="ln">60&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Diagnostics&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Debug&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objException&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Message&lt;/span>&lt;span class="p">);&lt;/span>
+&lt;span class="ln">61&lt;/span> &lt;span class="p">}&lt;/span>
+&lt;span class="ln">62&lt;/span> &lt;span class="c1">// Devuelve el valor que indica si se han mezclado los archivos
+&lt;/span>&lt;span class="ln">63&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">blnMerged&lt;/span>&lt;span class="p">;&lt;/span>
+&lt;span class="ln">64&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div></description></item></channel></rss>

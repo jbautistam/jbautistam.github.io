@@ -1,0 +1,835 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>BauDbStudio on jbautistam</title><link>http://jbautistam.github.io/series/baudbstudio/</link><description>Recent content in BauDbStudio on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 06 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/series/baudbstudio/index.xml" rel="self" type="application/rss+xml"/><item><title>BauDbStudio: SQL para generación de informes</title><link>http://jbautistam.github.io/applications/baudbstudio/articles/reporting/</link><pubDate>Sun, 06 Dec 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/articles/reporting/</guid><description>
+&lt;p>Una de las cosas que más envidio de las herramientas de Bussiness Intelligence o reporting es su capacidad para realizar consultas relativamente
+complejas prácticamente sin programación.&lt;/p>
+&lt;p>Por eso, estos últimos meses he estado trabajando en algunas ideas para reproducir este comportamiento en &lt;strong>BauDbStudio&lt;/strong>.&lt;/p>
+&lt;p>Normalmente la bases de datos utilizadas con reporting son especiales. Los datos se almacenan de forma que la explotación sea lo más sencilla posible,
+bien denormalizando tablas o bien agrupando datos en tablas para que el acceso sea más rápido.&lt;/p>
+&lt;p>Sobre estas tablas se genera además una estructura de metadatos con nombres y relaciones entre tablas para que el usuario pueda seleccionar los informes
+y consultas directamente desde la interface de usuario.&lt;/p>
+&lt;h2 id="generación-de-base-de-datos-de-reporting">Generación de base de datos de reporting&lt;/h2>
+&lt;p>Lo primero que tenemos que hacer, por tanto, es generar una base de datos de reporting. Esto no es completamente necesario, podríamos crear
+los informes y metadatos sobre una base de datos &lt;em>normal&lt;/em>, pero lo habitual es dejarlo en bases de datos separadas.&lt;/p>
+&lt;p>Como ejemplo, he cogido la base de datos &lt;strong>Northwind&lt;/strong>, la he copiado sobre una base de datos SqLite simplemente por demostrar que en algunos casos
+no es necesario utilizar un servidor de base de datos avanzado como SQL Server o Spark y he generado una base de datos de reporting también con SqLite con tablas preprocesadas
+para que podamos generar informes.&lt;/p>
+&lt;p>En este punto, ya nos aparece un concepto básico de los procesos de BI, el proceso de ETL (Extract, Transform and Load). Un ETL es un proceso automático que copia
+y transforma datos entre bases de datos y/o archivos.&lt;/p>
+&lt;p>Para este paso, he utilizado también &lt;strong>BauDbStudio&lt;/strong>. Para ello me he generado algunos archivos de script que realizan la copia y agregación de datos de la
+base de datos inicial a la base de datos de reporting.&lt;/p>
+&lt;p>Este caso es muy sencillo, pero sólo para que nos sirva de referencia, en el primer paso creamos las tablas en la base de datos destino:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-XML" data-lang="XML">&lt;span class="ln"> 1&lt;/span>&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34; ?&amp;gt;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="nt">&amp;lt;DbScript&amp;gt;&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="nt">&amp;lt;Block&lt;/span> &lt;span class="na">Message=&lt;/span>&lt;span class="s">&amp;#34;Create dimensions tables&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 5&lt;/span> DROP TABLE IF EXISTS [DimLocations];
+&lt;span class="ln"> 6&lt;/span> CREATE TABLE IF NOT EXISTS [DimLocations]
+&lt;span class="ln"> 7&lt;/span> (
+&lt;span class="ln"> 8&lt;/span> [LocationId] INTEGER NOT NULL,
+&lt;span class="ln"> 9&lt;/span> [Country] nvarchar(200) NOT NULL,
+&lt;span class="ln">10&lt;/span> [City] nvarchar(200) NULL,
+&lt;span class="ln">11&lt;/span> [Region] nvarchar(200) NULL,
+&lt;span class="ln">12&lt;/span> [PostalCode] nvarchar(200) NULL,
+&lt;span class="ln">13&lt;/span> CONSTRAINT [PK_Locations] PRIMARY KEY ([LocationId])
+&lt;span class="ln">14&lt;/span> );
+&lt;span class="ln">15&lt;/span>
+&lt;span class="ln">16&lt;/span> DROP TABLE IF EXISTS [DimCustomers];
+&lt;span class="ln">17&lt;/span> CREATE TABLE IF NOT EXISTS [DimCustomers]
+&lt;span class="ln">18&lt;/span> (
+&lt;span class="ln">19&lt;/span> [CustomerId] INTEGER NOT NULL,
+&lt;span class="ln">20&lt;/span> [Code] nvarchar(20) NOT NULL,
+&lt;span class="ln">21&lt;/span> [Name] nvarchar(200) NOT NULL,
+&lt;span class="ln">22&lt;/span> [LocationId] INTEGER,
+&lt;span class="ln">23&lt;/span> CONSTRAINT [PK_Customer] PRIMARY KEY ([CustomerId])
+&lt;span class="ln">24&lt;/span> );
+&lt;span class="ln">25&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln">26&lt;/span> &lt;span class="nt">&amp;lt;/Block&amp;gt;&lt;/span>
+&lt;span class="ln">27&lt;/span>
+&lt;span class="ln">28&lt;/span> &lt;span class="nt">&amp;lt;Block&lt;/span> &lt;span class="na">Message=&lt;/span>&lt;span class="s">&amp;#34;Create facts tables&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln">29&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln">30&lt;/span> DROP TABLE IF EXISTS [FactSales];
+&lt;span class="ln">31&lt;/span> CREATE TABLE IF NOT EXISTS [FactSales]
+&lt;span class="ln">32&lt;/span> (
+&lt;span class="ln">33&lt;/span> [CustomerId] INTEGER NOT NULL,
+&lt;span class="ln">34&lt;/span> [EmployeeId] INTEGER NOT NULL,
+&lt;span class="ln">35&lt;/span> [ProductId] INTEGER NOT NULL,
+&lt;span class="ln">36&lt;/span> [LocationId] INTEGER NOT NULL,
+&lt;span class="ln">37&lt;/span> [Date] Date NOT NULL,
+&lt;span class="ln">38&lt;/span> [Price] float NOT NULL
+&lt;span class="ln">39&lt;/span> );
+&lt;span class="ln">40&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln">41&lt;/span> &lt;span class="nt">&amp;lt;/Block&amp;gt;&lt;/span>
+&lt;span class="ln">42&lt;/span>&lt;span class="nt">&amp;lt;/DbScript&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El segundo paso, copia datos y en su caso los agrupa:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-XML" data-lang="XML">&lt;span class="ln"> 1&lt;/span>&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34; ?&amp;gt;&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="nt">&amp;lt;DbScript&amp;gt;&lt;/span>
+&lt;span class="ln"> 3&lt;/span> &lt;span class="nt">&amp;lt;Block&lt;/span> &lt;span class="na">Message=&lt;/span>&lt;span class="s">&amp;#34;Copying locations&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 4&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 5&lt;/span> DELETE FROM DimLocations
+&lt;span class="ln"> 6&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln"> 7&lt;/span>
+&lt;span class="ln"> 8&lt;/span> &lt;span class="nt">&amp;lt;BulkCopy&lt;/span> &lt;span class="na">Source=&lt;/span>&lt;span class="s">&amp;#34;Northwind&amp;#34;&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Table=&lt;/span>&lt;span class="s">&amp;#34;DimLocations&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 9&lt;/span> SELECT ROW_Number() OVER (ORDER BY Country) AS LocationId, Country, City, Region, PostalCode
+&lt;span class="ln"> 10&lt;/span> FROM (SELECT Country, City, Region, PostalCode
+&lt;span class="ln"> 11&lt;/span> FROM Suppliers
+&lt;span class="ln"> 12&lt;/span> UNION
+&lt;span class="ln"> 13&lt;/span> SELECT Country, City, Region, PostalCode
+&lt;span class="ln"> 14&lt;/span> FROM Employees
+&lt;span class="ln"> 15&lt;/span> UNION
+&lt;span class="ln"> 16&lt;/span> SELECT Country, City, Region, PostalCode
+&lt;span class="ln"> 17&lt;/span> FROM Customers
+&lt;span class="ln"> 18&lt;/span> UNION
+&lt;span class="ln"> 19&lt;/span> SELECT ShipCountry, ShipCity, ShipRegion, ShipPostalCode
+&lt;span class="ln"> 20&lt;/span> FROM Orders
+&lt;span class="ln"> 21&lt;/span> )
+&lt;span class="ln"> 22&lt;/span> &lt;span class="nt">&amp;lt;/BulkCopy&amp;gt;&lt;/span>
+&lt;span class="ln"> 23&lt;/span> &lt;span class="nt">&amp;lt;/Block&amp;gt;&lt;/span>
+&lt;span class="ln"> 24&lt;/span>
+&lt;span class="ln"> 25&lt;/span> &lt;span class="nt">&amp;lt;Block&lt;/span> &lt;span class="na">Message=&lt;/span>&lt;span class="s">&amp;#34;Copying customers&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 26&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 27&lt;/span> DROP TABLE IF EXISTS [SyncDimCustomers];
+&lt;span class="ln"> 28&lt;/span> CREATE TABLE IF NOT EXISTS [SyncDimCustomers]
+&lt;span class="ln"> 29&lt;/span> (
+&lt;span class="ln"> 30&lt;/span> [CustomerId] nvarchar(5) NOT NULL,
+&lt;span class="ln"> 31&lt;/span> [Name] nvarchar(200) NOT NULL,
+&lt;span class="ln"> 32&lt;/span> [Country] nvarchar(200) NOT NULL,
+&lt;span class="ln"> 33&lt;/span> [City] nvarchar(200) NULL,
+&lt;span class="ln"> 34&lt;/span> [Region] nvarchar(200) NULL,
+&lt;span class="ln"> 35&lt;/span> [PostalCode] nvarchar(200) NULL,
+&lt;span class="ln"> 36&lt;/span> CONSTRAINT [PK_SynCustomers] PRIMARY KEY ([CustomerId])
+&lt;span class="ln"> 37&lt;/span> );
+&lt;span class="ln"> 38&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln"> 39&lt;/span>
+&lt;span class="ln"> 40&lt;/span> &lt;span class="nt">&amp;lt;BulkCopy&lt;/span> &lt;span class="na">Source=&lt;/span>&lt;span class="s">&amp;#34;Northwind&amp;#34;&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Table=&lt;/span>&lt;span class="s">&amp;#34;SyncDimCustomers&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 41&lt;/span> SELECT CustomerID, CompanyName AS Name, Country, City, Region, PostalCode
+&lt;span class="ln"> 42&lt;/span> FROM Customers
+&lt;span class="ln"> 43&lt;/span> &lt;span class="nt">&amp;lt;/BulkCopy&amp;gt;&lt;/span>
+&lt;span class="ln"> 44&lt;/span>
+&lt;span class="ln"> 45&lt;/span> &lt;span class="nt">&amp;lt;BulkCopy&lt;/span> &lt;span class="na">Source=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Table=&lt;/span>&lt;span class="s">&amp;#34;DimCustomers&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 46&lt;/span> SELECT ROW_Number() OVER (ORDER BY SyncDimCustomers.CustomerId) AS CustomerId, SyncDimCustomers.CustomerId AS Code,
+&lt;span class="ln"> 47&lt;/span> SyncDimCustomers.Name, DimLocations.LocationId
+&lt;span class="ln"> 48&lt;/span> FROM SyncDimCustomers INNER JOIN DimLocations
+&lt;span class="ln"> 49&lt;/span> ON IfNull(SyncDimCustomers.Country, &amp;#39;&amp;#39;) = IfNull(DimLocations.Country, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 50&lt;/span> AND IfNull(SyncDimCustomers.Region, &amp;#39;&amp;#39;) = IfNull(DimLocations.Region, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 51&lt;/span> AND IfNull(SyncDimCustomers.City, &amp;#39;&amp;#39;) = IfNull(DimLocations.City, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 52&lt;/span> AND IfNull(SyncDimCustomers.PostalCode, &amp;#39;&amp;#39;) = IfNull(DimLocations.PostalCode, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 53&lt;/span> &lt;span class="nt">&amp;lt;/BulkCopy&amp;gt;&lt;/span>
+&lt;span class="ln"> 54&lt;/span>
+&lt;span class="ln"> 55&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 56&lt;/span> DROP TABLE IF EXISTS [SyncDimCustomers];
+&lt;span class="ln"> 57&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln"> 58&lt;/span> &lt;span class="nt">&amp;lt;/Block&amp;gt;&lt;/span>
+&lt;span class="ln"> 59&lt;/span>
+&lt;span class="ln"> 60&lt;/span> &lt;span class="nt">&amp;lt;Block&lt;/span> &lt;span class="na">Message=&lt;/span>&lt;span class="s">&amp;#34;Copying fact sales&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 61&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 62&lt;/span> DROP TABLE IF EXISTS [SyncFactSales];
+&lt;span class="ln"> 63&lt;/span> CREATE TABLE IF NOT EXISTS [SyncFactSales]
+&lt;span class="ln"> 64&lt;/span> (
+&lt;span class="ln"> 65&lt;/span> [CustomerCode] nvarchar(5) NOT NULL,
+&lt;span class="ln"> 66&lt;/span> [EmployeeId] INTEGER NOT NULL,
+&lt;span class="ln"> 67&lt;/span> [ProductId] INTEGER NOT NULL,
+&lt;span class="ln"> 68&lt;/span> [Date] Date NOT NULL,
+&lt;span class="ln"> 69&lt;/span> [Country] nvarchar(200) NOT NULL,
+&lt;span class="ln"> 70&lt;/span> [City] nvarchar(200) NULL,
+&lt;span class="ln"> 71&lt;/span> [Region] nvarchar(200) NULL,
+&lt;span class="ln"> 72&lt;/span> [PostalCode] nvarchar(200) NULL,
+&lt;span class="ln"> 73&lt;/span> [Price] float NOT NULL
+&lt;span class="ln"> 74&lt;/span> );
+&lt;span class="ln"> 75&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln"> 76&lt;/span>
+&lt;span class="ln"> 77&lt;/span> &lt;span class="nt">&amp;lt;BulkCopy&lt;/span> &lt;span class="na">Source=&lt;/span>&lt;span class="s">&amp;#34;Northwind&amp;#34;&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Table=&lt;/span>&lt;span class="s">&amp;#34;SyncFactSales&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 78&lt;/span> SELECT Orders.CustomerId AS CustomerCode, Orders.EmployeeId, Details.ProductId,
+&lt;span class="ln"> 79&lt;/span> IfNull(Orders.ShippedDate, Orders.OrderDate) AS Date, Orders.ShipCountry AS Country,
+&lt;span class="ln"> 80&lt;/span> Orders.ShipRegion AS Region, Orders.ShipCity AS City, Orders.ShipPostalCode AS PostalCode,
+&lt;span class="ln"> 81&lt;/span> Details.UnitPrice * Details.Quantity - Details.Discount AS Price
+&lt;span class="ln"> 82&lt;/span> FROM [Orders] INNER JOIN [Order Details] AS Details
+&lt;span class="ln"> 83&lt;/span> ON Orders.OrderId = Details.OrderId
+&lt;span class="ln"> 84&lt;/span> &lt;span class="nt">&amp;lt;/BulkCopy&amp;gt;&lt;/span>
+&lt;span class="ln"> 85&lt;/span>
+&lt;span class="ln"> 86&lt;/span> &lt;span class="nt">&amp;lt;BulkCopy&lt;/span> &lt;span class="na">Source=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span> &lt;span class="na">Table=&lt;/span>&lt;span class="s">&amp;#34;FactSales&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln"> 87&lt;/span> SELECT DimCustomers.CustomerId, DimEmployees.EmployeeId, DimProducts.ProductId, DimLocations.LocationId,
+&lt;span class="ln"> 88&lt;/span> SyncFactSales.Date, SyncFactSales.Price
+&lt;span class="ln"> 89&lt;/span> FROM SyncFactSales INNER JOIN DimCustomers
+&lt;span class="ln"> 90&lt;/span> ON SyncFactSales.CustomerCode = DimCustomers.Code
+&lt;span class="ln"> 91&lt;/span> INNER JOIN DimEmployees
+&lt;span class="ln"> 92&lt;/span> ON SyncFactSales.EmployeeId = DimEmployees.EmployeeId
+&lt;span class="ln"> 93&lt;/span> INNER JOIN DimProducts
+&lt;span class="ln"> 94&lt;/span> ON SyncFactSales.ProductId = DimProducts.ProductId
+&lt;span class="ln"> 95&lt;/span> INNER JOIN DimLocations
+&lt;span class="ln"> 96&lt;/span> ON IfNull(SyncFactSales.Country, &amp;#39;&amp;#39;) = IfNull(DimLocations.Country, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 97&lt;/span> AND IfNull(SyncFactSales.Region, &amp;#39;&amp;#39;) = IfNull(DimLocations.Region, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 98&lt;/span> AND IfNull(SyncFactSales.City, &amp;#39;&amp;#39;) = IfNull(DimLocations.City, &amp;#39;&amp;#39;)
+&lt;span class="ln"> 99&lt;/span> AND IfNull(SyncFactSales.PostalCode, &amp;#39;&amp;#39;) = IfNull(DimLocations.PostalCode, &amp;#39;&amp;#39;)
+&lt;span class="ln">100&lt;/span> &lt;span class="nt">&amp;lt;/BulkCopy&amp;gt;&lt;/span>
+&lt;span class="ln">101&lt;/span>
+&lt;span class="ln">102&lt;/span> &lt;span class="nt">&amp;lt;Execute&lt;/span> &lt;span class="na">Target=&lt;/span>&lt;span class="s">&amp;#34;Reporting&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
+&lt;span class="ln">103&lt;/span> DROP TABLE IF EXISTS [SyncFactSales];
+&lt;span class="ln">104&lt;/span> &lt;span class="nt">&amp;lt;/Execute&amp;gt;&lt;/span>
+&lt;span class="ln">105&lt;/span> &lt;span class="nt">&amp;lt;/Block&amp;gt;&lt;/span>
+&lt;span class="ln">106&lt;/span>&lt;span class="nt">&amp;lt;/DbScript&amp;gt;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Este último paso parece más complejo pero simplemente crea tablas temporales, copia los datos de la base de datos inicial y agrupa los datos necesarios.&lt;/p>
+&lt;p>Fijáos que en la base de datos de reporting se están creando códigos al vuelo como por ejemplo &lt;em>CustomerId&lt;/em>, las claves en nuestra base de datos de reporting
+no tienen porqué ser las mismas que en nuestras bases de datos OLTP y muchas veces no lo serán. Por ejemplo, puedo borrar un cliente en mi base de datos OLTP
+pero debo mantenerlo en mi base de datos de reporting porque sus ventas ya están agrupadas y contabilizadas y debemos mantenerlas a lo largo del tiempo.&lt;/p>
+&lt;p>En un ejemplo tan sencillo como éste se están recreando completamente las claves en cada importación, en casos más complejos habría que modificar los scripts
+para que mantenga las claves. Como ejemplo, nos basta así.&lt;/p>
+&lt;p>Una vez importados los datos, nuestra base de datos de reporting tiene este esquema:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/ReportingDbSchema.jpg" alt="Esquema de base de datos" title="Esquema de la base de datos de informes">&lt;/p>
+&lt;p>Si nos fijamos, tenemos dos tipos de nombre en las tablas, unas que empiezan por &lt;em>dim&lt;/em> y otras que comienzan por &lt;em>fact&lt;/em>.&lt;/p>
+&lt;p>Las tablas que comienzan por &lt;em>fact&lt;/em> se llaman tablas de hechos, en una &lt;a href="https://es.wikipedia.org/wiki/Tabla_de_hechos">tabla de hechos&lt;/a> se
+almacenan los valores de negocio y las relaciones con las dimensiones que la definen.&lt;/p>
+&lt;p>Por su parte, Las tablas que comienzan por &lt;em>dim&lt;/em> son tablas de dimensiones, en una &lt;a href="https://es.wikipedia.org/wiki/Tabla_de_dimensi%C3%B3n">tabla de dimensión&lt;/a>
+se almacenan atributos o campos utilizados para restringir las consultas de los datos almacenados en la tabla de hechos.&lt;/p>
+&lt;p>Por supuesto esta forma de nombrarlo no es obligatoria pero posteriormente nos servirán para identificarlas más fácilmente.&lt;/p>
+&lt;p>Lo habitual es que las tablas de hechos contengan únicamente valores o cantidades y campos de relación con las tablas de dimensión.&lt;/p>
+&lt;p>Por ejemplo, nuestra tabla de ventas contiene precios y fechas como valores y los códigos de cliente, vendedor, proveedor... que identifican las
+diferentes dimensiones:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/FactSalesTable.jpg" alt="Tabla FactSales" title="Campos de la tabla FactSales">&lt;/p>
+&lt;p>Como podemos apreciar, los campos que terminan por &lt;em>Id&lt;/em> son claves foráneas a las tablas de dimensión.&lt;/p>
+&lt;p>Una tabla de dimensión, como &lt;strong>DimCustomers&lt;/strong> por ejemplo, almacena información y atributos sobre el cliente:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/DimCustomersTable.jpg" alt="Tabla DimCustomers" title="Campos de la tabla DimCustomers">&lt;/p>
+&lt;p>En este caso, tenemos el nombre del cliente y su código y una clave foránea a la tabla &lt;em>DimLocations&lt;/em> llamada &lt;em>LocationId&lt;/em>. Es decir,
+una tabla de dimensión puede hacer referencia a otras tablas de dimensión, en nuestro caso la tabla &lt;strong>DimLocations&lt;/strong> tiene estos
+campos:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/DimLocationsTable.jpg" alt="Tabla DimLocations" title="Campos de la tabla DimLocations">&lt;/p>
+&lt;p>Eso nos permite crear un modelo en estrella o de copo de nieve entre nuestras tablas de dimensión y nuestras tablas de hechos.&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/SnowflakeModel.jpg" alt="Modelo de copo de nieve" title="Modelo de copo de nieve">&lt;/p>
+&lt;h2 id="definiendo-metadatos">Definiendo metadatos&lt;/h2>
+&lt;p>Hasta el momento, hemos creado nuestra base de datos de reporting y hemos introducido datos desde nuestra base de datos transaccional, pero
+aún no hemos definido ningún metadato, por tanto, aún no podemos utilizarla para hacer consultas complejas.&lt;/p>
+&lt;p>Los metadatos nos van a permitir identificar:&lt;/p>
+&lt;ul>
+&lt;li>Las tablas que vamos a utilizar como dimensiones&lt;/li>
+&lt;li>La jerarquías entre las dimensiones&lt;/li>
+&lt;li>Las tablas que vamos a utilizar como hechos y sus relaciones con las dimensiones&lt;/li>
+&lt;/ul>
+&lt;p>Estos metadatos, por tanto, son los que permitirán que el usuario pueda realizar consultas complejas.&lt;/p>
+&lt;p>Nuestra estructura de metadatos, queda de esta forma:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/Metadata.jpg" alt="Estructura de metadatos" title="Metadatos">&lt;/p>
+&lt;p>Para el ejemplo he creado una estructura sencilla:&lt;/p>
+&lt;ul>
+&lt;li>En &lt;strong>orígenes de datos&lt;/strong> tenemos las tablas base del esquema sobre el que vamos a trabajar. En este caso
+sólo tenemos tablas físicas pero se pueden definir también orígenes de datos utilizando SQL que se comportarán
+como vistas en las relaciones.&lt;/li>
+&lt;li>En &lt;strong>dimensiones&lt;/strong> se definen las jerarquías que van a utilizar nuestros informes, por ejemplo vemos que la
+dimensión de productos &lt;em>Products dimension&lt;/em> lee del origen de datos &lt;em>DimProducts&lt;/em> y se relaciona con las dimensiones
+&lt;em>Categories dimension&lt;/em> (que lee del origen de datos &lt;em>DimCategories&lt;/em>) y la dimensión &lt;em>DimSuppliers&lt;/em> que a la vez se
+relaciona con la dimensión &lt;em>Locations dimension&lt;/em>, es decir, un producto, aparte de sus datos básicos, tiene categorías
+y proveedores.&lt;/li>
+&lt;li>Por último, los &lt;strong>informes&lt;/strong> como &lt;em>Sales&lt;/em> leen de un origen de datos (en este caso &lt;em>FactSales&lt;/em>, nuestra tabla de hechos) y tienen unas dimensiones
+relacionadas, en este caso &lt;em>Customers dimension&lt;/em>, &lt;em>Employees dimension&lt;/em>, &lt;em>Products dimension&lt;/em> y &lt;em>Location dimension&lt;/em>. Es
+decir, podremos consultar datos por cliente, por empleado, por producto y por ubicación de venta y dado que los productos
+están relacionados con categorías también por la categoría del producto y dado que está relacionado con proveedores podríamos
+hacer consultas por la ciudad del proveedor (dado que los proveedores se relacionan con ubicaciones ¿queda clara la idea?).&lt;/li>
+&lt;/ul>
+&lt;p>Por supuesto, estos metadatos se pueden modificar o ampliar utilizando &lt;strong>BauDbStudio&lt;/strong> pero este artículo es para explicar
+las posibilidades, no vamos a entrar en el mantenimiento de los metadatos.&lt;/p>
+&lt;h2 id="ejecución-de-informes">Ejecución de informes&lt;/h2>
+&lt;p>Si en &lt;strong>BauDbStudio&lt;/strong> ejecutamos una consulta sobre un informe definido:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySales.jpg" alt="Consulta sobre el informe de ventas" title="Consulta de informe">&lt;/p>
+&lt;p>Nos abrirá una pantalla de ejecución del informe:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesWindow.jpg" alt="Ventana del informe de ventas" title="Informe de ventas">&lt;/p>
+&lt;p>En el árbol de la izquierda podemos ver las dimensiones y expresiones que podemos utilizar en este informe.&lt;/p>
+&lt;p>En concreto, para el informe &lt;em>Sales&lt;/em> hemos definido las dimensiones de clientes con sus ubicaciones, empleados con sus ubicaciones, ubicaciones (para el
+lugar en el que se ha producido la venta) y los productos con sus categorías y proveedores con sus ubicaciones.&lt;/p>
+&lt;p>También tenemos dos expresiones en la parte inferior: la fecha y el precio de la venta.&lt;/p>
+&lt;p>Podemos hacer una consulta sencilla para empezar, simplemente veamos las fechas y precios de venta sin seleccionar niguna dimensión, para ello seleccionamos
+las expresiones de fecha y precio y pulsamos sobre la ejecución de consulta. En la ventana nos aparecerá la SQL creada y el resultado de la consulta:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesExpressions.jpg" alt="Consulta sencilla de expresiones" title="Consulta de expresiones">&lt;/p>
+&lt;p>Vamos a hacer algo un poco más complicado, vamos a obtener la suma de precios agrupados por fecha y ordenados por fecha ascendente.
+Para ello simplemente seleccionamos la agregación de suma y pulsamos sobre el botón de ejecución de consulta:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesExpressionsSum.jpg" alt="Consulta de expresiones con suma" title="Suma de precios ordenado por fecha">&lt;/p>
+&lt;p>Pero con expresiones es sencillo, hagamos algo más complejo, visualicemos el nombre de cliente, producto y la ciudad del cliente. Simplemente tenemos
+que seleccionar los campos requeridos en el árbol y ejecutar:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensions.jpg" alt="Consulta con dimensiones" title="Consulta con dimensiones">&lt;/p>
+&lt;p>Ahora filtremos por los clientes de &lt;em>Lyon&lt;/em>, para ello añadimos un filtro sobre la ciudad del cliente:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/FilterCustomerCity.jpg" alt="Filtro por la ciudad del cliente" title="Filtro de clientes">&lt;/p>
+&lt;p>Y ejecutamos:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensionsFiltered.jpg" alt="Consulta con dimensiones filtrado" title="Consulta filtrada con dimensiones">&lt;/p>
+&lt;p>Pero dado que nos van a salir todos los datos de &lt;em>Lyon&lt;/em>, vamos a quitarle este campo del resultado y le vamos a añadir la categoría del producto:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensionsProductFiltered.jpg" alt="Consulta con categoría de producto" title="Consulta filtrada con categoría">&lt;/p>
+&lt;p>Por último, nos puede interesar ver sólo las ventas con una suma total por fecha superior a 300. En ese caso añadimos un filtro sobre precios pero
+en la parte del agregado, es decir, queremos una cláusula HAVING en nuestra consulta final. Para ésto añadimos el filtro al campo agregado:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/FilterPriceHaving.jpg" alt="Filtro sobre la suma de precios" title="Filtro HAVING">&lt;/p>
+&lt;p>Y ejecutamos:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensionsProductHaving.jpg" alt="Consulta con filtro sobre la suma de precios" title="Consulta con un filtro para el total">&lt;/p>
+&lt;p>Por supuesto, también podemos hacer nuestro pequeño gráfico del resultado aunque aún no estoy muy orgulloso de él:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QueryChart.jpg" alt="Gráfico del resultado de la consulta" title="Gráfico">&lt;/p>
+&lt;p>A partir de aquí, todo es jugar con ordenaciones, filtros, agrupaciones... para que nuestro usuario pueda obtener los datos sin necesidad de saber
+SQL dado que nuestros informes están previamente preparados con una serie de metadatos para facilitarle el trabajo.&lt;/p>
+&lt;p>Por supuesto para nosotros, como programadores, la vida será más fácil porque no vamos a tener que escribir SQL para cada petición de nuestro departamento de negocio.
+Nuestro trabajo se reducirá a la creación y mantenimiento de los metadatos y sobre todo a preparar las tablas de hechos para que el acceso sea lo más
+eficiente posible.&lt;/p>
+&lt;h2 id="siguientes-pasos">Siguientes pasos&lt;/h2>
+&lt;p>La generación de SQL es correcta en casi todos los casos pero aún le quedan algunas cosas complicadas como por ejemplo las jerarquías anidadas. Habréis observado
+que no he intentado hacer ninguna consulta sobre la ciudad en la que tiene su sede el proveedor de un producto. Aún no se generan las consultas para
+jerarquías doblemente anidadas, me di cuenta ayer, supongo que en estos días terminaré con ello.&lt;/p>
+&lt;p>La parte de interface de usuario, como habréis notado, aún es mejorable y permite hacer cosas como jerarquías de dimensiones recursivas que no deberían
+existir.&lt;/p>
+&lt;p>Por último, los informes están pensados para que se puedan alimentar de diferentes orígenes de datos. Por ejemplo, si sólo queremos la suma de ventas entre
+fechas, no parece tener sentido ir sobre la tabla &lt;em>FactSales&lt;/em> que puede tener millones de registros, parece más lógico crear una tabla &lt;em>FactGroupedSales&lt;/em>
+con los datos previamente sumados y si el usuario no escoge ninguna dimensión ejecutar nuestra consulta sobre esta segunda tabla.&lt;/p>
+&lt;p>En algunos casos, también nos puede interesar hacer filtros por datos adicionales, por ejemplo un periodo adicional, esto no está contemplado en esta versión.&lt;/p>
+&lt;p>Ahora mismo, &lt;strong>BauDbStudio&lt;/strong> no nos permite agregar datos sobre el mismo campo, es decir, no nos permite ver la suma y la media de precios a la vez, ni por
+supuesto consultas más complejas como un porcentaje sobre el total o una fórmula sobre los registros. En realidad es un problema del interface de usuario, no
+del generador de SQL e iré añadiendo esta opción en el futuro.&lt;/p>
+&lt;p>Todos estos puntos los iré desarrollando pero el resto es plenamente funcional.&lt;/p>
+&lt;p>Como siempre, tenéis la aplicación en &lt;a href="https://github.com/jbautistam/BauDbStudio/releases">GitHub&lt;/a> por si queréis hacer alguna prueba.&lt;/p></description></item><item><title> Log</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log/</guid><description>
+&lt;p>Toda la información sobre ejecuciones de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a>,
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a> y
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>
+aparece en el control de log situado inicialmente en la parte inferior de la ventana.&lt;/p>
+&lt;p>Si entre los registros de log aparece un mensaje de error (indicado en color rojo), se puede ver la información
+completa del error pulsando dos veces sobre él:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/100-log/error.jpg" alt="Información sobre errores" title="Información sobre errores">&lt;/p></description></item><item><title>Archivo de contexto ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Archivo de proyecto ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Archivos de datos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos/</guid><description>
+&lt;p>Al trabajar con bases de datos, es muy habitual tener archivos de datos en formato CSV o
+&lt;a href="https://parquet.apache.org/">Parquet&lt;/a> o Excel.&lt;/p>
+&lt;p>Para facilitar el trabajo, &lt;strong>BauDbStudio&lt;/strong> permite visualizar este tipo de archivos. Simplemente pulsando
+dos veces sobre el nodo con el nombre del archivo:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/arbol-archivos.jpg" alt="Arbol de archivos" title="Arbol de archivos en BauDbStudio">&lt;/p>
+&lt;p>En la sección central de la aplicación se nos abrirá el contenido del archivo:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/visualizador-archivo-parquet.jpg" alt="Visualizador de archivos parquet" title="Visualizador de archivos parquet en BauDbStudio">&lt;/p>
+&lt;p>Si tiene instalado un servidor ODBC de Spark, puede escribir
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas SQL&lt;/a> directamente para ver el contenido del archivo.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> en los archivos Excel sólo se visualiza la primera hoja sin formato.&lt;/p></description></item><item><title>Archivos de parámetros</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros/</guid><description>
+&lt;p>Cuando escribimos scripts o consultas SQL, en ocasiones necesitamos asociarle parámetros.&lt;/p>
+&lt;p>Por ejemplo, esta consulta sobre una base de datos SqLite:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">OrderID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">CustomerID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">EmployeeID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">OrderDate&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">RequiredDate&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShippedDate&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipVia&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">Freight&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipName&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipAddress&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipCity&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipRegion&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipPostalCode&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipCountry&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="n">OrderDate&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">@&lt;/span>&lt;span class="n">StartDate&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>muestra aquellos pedidos posteriores a determinada fecha, llamada &lt;strong>StartDate&lt;/strong>.&lt;/p>
+&lt;p>Para que esta consulta funcione, se le debe pasar el valor del parámetro &lt;strong>StartDate&lt;/strong> a la consulta SQL, si no, el servidor
+de base de datos dará un error.&lt;/p>
+&lt;p>Para no tener que introducir estos valores manualmente, &lt;strong>BauDbStudio&lt;/strong> utiliza los archivos de parámetros.&lt;/p>
+&lt;p>Un archivo de parámetros es un archivo JSON que contiene todos los parámetros que vamos a utilizar en nuestro script o
+consulta, por ejemplo, en nuestro caso nuestro archivo sería algo así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1970-01-01&amp;#34;&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, nuestro archivo de parámetro puede contener todos los parámetros que deseemos.&lt;/p>
+&lt;p>Podemos tener varios archivos de parámetros en nuestro ordenador, por ejemplo asociados a diferentes clientes o proyectos, pero
+sólo podemos tener un archivo de parámetros activo. Este archivo de parámetro lo seleccionamos pulsando el botón
+&lt;strong>Seleccionar archivo de parámetros&lt;/strong> de la barra de herramientas principal.&lt;/p>
+&lt;p>Una vez seleccionado un archivo de parámetros, veremos su nombre en la barra de herramientas junto a la conexión y al pulsar
+sobre él podemos editar su contenido:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/seleccionarchivoparametros.jpg" alt="Selección de archivo de parámetros" title="Selección de archivo de parámetros">&lt;/p>
+&lt;p>Dado que es bastante común cambiar de archivo de parámetros, &lt;strong>BauDbStudio&lt;/strong> mantiene una lista con los últimos archivos de parámetros
+seleccionados para que podamos cambiar de uno a otro rápidamente.&lt;/p>
+&lt;p>Aparte de los argumentos de consulta, en los archivos de parámetros podemos definir constantes como por ejemplo
+un nombre de base de datos o un directorio de archivo de datos. Por ejemplo, en este código:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;Constant.DbCompute&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;DbSample&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="nt">&amp;#34;Constant.MountPath&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/mnt/c/Test/BauDbStudio/Samples/Files&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1970-01-01&amp;#34;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Definimos dos contantes, la primera de ellas &lt;strong>DbCompute&lt;/strong> es un nombre de base de datos mientras que &lt;strong>MountPath&lt;/strong> es el nombre
+de un directorio.&lt;/p>
+&lt;p>Podemos utilizar estas constantes por ejemplo cuando insertamos los datos de un archivo parquet en una tabla utilizando Spark Sql:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="k">Data&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="o">`&lt;/span>&lt;span class="n">Id&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">TRIM&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">Name&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="o">`&lt;/span>&lt;span class="n">Name&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">{{&lt;/span>&lt;span class="n">MountPath&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="mi">2020&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">07&lt;/span>&lt;span class="o">-&lt;/span>&lt;span class="mi">26&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">DataFile&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Esta consulta crea una tabla llamada &lt;strong>Data&lt;/strong> sobre la base de datos &lt;strong>DbSample&lt;/strong> (el valor definido en la constante &lt;strong>DbCompute&lt;/strong>)
+con el contenido del archivo &lt;strong>DataFile.parquet&lt;/strong> que está en el directorio
+&lt;em>/mnt/c/Test/BauDbStudio/Samples/Files/2020-07-26&lt;/em>, es decir, el contenido de la constante &lt;strong>MountPath&lt;/strong> combinado
+con la cadena &lt;em>2020-07-26&lt;/em>.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> puede encontrar más información sobre parámetros en la página dedicada a los
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>.&lt;/p></description></item><item><title>Conexiones a base de datos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones/</guid><description>
+&lt;p>Para poder trabajar con base de datos en &lt;strong>BauDbStudio&lt;/strong> primero debemos crear las conexiones oportunas.&lt;/p>
+&lt;p>Inicialmente, las conexiones definidas a base de datos se ven en el panel de la izquierda en la ficha &lt;strong>Conexiones&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/ficha-conexiones.jpg" alt="Ficha conexiones a base de datos" title="Ficha conexiones a base de datos en BauDbStudio">&lt;/p>
+&lt;p>Para crear una conexión, lo podemos hacer tanto desde el menú principal con la opción &lt;em>Archivo | Nuevo | Conexión&lt;/em>
+como con el icono de la barra de herramientas como desde el menú secundario sobre el nodo de conexiones:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/crear-conexion.jpg" alt="Crear una nueva conexión" title="Crear una nueva conexión a base de datos en BauDbStudio">&lt;/p>
+&lt;p>Con cualquiera de estas opciones, se nos abre el cuadro de diálogo de creación de una nueva conexión:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/cuadro-dialogo-conexion.jpg" alt="Crear conexión" title="Crear una nueva conexión en BauDbStudio">&lt;/p>
+&lt;p>En &lt;strong>BauDbStudio&lt;/strong> se pueden crear conexiones diferentes servidores de base de datos:&lt;/p>
+&lt;ul>
+&lt;li>Spark&lt;/li>
+&lt;li>Sql Server&lt;/li>
+&lt;li>SqLite&lt;/li>
+&lt;li>MySql&lt;/li>
+&lt;li>PostgreSql&lt;/li>
+&lt;li>ODBC&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>Nota:&lt;/strong> la conexión a Spark es algo especial, puede encontrar más información en &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">Crear una conexión Spark&lt;/a>.&lt;/p>
+&lt;p>Para cada una de ellas, por supuesto, tendremos que rellenar los datos adecuados, por ejemplo, para una conexión SQL Server
+debemos indicar el servidor, puerto, base de datos y usuario y contraseña:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/conexion-sql-server.jpg" alt="Creación de una conexión" title="Creación de una conexión a un servidor Sql Server con BauDbStudio">&lt;/p>
+&lt;p>Una vez creada la conexión, al pulsar dos veces sobre su nombre en el árbol o al seleccionar
+la opción &lt;strong>Abrir&lt;/strong> en el menú que aparece cuando pulsamos con el botón secundario del ratón sobre un nodo de conexión,
+podemos modificar los datos de la conexión:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/modificar-conexion.jpg" alt="Modificar una conexión" title="Modificar una conexión a base de datos en BauDbStudio">&lt;/p>
+&lt;p>Una vez creada la conexión, nos aparecerá en el árbol de conexiones y podemos ver el esquema de datos: tablas y campos:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/esquema-base-datos.jpg" alt="Esquema de base datos" title="Esquema de base datos de una conexión en BauDbStudio">&lt;/p>
+&lt;p>Al pulsar dos veces sobre una tabla nos aparecerá una ventana de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consulta&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/consulta-tabla.jpg" alt="Consulta de los datos de una tabla" title="Consulta de los datos de una tabla en BauDbStudio">&lt;/p>
+&lt;p>donde podremos ver el contenido de la tabla.&lt;/p></description></item><item><title>Consola de conversion a databricks</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks/</guid><description>
+&lt;p>Estamos trabajando en ello pero mientras tanto puedes aprender qué son las
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a>.&lt;/p></description></item><item><title>Consola de ejecución de procesos ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Consultas</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas/</guid><description>
+&lt;p>Mientras escribimos &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> o
+investigamos el contenido de una &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión&lt;/a>
+a base de datos, necesitaremos sabe cuál es el contenido de nuestras tablas.&lt;/p>
+&lt;p>Para ello, podemos escribir &lt;strong>consultas SQL&lt;/strong> y visualizar el resultado en la ventana de consultas.&lt;/p>
+&lt;p>Para abrir una ventana de consultas, podemos utilizar tanto la opción de menú &lt;strong>Archivo | Nuevo | Consulta&lt;/strong> o
+el botón &lt;strong>Consulta&lt;/strong> de la barra de herramientas, esto nos abrirá una ventana de consulta
+como la que vemos al inicio de este artículo.&lt;/p>
+&lt;p>También podemos pulsar dos veces sobre una tabla en la lista de conexiones para abrir una consulta sobre
+esa tabla:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/consultatabla.jpg" alt="Consulta sobre una tabla" title="Consulta sobre una tabla">&lt;/p>
+&lt;p>En la parte superior de esta ventana se encuentra el cuadro de edición donde escribiremos la consulta, la barra
+de herramientas colocada en la parte inferior nos permite seleccionar la conexión sobre la que ejecutamos
+la consulta y el botón de ejecutar:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/barraherramientas.jpg" alt="Barra de herramientas de consulta" title="Barra de herramientas de consulta">&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> Observe que hay dos botones de ejecución en la aplicación, uno en la ventana de consulta y
+otro en la barra de herramientas principal. El botón de la barra de herramientas principal nos permite
+ejecutar &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> y
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>, pero no las consultas de esta ventana. Para ejecutar
+consultas debemos utilizar su propia barra de herramientas. La razón principal es que la ejecución de scripts
+SQL o ETL puede tardar mucho tiempo y mientras tanto podremos seguir ejecutando en la ventana de consultas sin
+necesidad de detener otros procesos.&lt;/p>
+&lt;p>Cuando pulsamos el botón de ejecutar, veremos el resultado de la consulta en el grid inferior:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/resultadosconsulta.jpg" alt="Visualización de resultados" title="Visualización de resultados consulta">&lt;/p>
+&lt;p>Junto al botón de ejecutar, vemos un botón etiquetado como &lt;strong>Plan de ejecución&lt;/strong>, cuando lo pulsemos, veremos en el cuadro de texto
+de la ficha &lt;strong>Plan de ejecución&lt;/strong> el plan que va a ejecutar el servidor de base de datos para obtener el resultado de la consulta:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/planejecucion.jpg" alt="Plan de ejecución" title="Plan de ejecución de una consulta">&lt;/p>
+&lt;p>La última ficha nos permite visualizar un gráfico básico de la consulta (esta opción aún esta en desarrollo, por ahora es algo limitada):&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/graficoconsulta.jpg" alt="Gráfico" title="Gráfico de una consulta">&lt;/p>
+&lt;p>Además, el botón de &lt;strong>Guardar&lt;/strong> nos permite guardar el resultado de la consulta en un archivo
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">CSV o parquet&lt;/a> mientras que el botón de
+&lt;strong>Paginar consulta&lt;/strong> lanzará automáticamente consultas paginadas sobre el servidor.&lt;/p>
+&lt;p>Las consultas que escribamos en esta ventana, utilizan el mismo
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros">archivo de parámetros&lt;/a> que los
+scripts SQL, es decir, podemos utilizar los valores de los parámetros y constantes de los archivos de parámetros
+en esta ventana.&lt;/p>
+&lt;p>Por ejemplo, podemos escribir esta consulta sobre una conexión a SqLite:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">OrderID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">CustomerID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">EmployeeID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">OrderDate&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">RequiredDate&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShippedDate&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipVia&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">Freight&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipName&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipAddress&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipCity&lt;/span>&lt;span class="p">],&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipRegion&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipPostalCode&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">ShipCountry&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">]&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="n">OrderDate&lt;/span> &lt;span class="o">&amp;gt;&lt;/span> &lt;span class="o">@&lt;/span>&lt;span class="n">StartDate&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Donde &lt;strong>StartDate&lt;/strong> está definida en nuestro archivo de parámetros como:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1970-01-01&amp;#34;&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El resultado que obtenemos en este caso será:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/resultadosconsultaparametros.jpg" alt="Resultado de una consulta" title="Resultado de una consulta con parámetros sobre SqLite">&lt;/p>
+&lt;p>Por último, para facilitar la escritura de consultas:&lt;/p>
+&lt;ul>
+&lt;li>Si arrastramos y soltamos una tabla desde las conexiones al editor de consultas se escribirá el nombre de la tabla.&lt;/li>
+&lt;li>Si arrastramos y soltamos una tabla desde las conexiones al editor de consultas mientras mantenemos pulsada
+la tecla de mayúsculas, se escribirá en la consulta el nombre de la tabla y todos sus campos.&lt;/li>
+&lt;/ul>
+&lt;p>Del mismo modo que en la ventana de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">edición de scripts&lt;/a>,
+si seleccionamos un bloque de código, se ejecutará una consulta sólo sobre el bloque seleccionado.&lt;/p></description></item><item><title>Cómo conectar a Spark</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark/</guid><description>
+&lt;p>Para poder ejecutar scripts de &lt;strong>Spark SQL&lt;/strong> sobre un servidor de Spark, antes tenemos que crear una conexión adecuada.&lt;/p>
+&lt;p>Debemos tener en cuenta que los scripts que creemos sobre la aplicación, se van a ejecutar utilizando ODBC, es decir,
+tenemos que tener un servidor ODBC en nuestro equipo o sobre nuestro cluster de Spark.&lt;/p>
+&lt;p>En mi caso, instalé &lt;a href="http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark">Spark sobre WSL&lt;/a> en mi equipo y la versión de
+64 bits del driver &lt;a href="https://www.microsoft.com/en-us/download/details.aspx?id=49883">ODBC para Spark de Microsoft&lt;/a>.&lt;/p>
+&lt;p>Una vez instalado Spark, en lugar de levantar los nodos con &lt;strong>start-master&lt;/strong> y &lt;strong>start-slave&lt;/strong>, debemos levantar
+el servidor [Thrift Server] (&lt;a href="http://www.russellspitzer.com/2017/05/19/Spark-Sql-Thriftserver/">http://www.russellspitzer.com/2017/05/19/Spark-Sql-Thriftserver/&lt;/a>) para Spark ejecutando la siguiente instrucción sobre una consola de WSL:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/start-thriftserver.sh
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Al ejecutar esta instrucción, veremos que se levanta el servidor:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/servidor-odbc-spark.jpg" alt="Conectar al servidor Thrift Server" title="Conectar al servidor Thrift Server de Spark para ODBC">&lt;/p>
+&lt;p>Al cabo de unos segundos podemos ver el estado del servidor abriendo un navegador y solicitando la dirección &lt;strong>https://localhost:4040&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="D:/Projects/Personal/Hugo/test-hugo/content/applications/baudbstudio/manual/025-conexion-spark/estado-thrift-server.jpg" alt="Estado de Thrift Server" title="Estado del servidor ODBC Thrift Server">&lt;/p>
+&lt;p>En esa página encontraremos información sobre los nodos y el estado de las consultas SQL que ejecutemos sobre el servidor.&lt;/p>
+&lt;p>Una vez levantado el servidor, simplemente nos queda crear una conexión ODBC utilizando el driver que nos hemos descargado
+anteriormente. Para ello, abrimos la ventana de orígenes de datos de 64 bits de Windows:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexiones-odbc-64.jpg" alt="Conexiones ODBC de 64bits" title="Conexiones a orígenes de datos ODBC de 64bits de Windows">&lt;/p>
+&lt;p>Y agregamos una conexión utilizando el driver:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexion-odbc-spark.jpg" alt="Creación de una conexion ODBC" title="Creación de una conexion a ODBC Spark">&lt;/p>
+&lt;p>En mi caso, he seleccionado la dirección del host como local (127.0.0.1) en el puerto 10.000 a la base de datos default. Los datos
+predeterminados, por cierto:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexion-odbc-spark-sample.jpg" alt="Conexion de ejemplo" title="Conexion de ejemplo al servidor ODBC de Spark">&lt;/p>
+&lt;p>Como autentificación, he utilizado el mecanismo &lt;strong>User name&lt;/strong> y como nombre de usuario el administrador
+de mi sistema Linux.&lt;/p>
+&lt;h2 id="configuración-en-baudbstudio">Configuración en BauDbStudio&lt;/h2>
+&lt;p>Una vez hemos creado la DSN de sistema al servidor Thrift Server de Spark, sólo nos queda crear una
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión&lt;/a> a nuestro servidor en BauDbStudio.&lt;/p>
+&lt;p>Como el resto de las conexiones, simplemente agregamos una nueva conexión, seleccionamos el tipo de conexión Spark y en
+la cadena de conexión escribimos &lt;strong>DSN=LocalSpark&lt;/strong> (donde LocalSpark es el nombre de la conexión ODBC que hemos
+configurado anteriormente en los orígenes de datos ODBC):&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexion-spark-baudbstudio.jpg" alt="Conexión a un servidor ODBC de Spark" title="Conexión a un servidor ODBC de Spark utilizando BauDbStudio">&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> como vamos a ejecutar scripts en teoría pesados sobre nuestro servidor a Spark, yo le suelo
+dejar un timeout para la ejecución de scripts bastante alto, de hecho, 120 minutos en la imagen.&lt;/p>
+&lt;p>A partir de este momento podemos utilizar el servidor a Spark como cualquier otra base de datos:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/consulta-spark.jpg" alt="Consulta sobre un servidor Spark" title="Consulta sobre un servidor Spark utilizando ODBC en BauDbStudio">&lt;/p></description></item><item><title>Directorios de trabajo</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos/</guid><description>
+&lt;p>Para trabajar con archivos de script de SQL o ETL u otros archivos, primero debemos asociar directorios
+al proyecto en BauDbStudio.&lt;/p>
+&lt;p>Para añadir un directorio al []({ href = &amp;quot;Aplicaciones\BauDbStudio\Manual\110 Marco trabajo&amp;quot; } marco de trabajo)
+actual de la aplicación podemos utilizar tanto la opción del menú &lt;strong>Archivo | Nuevo | Directorio&lt;/strong> como el
+botón &lt;strong>Añadir carpeta&lt;/strong> de la barra de herramientas como el menú secundario de la ficha &lt;strong>Archivos&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/nuevo-directorio.jpg" alt="Añadir un directorio al árbol de archivos" title="Añadir un directorio al árbol de archivos">&lt;/p>
+&lt;p>Sólo debemos seleccionar un directorio de nuestro sistema donde vamos a almacenar nuestros archivos SQL o archivos de
+datos.&lt;/p>
+&lt;p>Para los ejemplo de este tutorial, me he creado éste árbol de directorios:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/arbol-directorios.jpg" alt="Arbol de directorios de ejemplo" title="Arbol de directorios de ejemplo">&lt;/p>
+&lt;p>Sobre el árbol de directorios podemos crear carpetas o archivos de diferente tipo
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>,
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts para procesos ETL&lt;/a> o
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a>
+CSV o parquet.&lt;/p>
+&lt;p>Normalmente suelo dejar por separado los directorios donde almaceno archivos de datos de los scripts porque así
+puedo asociar las carpetas de proyecto a un repositorio de control de código fuente pero en este caso de ejemplo
+he dejado todos los archivos sobre la misma carpeta de trabajo.&lt;/p>
+&lt;p>Por supuesto, al pulsar dos veces sobre cada uno de los archivos se nos abrirá el editor o visualizador adecuado:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/visualizador-sql.jpg" alt="Editor de SQL de BauDbStudio" title="Editor de SQL de BauDbStudio">&lt;/p></description></item><item><title>Distribuciones</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones/</guid><description>
+&lt;p>&lt;strong>BauDbStudio&lt;/strong> permite ejecutar scripts de Spark Sql contra un servidor ODBC en local o remoto pero
+para trabajar con grandes cantidades de datos, podemos utilizar servicios como &lt;a href="https://databricks.com/">Databricks&lt;/a>.&lt;/p>
+&lt;p>El problema es que &lt;strong>Databricks&lt;/strong> no acepta los scripts SQL que tenemos hasta ahora, por tanto, debemos
+transformarlo al formato de notebooks propio del servicio.&lt;/p>
+&lt;p>Así, por ejemplo, el contenido de un notebook para un script sencillo de Spark Sql sería así:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">-- Databricks notebook source
+&lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="ln"> 3&lt;/span>&lt;span class="c1">-- COMMAND ----------
+&lt;/span>&lt;span class="ln"> 4&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="ln"> 5&lt;/span>&lt;span class="c1">-- MAGIC %md Crea la base de datos de cálculo
+&lt;/span>&lt;span class="ln"> 6&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="c1">-- COMMAND ----------
+&lt;/span>&lt;span class="ln"> 8&lt;/span>&lt;span class="c1">&lt;/span>
+&lt;span class="ln"> 9&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">dbcompute&lt;/span>
+&lt;span class="ln">10&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;$mountpath/$dbcompute&amp;#39;&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Vemos que los diferentes comandos (o celdas) del notebook deben separarse por sentencias &lt;strong>COMMAND&lt;/strong> y que los comentarios
+deben ir precedidos por &lt;strong>MAGIC %md&lt;/strong> para que se interpreten en formato Markdown.&lt;/p>
+&lt;p>Por supuesto, hacer estas modificaciones manualmente puede resultar muy trabajoso y llevarnos a errores, por eso en &lt;strong>BauDbStudio&lt;/strong>
+tenemos la posibilidad de crear distribuciones.&lt;/p>
+&lt;p>Para dar de alta una distribución, simplemente debemos elegir la opción de menú &lt;strong>Archivo | Nuevo | Distribución&lt;/strong> o seleccionar
+la opción &lt;strong>Nueva | Distribución&lt;/strong> en el menú secundario del árbol de conexiones. Esto nos abrirá un formulario
+similar al que mostrábamos al principio de este artículo:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones.jpg" alt="Administración de distribuciones" title="Formulario de administración de distribuciones">&lt;/p>
+&lt;p>Aparte del nombre y la descripción, debemos seleccionar tanto el directorio en el que se encuentran nuestros scripts originales
+escritos en Spark Sql y el directorio donde se dejarán los archivos traducidos al formato de notebooks de Databricks.&lt;/p>
+&lt;p>Además podemos controlar si en la traducción deseamos:&lt;/p>
+&lt;ul>
+&lt;li>Copiar los comentarios en los archivos de notebook o sólo los comandos sin comentarios.&lt;/li>
+&lt;li>Pasar todos los nombres de archivos a minúsculas.&lt;/li>
+&lt;li>Sustituir los argumentos utilizados en Spark Sql del tipo &lt;strong>$NombreArgumento&lt;/strong> por la llamada a función &lt;strong>GetArgument(&amp;quot;NombreArgumento&amp;quot;)&lt;/strong> que recomiendan en DataBricks.&lt;/li>
+&lt;/ul>
+&lt;p>Por último podemos seleccionar los valores que van a sustituir los parámetros fijos, es decir,
+las constantes del tipo &lt;strong>{{Valor}}&lt;/strong> que utilizamos al escribir nuestros &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>.&lt;/p>
+&lt;p>Una vez definida una distribución, podemos ejecutarla con la opción de menú &lt;strong>Distribuir&lt;/strong> del menú secundario del árbol de conexiones:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/distribuir.jpg" alt="Distribuir scripts" title="Distribuir scripts">&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> Aunque podemos ejecutar manualmente esta distribución y copiar los notebooks manualmente a un WorkSpace de Databricks,
+también existe una &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks">consola&lt;/a>
+que puede integrarse en los pipelines de CI/CD para automatizar el proceso.&lt;/p></description></item><item><title>Espacios de trabajo</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo/</guid><description>
+&lt;p>En ocasiones, cuando estamos trabajando con diferentes proyectos, acabamos con demasiados directorios y conexiones
+en nuestro explorador.&lt;/p>
+&lt;p>Los &lt;strong>espacios de trabajo&lt;/strong> nos permiten crear diferentes entornos de trabajo para diferentes soluciones.&lt;/p>
+&lt;p>Para crear un nuevo espacio de trabajo, seleccione la opción de menú &lt;strong>Archivo | Espacio de trabajo | Nuevo&lt;/strong>, esto
+solicitará un nombre para el marco de trabajo que vamos a crear.&lt;/p>
+&lt;p>Cuando estamos en un nuevo espacio de trabajo, la pantalla estará vacía, es decir, debemos añadir los
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">directorios de trabajo&lt;/a> y
+las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones&lt;/a> que necesitemos
+para nuestro proyecto.&lt;/p>
+&lt;p>Si queremos pasar a otro proyecto, sólo tenemos que seleccionar el nombre del espacio de trabajo en la
+lista que aparece en &lt;strong>Archivo | Espacio de trabajo&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo.jpg" alt="Selección del espacio de trabajo" title="Selección del espacio de trabajo">&lt;/p>
+&lt;p>En mi caso, tengo definidos tres espacios de trabajo: Formación, Manual y Studio.Configuration.&lt;/p>
+&lt;p>El espacio de trabajo Studio.Configuration es el espacio que se crea al abrir la aplicación y no se puede borrar, el resto
+de los espacios de trabajo los podemos eliminar usando la opción &lt;strong>Archivo | Espacio de trabajo | Borrar&lt;/strong>.&lt;/p>
+&lt;p>Por supuesto, el borrado del espacio de trabajo no implica ningún borrado de datos.&lt;/p></description></item><item><title>Etl de almacenamiento en la nube</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Etl de procesos Rest</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Etl procesos de base datos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Manual de BauDbStudio</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/manual/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/manual/</guid><description>
+&lt;p>&lt;strong>BauDbStudio&lt;/strong> es una herramienta para la edición y ejecución de scripts de SQL y proyectos de transformación
+de datos o ETL - Extract Transform and load.&lt;/p>
+&lt;p>Aunque &lt;strong>BauDbStudio&lt;/strong> nació como una herramienta de ejecución de scripts para Spark Sql (conocida
+como &lt;em>BauSparkScriptsStudio&lt;/em>) y para la distribución en notebooks sobre clusters de DataBricks, ha evolucionado hacia una aplicación
+más ambiciosa que puede utilizarse para el tratamiento de grandes cantidades de datos.&lt;/p>
+&lt;p>Con &lt;strong>BaudbStudio&lt;/strong> puede:&lt;/p>
+&lt;ul>
+&lt;li>Manejar conexiones a diferentes servicios de base de datos relacionales como Sql Server, PostgreSql, MySql,
+SqLite, ODBC y Spark.&lt;/li>
+&lt;li>Editar y ejecutar scripts sobre Spark Sql y sobre otras bases de datos.&lt;/li>
+&lt;li>Editar y ejecutar proyectos de ETL y proyectos de prueba sobre bases de datos.&lt;/li>
+&lt;li>Visualizar archivos de tipo parquet y CSV.&lt;/li>
+&lt;li>Mantener conxiones a Azure blob storage.&lt;/li>
+&lt;/ul>
+&lt;h2 id="tutorial-de-baudbstudio">Tutorial de BauDbStudio&lt;/h2>
+&lt;p>Para explicar mejor cómo cómo utilizar la explicación he preparado este
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">tutorial de BauDbStudio&lt;/a>.&lt;/p>
+&lt;h2 id="descarga-de-la-aplicación">Descarga de la aplicación&lt;/h2>
+&lt;p>Las diferentes versiones del ejecutable de esta aplicación, se pueden encontrar en Github:
+&lt;a href="https://github.com/jbautistam/BauDbStudio/releases">Versiones de BauDbStudio&lt;/a>.&lt;/p>
+&lt;p>El código fuente de la aplicación se encuentra en &lt;a href="https://github.com/jbautistam/BauDbStudio">GitHub&lt;/a>&lt;/p></description></item><item><title>Procesos Etl de tratamiento de archivos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Scripts</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql/</guid><description>
+&lt;p>La principal función de &lt;strong>BauDbStudio&lt;/strong> es la ejecución de scripts de SQL.&lt;/p>
+&lt;p>Para crear un script de SQL simplemente debemos añadir un &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">archivo&lt;/a>
+con extensión SQL a nuestro directorio de proyecto.&lt;/p>
+&lt;p>Los scripts a ejecutar en &lt;strong>BauDbStudio&lt;/strong> se componen de instrucciones SQL (SELECT, INSERT, CREATE TABLE...) adecuadas
+para la &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión a base de datos&lt;/a> que estemos utilizando.&lt;/p>
+&lt;p>El único requisito es que debemos separar las sentencias SQL con el comando &lt;strong>GO&lt;/strong> que sirve como separador de sentencias
+en &lt;strong>BauDbStudio&lt;/strong>.&lt;/p>
+&lt;p>Por ejemplo, veamos un script de creación de una tabla a partir de un archivo parquet utilizando una conexión SparkSql:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">Sales&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="n">Sales&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">c&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Test&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">BauDbStudio&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Samples&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Files&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">Input&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Sales&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> en mi caso, el archivo parquet se encuentra en el directorio &lt;em>c:/Test/BauDbStudio/Samples/Files/Input/Sales.parquet&lt;/em>, dado que estoy utilizando Spark con WSL,
+el directorio se debe indicar en formato Linux, por eso he utilizado el nombre de archivo &lt;em>/mnt/c/Test/BauDbStudio/Samples/Files/Input/Sales.parquet&lt;/em>.&lt;/p>
+&lt;p>Si queremos ejecutar este script, debemos seleccionar la
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">conexión a nuestro servidor de Spark&lt;/a>
+en la barra de herramientas y pulsar el botón de &lt;strong>Ejecutar&lt;/strong> de la barra de herramientas:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/ejecutar-script-sql.jpg" alt="Ejecutar script SQL" title="Ejecutar script SQL desde la barra de herramientas">&lt;/p>
+&lt;p>También podemos utilizar la tecla de función &lt;strong>F5&lt;/strong> para ejecutar el script. Podemos seleccionar parte del texto
+para ejecutar únicamente ua parte del script.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> al ejecutar un script, se muestra en la &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log">ventana de log&lt;/a> el resultado de la ejecución. Si deseamos
+ver el resultado de una consulta debemos utilizar la ventana de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a>.&lt;/p>
+&lt;p>Mientras ejecutemos el script, en la barra de herramientas vemos el tiempo de ejecución:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/ejecucion-script.jpg" alt="Ejecución de un script SQL" title="Ejecución de un script SQL">&lt;/p>
+&lt;p>En cualquier momento podemos detener la ejecución del script pulsando el botón &lt;strong>Cancelar&lt;/strong> de la barra de herramientas.&lt;/p>
+&lt;p>Por supuesto, podemos cerrar la ventana del script y seguir trabajando mientras termina la ejecución.&lt;/p>
+&lt;p>El script anterior creaba una tabla de ventas con los datos del archivo parquet, una vez ejecutado podemos ver la
+tabla creada en nuestra lista de conexiones:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/nueva-tabla.jpg" alt="Creación de una tabla" title="Creación de una tabla en la base de datos">&lt;/p>
+&lt;h2 id="parámetros-de-consulta">Parámetros de consulta&lt;/h2>
+&lt;p>Una vez tenemos la tabla de ventas en nuestra base de datos, siempre podemos crear una tabla de resumen con la suma de datos entre
+fechas, por ejemplo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">SalesSummary&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="n">SalesSummary&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="n">StoreId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">SUM&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Units&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">Units&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Sales&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="nb">Date&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="s1">&amp;#39;2017-01-01&amp;#39;&lt;/span>
+&lt;span class="ln">8&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">StoreId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>
+&lt;span class="ln">9&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Este script nos va a dar un acumulado de ventas desde el año 2017, pero ¿no estaría bien que pudiéramos modificar esta fecha
+sin tener que volver a escribir el script?&lt;/p>
+&lt;p>Para ello vamos a utilizar argumentos en las consultas y archivos de parámetros.&lt;/p>
+&lt;p>Para utilizar un argumento en una consulta sobre Spark Sql, vamos a usar un script de este tipo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">SalesSummary&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="n">SalesSummary&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="n">StoreId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">SUM&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Units&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">Units&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Sales&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="nb">Date&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">StartDate&lt;/span>
+&lt;span class="ln">8&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">StoreId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>
+&lt;span class="ln">9&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Donde &lt;strong>$StartDate&lt;/strong> es nuestro parámetro o la variable que vamos a utilizar para indicar la fecha, es decir, identificamos
+los argumentos en Spark Sql con un signo de dólar seguido por el nombre del argumento.&lt;/p>
+&lt;p>Pero antes de ejecutar esta instrucción, debemos indicarle a la aplicación el valor de los parámetros que vamos a utilizar.&lt;/p>
+&lt;p>Para ello primero creamos un archivo de parámetros en nuestro árbol de archivo y lo llamamos, por ejemplo, &lt;em>Parameters.json&lt;/em>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/creacion-archivo-parametros.jpg" alt="Creación de un archivo de parámetros" title="Creación de un archivo de parámetros">&lt;/p>
+&lt;p>Los archivos de parámetros tienen formato JSON, en nuestro caso, va a tener un único parámetro, nuestra variable &lt;strong>StartDate&lt;/strong>,
+escribiendo el siguiente texto en el archivo:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2017-01-01&amp;#34;&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Lo último que nos falta es asociar este archivo de parámetros con la ejecución de nuestros scripts. Para ésto, pulsamos el
+botón &lt;strong>Seleccionar archivo de parámetros&lt;/strong> situado en la barra de herramientas a la derecha de la conexión seleccionada:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/barra-de-herramientas-seleccion-archivo-parametros.jpg" alt="Selección de archivo parametros" title="Selección de archivo parametros en la barra de herramientas">&lt;/p>
+&lt;p>Este botón nos abre una ventana donde podemos seleccionar el archivo de parámetros que acabamos de escribir (por ahora,
+podemos dejar vacío el archivo de contexto ETL que se utiliza con los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/seleccion-archivo-parametros.jpg" alt="Selección de archivo de parámetros" title="Selección de archivo de parámetros">&lt;/p>
+&lt;p>Una vez seleccionado el archivo de parámetros, nos aparecerá el nombre de archivo en la barra de herramientas:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/barra-de-herramientas-archivo-parametros.jpg" alt="Visualizar el archivo de parámetros" title="Barra de herramientas: visualizar el archivo de parámetros">&lt;/p>
+&lt;p>Al pulsar el nombre del archivo de parámetros, se nos abrirá una ventana de edición del archivo en la que podemos hacer las
+modificaciones necesarias:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/ver-archivo-parametros.jpg" alt="Modificación del archivo de parámetros" title="Modificación del archivo de parámetros">&lt;/p>
+&lt;p>Ahora ya podemos ejecutar la consulta con el argumento seleccionado, por supuesto, podemos modificar estos parámetros cuando
+queramos y tener tantos archivos de parámetros como necesitemos.&lt;/p>
+&lt;h2 id="constantes">Constantes&lt;/h2>
+&lt;p>Al comienzo de este artículo, hemos utilizado una consulta como ésta para crear una tabla a partir de un archivo
+parquet:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">Sales&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="n">Sales&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">c&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Test&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">BauDbStudio&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Samples&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Files&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">Input&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Sales&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>No va a poder ejecutar esta consulta en su ordenador a menos que tenga exactamente el mismo directorio. Esto
+nos dará problemas cuando trabajamos en un equipo puesto que obligamos a todos sus componentes a tener los archivos
+en los mismos directorios. Además, cuando &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuyamos&lt;/a>
+nuestros scripts a otros entornos como DataBricks, debemos asegurarnos de cambiar estos directorios.&lt;/p>
+&lt;p>Para evitarlo, utilizaremos un parámetro especial, una constante en realidad.&lt;/p>
+&lt;p>Para definir una constante, utilizaremos el mismo archivo de parámetros que teníamos hasta ahora, pero le vamos a añadir
+un nombre de parámetro especial, que debe comenzar por &lt;strong>Constant&lt;/strong>, por ejemplo, voy a definir una constante
+llamada &lt;strong>MountPath&lt;/strong> que identifique el directorio base de mis archivos:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;Constant.MountPath&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/mnt/c/Test/BauDbStudio/Samples/Files&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2017-01-01&amp;#34;&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, puede utilizar el directorio que más le guste.&lt;/p>
+&lt;p>Ahora sólo tenemos que utilizar esta constante en nuestro script utilizando un nombre de variable especial rodeada
+por dobles llaves: &lt;strong>{{MountPath}}&lt;/strong>:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">Sales&lt;/span>
+&lt;span class="ln">2&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">3&lt;/span>
+&lt;span class="ln">4&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="n">Sales&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln">5&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln">6&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="err">{{&lt;/span>&lt;span class="n">MountPath&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">Input&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Sales&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln">7&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>A partir de ahora, cada miembro del equipo puede almacenar los archivos donde quiera simplemente cambiando el archivo de parámetros.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> en mi caso he dejado el directorio de MountPath una carpeta por encima del directorio &lt;em>Input&lt;/em>, es
+una costumbre, me permite utilizar diferentes subdirectorios para mis archivos. Por ejemplo, puedo tener un directorio &lt;em>Input&lt;/em>
+para mis archivos de entrada y otro archivo &lt;em>Output&lt;/em> con las tablas de salida y sólo tengo que cambiar los subdirectorios de
+las consultas, no hace falta añadir nuevas constantes.&lt;/p>
+&lt;h2 id="creación-de-una-base-de-datos">Creación de una base de datos&lt;/h2>
+&lt;p>En nuestro ejemplo de script con Spark SQL, estamos utilizando la base de datos &lt;strong>default&lt;/strong>, no hay ningún problema con ello
+pero, al mí al menos, me resulta más cómodo tener diferentes bases de datos para mis diferentes proyectos, así que nos
+vamos a crear un script de creación de una nueva base de datos:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="c1">-- Elimina la base de datos si existía
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">DbSample&lt;/span> &lt;span class="k">CASCADE&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">4&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="c1">-- Crea la base de datos de cálculo
+&lt;/span>&lt;span class="ln">6&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="n">DbSample&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;{{MountPath}}/DbSample&amp;#39;&lt;/span>
+&lt;span class="ln">8&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>En este caso la he llamado &lt;strong>DbSample&lt;/strong>.&lt;/p>
+&lt;p>Pero imaginemos que estoy trabajando con diferentes scripts, me interesa que ese nombre de base de datos sea diferente para
+todos los proyectos pero no quiero obligar a mis compañeros a utilizar un nombre único. Puedo utilizar otra constante,
+por ejemplo, &lt;strong>DbCompute&lt;/strong>. Ya nos podemos imaginar que eso se hace modificando el archivo de parámetros:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
+&lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;Constant.DbCompute&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;DbSample&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">3&lt;/span> &lt;span class="nt">&amp;#34;Constant.MountPath&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;/mnt/c/Test/BauDbStudio/Samples/Files&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span>
+&lt;span class="ln">4&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;2017-01-01&amp;#34;&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="p">}&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Ahora puedo modificar el script de creación de base de datos para que utilice la constante:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="c1">-- Elimina la base de datos si existía
+&lt;/span>&lt;span class="ln">2&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span> &lt;span class="k">CASCADE&lt;/span>
+&lt;span class="ln">3&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">4&lt;/span>
+&lt;span class="ln">5&lt;/span>&lt;span class="c1">-- Crea la base de datos de cálculo
+&lt;/span>&lt;span class="ln">6&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">DATABASE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">NOT&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span>
+&lt;span class="ln">7&lt;/span> &lt;span class="k">LOCATION&lt;/span> &lt;span class="s1">&amp;#39;{{MountPath}}/{{DbCompute}} &amp;#39;&lt;/span>
+&lt;span class="ln">8&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Cuando lo ejecute me va a crear una base de datos llamada &lt;strong>DbSample&lt;/strong> en mi servidor y un directorio también llamado &lt;strong>DbSample&lt;/strong>
+por debajo de mi directorio &lt;strong>MountPath&lt;/strong> donde Spark deja sus archivos.&lt;/p>
+&lt;p>Por supuesto, debo cambiar también el script de creación de tablas para que se ejecuten sobre esa base de datos:&lt;/p>
+&lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Sales&lt;/span>
+&lt;span class="ln"> 2&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln"> 3&lt;/span>
+&lt;span class="ln"> 4&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Sales&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln"> 5&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
+&lt;span class="ln"> 6&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`/&lt;/span>&lt;span class="n">mnt&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">c&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Test&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">BauDbStudio&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Samples&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Files&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="k">Input&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">Sales&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
+&lt;span class="ln"> 7&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln"> 8&lt;/span>
+&lt;span class="ln"> 9&lt;/span>&lt;span class="k">DROP&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="k">IF&lt;/span> &lt;span class="k">EXISTS&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SalesSummary&lt;/span>
+&lt;span class="ln">10&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;span class="ln">11&lt;/span>
+&lt;span class="ln">12&lt;/span>&lt;span class="k">CREATE&lt;/span> &lt;span class="k">TABLE&lt;/span> &lt;span class="err">{{&lt;/span>&lt;span class="n">DbCompute&lt;/span>&lt;span class="err">}}&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">SalesSummary&lt;/span> &lt;span class="k">AS&lt;/span>
+&lt;span class="ln">13&lt;/span> &lt;span class="k">SELECT&lt;/span> &lt;span class="n">StoreId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">SUM&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Units&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">Units&lt;/span>
+&lt;span class="ln">14&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Sales&lt;/span>
+&lt;span class="ln">15&lt;/span> &lt;span class="k">WHERE&lt;/span> &lt;span class="nb">Date&lt;/span> &lt;span class="o">&amp;gt;=&lt;/span> &lt;span class="err">$&lt;/span>&lt;span class="n">StartDate&lt;/span>
+&lt;span class="ln">16&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">StoreId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>
+&lt;span class="ln">17&lt;/span>&lt;span class="k">GO&lt;/span>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez ejecutado, aparecerá la nueva base de datos bajo mi conexión:&lt;/p>
+&lt;p>&lt;img src="D:/Projects/Personal/Hugo/test-hugo/content/applications/baudbstudio/manual/040-scripts-sql/conexion-dbsample.jpg" alt="Base de datos DBSample" title="Base de datos DBSample">&lt;/p>
+&lt;p>Las constantes que hemos visto, son muy importantes no sólo en la ejecución de scripts si no también en la
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribución de nuestros scripts&lt;/a> a DataBricks.&lt;/p></description></item><item><title>Scripts de ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl/</guid><description>
+&lt;p>Al trabajar con datos, normalmente nos encontramos con la necesidad de ejecutar procesos repetitivos como copiar
+archivos, realizar consultas, copiar datos resumidos entre base de datos, etc...&lt;/p>
+&lt;p>Este tipo de trabajos se conocen como procesos ETL (Extract, Transform, Load). &lt;strong>BauDbStudio&lt;/strong> permite la definición
+y ejecución de este tipo de procesos.&lt;/p>
+&lt;h2 id="tipos-de-procesos-etl">Tipos de procesos ETL&lt;/h2>
+&lt;p>Para trabajar con procesos ETL, &lt;strong>BauDbStudio&lt;/strong> define diferentes procesadores, cada uno de estos procesadores se encarga
+de un tipo de trabajo.&lt;/p>
+&lt;p>Actualmente podemos definir procesos de:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos">Tratamiento de archivos&lt;/a>&lt;/strong>:
+copia, borrado de archivos, ejecución de comandos del sistema operativo, transformación de archivos (CSV, Excel, Parquet).&lt;/li>
+&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage">Tratamiento de archivos en la nube&lt;/a>&lt;/strong>:
+tratamiento de archivos en sistemas de almacenamiento en la nube (actualmente Azure Storage Blob),
+sobre todo para descarga y subida de archivos.&lt;/li>
+&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest">Procesos REST&lt;/a>&lt;/strong>:
+llamadas a procesos REST (actualmente en desarrollo).&lt;/li>
+&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos">Procesos de base datos&lt;/a>&lt;/strong>:
+procesos de consulta, copia y conversión de datos entre bases de datos relacionales.&lt;/li>
+&lt;/ul>
+&lt;h2 id="definición-de-procesos">Definición de procesos&lt;/h2>
+&lt;p>&lt;strong>BauDbStudio&lt;/strong> define los procesos de ETL utilizando diferentes archivos XML para cada tipo de proceso.&lt;/p>
+&lt;p>Para dirigir el proceso, se utilizan dos archivos especiales:&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>Archivo de proyecto:&lt;/strong> que indica el orden de los pasos a ejecutar.&lt;/li>
+&lt;li>&lt;strong>Archivo de contexto:&lt;/strong> que mantiene los parámetros como por ejemplo las cadenas de conexión o
+nombres de directorio. Este tipo de archivos nos permite ejecutar el mismo proceso pero con datos
+diferentes&lt;/li>
+&lt;/ul>
+&lt;p>Cada tipo de proceso tiene sentencias y esquemas diferentes que se explica en su propia página.&lt;/p>
+&lt;ul>
+&lt;li>Información del &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>&lt;/li>
+&lt;li>Información del &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto">archivo de contexto&lt;/a>&lt;/li>
+&lt;li>Información de procesos
+&lt;ul>
+&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos">Procesos de archivos&lt;/a>&lt;/li>
+&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage">Procesos sobre archivos en la nube&lt;/a>&lt;/li>
+&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest">Procesos REST&lt;/a>&lt;/li>
+&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos">Procesos de base datos&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;/ul>
+&lt;h2 id="ejecución-de-procesos-de-etl">Ejecución de procesos de ETL&lt;/h2>
+&lt;p>Para ejecutar los procesos ETL, si nos colocamos sobre un &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>
+en el árbol de archivos y pulsamos la opción de menú &lt;strong>Ejecutar&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/menuejecucionetl.jpg" alt="Menú de ejecución de procesos ETL" title="Menú de ejecución">&lt;/p>
+&lt;p>Se nos abrirá la ventana de ejecución de &lt;strong>procesos ETL&lt;/strong>:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/ejecucionetl.jpg" alt="Ejecucion de procesos Etl" title="Ejecucion de procesos Etl">&lt;/p>
+&lt;p>En la sección izquierda vemos el contenido del &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>.&lt;/p>
+&lt;p>En la parte derecha debemos seleccionar el &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto">archivo de contexto&lt;/a>
+con el que deseamos ejecutar el proceso:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/ejecucionetlcontext.jpg" alt="Ejecución de procesos Etl sobre un contexto" title="Ejecución de procesos Etl sobre un contexto">&lt;/p>
+&lt;p>Una vez seleccionado un contexto correcto, podemos pulsar sobre el botón &lt;strong>Ejecutar&lt;/strong> para procesar los diferentes pasos del script.&lt;/p>
+&lt;p>Existe una &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl">consola&lt;/a>
+asociada a &lt;strong>BauDbStudio&lt;/strong> que nos permite ejecutar los proyectos por separado.&lt;/p></description></item><item><title>Storage</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Tutorial de BauDbStudio</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio/</guid><description>
+&lt;p>Cuando se ejecuta la aplicación &lt;strong>BauDbStudio&lt;/strong> por primera vez, nos enfrentamos a un escenario vacío
+que debemos configurar antes de comenzar a utilizar la aplicación.&lt;/p>
+&lt;p>Vamos a ver las diferentes partes de la ventana antes de continuar:&lt;/p>
+&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/baudbstudio-primera.jpg" alt="Pantalla inicial" title="Pantalla inicial de BauDbStudio">&lt;/p>
+&lt;p>Como cualquier aplicación de Windows, en la parte superior encontramos los menús y las barras de herramientas.&lt;/p>
+&lt;ul>
+&lt;li>A la izquierda tenemos una ficha con dos pestañas: archivos y conexiones.
+&lt;ul>
+&lt;li>En la ficha de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">archivos&lt;/a> vemos el árbol de nuestra solución
+y nuestros proyectos una vez seleccionados (en un momento explicamos cómo).&lt;/li>
+&lt;li>En la ficha de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones&lt;/a> tendremos la lista de conexiones
+a base de datos y &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a>.&lt;/li>
+&lt;/ul>
+&lt;/li>
+&lt;li>La parte derecha de la ventana contiene una ficha donde podemos mantener una lista de conexiones a
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage">Azure blob storage&lt;/a> asociadas a nuestros proyectos de datos.&lt;/li>
+&lt;li>En la parte central, por ahora vacía, tenemos el espacio donde editaremos y visualizaremos nuestros
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a>,
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas de base de datos&lt;/a> o
+el contenido de los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a> (CSV o parquet).&lt;/li>
+&lt;/ul>
+&lt;p>En la parte inferior de la ventana vemos una pestaña de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log">log&lt;/a> donde
+se muestran los mensajes y errores de la aplicación.&lt;/p>
+&lt;p>Por supuesto, puede cambiar el aspecto de la ventana en cualquier momento y mover las pestañas al punto de la pantalla donde
+le resulte más cómodo.&lt;/p>
+&lt;h2 id="configuración-inicial">Configuración inicial&lt;/h2>
+&lt;p>Para comenzar a utilizar la aplicación, le recomiendo que siga los siguientes pasos:&lt;/p>
+&lt;ol>
+&lt;li>Configure las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones a base de datos&lt;/a> con las que
+va a trabajar (si va a utilizar Spark Sql, recomiendo que lea también cómo establecer una
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">conexión a Spark con ODBC&lt;/a>.&lt;/li>
+&lt;li>Seleccione las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">carpetas&lt;/a> de su ordenador donde
+se van a encontrar los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a>,
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a> y
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a>.&lt;/li>
+&lt;li>Aprenda a ejecutar &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a> sobre las
+conexiones de base de datos&lt;/li>
+&lt;li>Aprenda qué son los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros">archivos de parámetros&lt;/a> y
+para qué se utilizan.&lt;/li>
+&lt;li>En el caso de trabajar con &lt;strong>Databricks&lt;/strong>, prepare las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a> adecuadas.&lt;/li>
+&lt;li>Si necesita acceder a archivos que se encuentren en &lt;strong>Azure Blob Storage&lt;/strong> configure las diferentes
+&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage">conexiones a storage&lt;/a>.&lt;/li>
+&lt;/ol>
+&lt;h2 id="instalación">Instalación&lt;/h2>
+&lt;p>Para instalar la aplicación, puede descargar la última versión desde la página de &lt;a href="https://github.com/jbautistam/BauDbStudio/releases">GitHub&lt;/a>.&lt;/p>
+&lt;p>La aplicación necesita que tenga instalado en su ordenador la versión 3.0 o superior de
+&lt;a href="https://dotnet.microsoft.com/download/dotnet-core/3.1">.Net Core&lt;/a>.&lt;/p></description></item></channel></rss>
