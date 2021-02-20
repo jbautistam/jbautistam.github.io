@@ -1,6 +1,16 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\content",
+    "\\content\\post",
+    "\\data",
+    "\\layouts",
+    "\\public",
+    "\\resources",
+    "\\static",
+    "\\themes",
+    "\\themes\\clarity"
   ],
+  "SelectedNode": "\\content\\_index.md",
   "PreviewInSolutionExplorer": false
 }

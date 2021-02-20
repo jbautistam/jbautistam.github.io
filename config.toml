@@ -1,7 +1,7 @@
-baseURL = "http://jbautistam.github.io/"
+baseURL = "/"
 languageCode = "en-us"
 title = "jbautistam"
-author = "Jose Antonio Bautista Monejo"
+author = "Jose Antonio Bautista Montejo"
 copyright = "Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved."
 paginate = 10
 
