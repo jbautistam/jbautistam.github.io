@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Comunicaciones on jbautistam</title><link>http://jbautistam.github.io/tags/comunicaciones/</link><description>Recent content in Comunicaciones on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/comunicaciones/index.xml" rel="self" type="application/rss+xml"/><item><title>BauMessenger: implementación del protocolo XMPP</title><link>http://jbautistam.github.io/articles/source-code/baumessenger/baumessenger/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/baumessenger/baumessenger/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Comunicaciones on jbautistam</title><link>/tags/comunicaciones/</link><description>Recent content in Comunicaciones on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Fri, 11 Oct 2019 00:00:00 +0000</lastBuildDate><atom:link href="/tags/comunicaciones/index.xml" rel="self" type="application/rss+xml"/><item><title>BauMessenger: implementación del protocolo XMPP</title><link>/articles/source-code/baumessenger/baumessenger/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/baumessenger/baumessenger/</guid><description>
 &lt;p>Los más veteranos del lugar quizá recuerden que sobre el año 2.000 surgieron una nueva línea de aplicaciones
 conocidas con el nombre genérico de 'aplicaciones de mensajería instantánea'. Entre estas aplicaciones estaban
 &lt;strong>Icq&lt;/strong> (de Mirabilis), &lt;strong>Yahoo! Messenger&lt;/strong> (de Yahoo, obviamente) o &lt;strong>MSN Messenger&lt;/strong> (de Microsoft) y
@@ -53,11 +53,11 @@ dispone de un método llamado &lt;code>RegisterUser&lt;/code> desde el que podem
 aún no disponemos de ninguna conexión válida.&lt;/p>
 &lt;h2 id="formularios-de-la-aplicación">Formularios de la aplicación&lt;/h2>
 &lt;p>Se puede manejar completamente &lt;strong>BauMessenger&lt;/strong> desde su formulario principal:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/formulario-principal.jpg" alt="Formulario principal de BauMessenger" title="Formulario principal de BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/formulario-principal.jpg" alt="Formulario principal de BauMessenger" title="Formulario principal de BauMessenger">&lt;/p>
 &lt;p>El árbol de la derecha muestra la lista de conexiones y contactos. Podemos registrar un nuevo usuario con el botón de &lt;em>Crear
 usuario&lt;/em> de la barra de herramients superior. Al registrar un nuevo usuario se nos muestra un formulario con los datos necesarios
 para crear una cuenta:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/creacion-usuario.jpg" alt="Creación de nueva cuenta XMPP con BauMessenger" title="Creación de nueva cuenta XMPP con BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/creacion-usuario.jpg" alt="Creación de nueva cuenta XMPP con BauMessenger" title="Creación de nueva cuenta XMPP con BauMessenger">&lt;/p>
 &lt;p>El formulario que aparece es una de las particularidades del protocolo XMPP: no existe una forma predefinida para crear un usuario si no
 que el servidor al que nos conectamos nos envía un XML con los datos que necesita y el cliente los rellena y reenvía para dar de
 alta el usuario. Es decir, nos encontraremos con servidores que nos pidan usuario y contraseña simplemente, otros nos pedirán además
@@ -66,7 +66,7 @@ un captcha y nuestro nombre. Las posibilidades son ilimitadas.&lt;/p>
 captcha se presentan como URL y no como imagen y no presenta combos. Recordemos que esto comenzó siendo una prueba de concepto.&lt;/p>
 &lt;p>Si ya tenemos un usuario podemos añadir la conexión a nuestra colección con el segundo botón por la derecha de la barra de herramientas
 superior:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/conexion-a-servidor.jpg" alt="Conexión a un servidor XMPP con BauMessenger" title="Conexión a un servidor XMPP con BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/conexion-a-servidor.jpg" alt="Conexión a un servidor XMPP con BauMessenger" title="Conexión a un servidor XMPP con BauMessenger">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> como dijimos anteriormente, hay varios servidores disponibles. Yo suelo utilizar &lt;strong>jabberes.org&lt;/strong> pero
 la aplicación debe ser capaz de comunicarse con cualquier servidor.&lt;/p>
 &lt;p>Una vez tenemos una conexión nos podemos conectar y desconectar así como cambiar nuestro estado con el menú del primer
@@ -74,7 +74,7 @@ botón de la barra superior:&lt;/p>
 &lt;p>&lt;img src="articles/source-code/baumessenger/menu-de-conexion.jpg" alt="Menú de conexión y desconexión y cambio de estado de BauMessenger" title="Conexión / desconexión">&lt;/p>
 &lt;p>Por supuesto, podemos añadir contactos una vez conectados a un servidor simplemente añadiendo su nombre de usuario. El nombre de
 usuario en XMPP es similar a las cuentas de correo, es decir, &lt;em>Nombre de usuario@servidor&lt;/em>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/anadir-contacto.jpg" alt="Añadir un contacto a la lista de contactos de BauMessenger" title="Añadir contacto">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/anadir-contacto.jpg" alt="Añadir un contacto a la lista de contactos de BauMessenger" title="Añadir contacto">&lt;/p>
 &lt;p>&lt;strong>Xmpp&lt;/strong> define que al añadir un contacto a nuestra lista se le envíe un mensaje al usuario destino para que acepte o rechace
 nuestra solicitud. Del mismo modo si algún otro usuario solicita añadirnos a su lista de contactos, se abrirá una ventana
 indicando que aceptemos o rechacemos su solicitud.&lt;/p>
@@ -86,7 +86,7 @@ para probar opciones avanzadas desde nuestro propio ordenador.&lt;/p>
 &lt;p>Por supuesto, lo más importante de una aplicación de mensajería es que podamos enviar y recibir mensajes. Para comenzar una
 conversación simplemente debemos pulsar dos veces sobre el icono de un contacto en el árbol de la derecha y se nos abrirá
 una ficha de chat con ese usuario:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/chat.jpg" alt="Ficha de chat de BauMessenger" title="Chat de BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/chat.jpg" alt="Ficha de chat de BauMessenger" title="Chat de BauMessenger">&lt;/p>
 &lt;p>Si la comunicación comienza por uno de nuestros contactos, es decir, si otro contacto intenta comunicarse con nosotros, se
 abrirá automáticamente una ficha de conversación.&lt;/p>
 &lt;h2 id="resumen">Resumen&lt;/h2>
@@ -98,7 +98,7 @@ contactos y enviar y recibir mensajes. Es decir, implementa las opciones princip
 &lt;li>No envía ni recibe archivos aunque la librería &lt;strong>Sharp.Xmpp&lt;/strong> está preparada para ello.&lt;/li>
 &lt;li>No tiene opciones avanzadas como videoconferencia aunque el protocolo lo permite.&lt;/li>
 &lt;/ul>
-&lt;p>Os invito a ampliar la librería y la aplicación con vuestras ideas y a investigar en todas las posibilidades de este protocolo.&lt;/p></description></item><item><title>Consumir servicios Web utilizando SSL/HTTPS en C#</title><link>http://jbautistam.github.io/articles/development/consumir-servicios-web/consumir-servicios-web/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/consumir-servicios-web/consumir-servicios-web/</guid><description>
+&lt;p>Os invito a ampliar la librería y la aplicación con vuestras ideas y a investigar en todas las posibilidades de este protocolo.&lt;/p></description></item><item><title>Consumir servicios Web utilizando SSL/HTTPS en C#</title><link>/articles/development/consumir-servicios-web/consumir-servicios-web/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/consumir-servicios-web/consumir-servicios-web/</guid><description>
 &lt;p>En ocasiones, cuando se consumen &lt;strong>servicios Web&lt;/strong> utilizando &lt;strong>SSL / HTTPS&lt;/strong> puede que encontremos errores de este tipo:&lt;/p>
 &lt;blockquote>
 &lt;p>Se ha cerrado la conexión subyacente: no se han podido establecer relaciones de confianza con el servidor remoto /
@@ -164,7 +164,7 @@ como válido en el caso que no haya errores utilizaríamos este otro código:&lt
 &lt;span class="ln">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">sslPolicyErrors&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="n">SslPolicyErrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">None&lt;/span>&lt;span class="p">;&lt;/span>
 &lt;span class="ln">12&lt;/span> &lt;span class="p">};&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, la utilización del último parámetro nos ofrece muchas posibilidades aunque esto lo dejaremos para
-próximos artículos.&lt;/p></description></item><item><title>Descargar archivo FTP</title><link>http://jbautistam.github.io/articles/development/descargar-archivo-ftp/descargar-archivo-ftp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/descargar-archivo-ftp/descargar-archivo-ftp/</guid><description>
+próximos artículos.&lt;/p></description></item><item><title>Descargar archivo FTP</title><link>/articles/development/descargar-archivo-ftp/descargar-archivo-ftp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/descargar-archivo-ftp/descargar-archivo-ftp/</guid><description>
 &lt;p>Si deseamos descargar archivos de un servidor &lt;strong>FTP&lt;/strong> con C#, podemos utilizar la clase &lt;strong>FtpWebRequest&lt;/strong> del
 espacio de nombre &lt;strong>System.Net&lt;/strong> del &lt;strong>.NET Framework&lt;/strong>.&lt;/p>
 &lt;p>La utilización es bastante sencilla, simplemente creamos una solicitud sobre el servidor &lt;strong>FTP&lt;/strong> indicando
@@ -240,7 +240,7 @@ objeto &lt;strong>FtpWebRequest&lt;/strong> ) y lo grabamos sobre un archivo loc
 &lt;span class="ln">37&lt;/span> &lt;span class="p">}&lt;/span>
 &lt;span class="ln">38&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> si desea información sobre cómo subir un archivo a un servidor FTP
-lea el artículo: [subir archivo por FTP](Artículos\Programación\Subir archivo FTP).&lt;/p></description></item><item><title>Librería FTP en C#</title><link>http://jbautistam.github.io/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</guid><description>
+lea el artículo: [subir archivo por FTP](Artículos\Programación\Subir archivo FTP).&lt;/p></description></item><item><title>Librería FTP en C#</title><link>/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</guid><description>
 &lt;p>En las aplicaciones que utilizan &lt;a href="https://en.wikipedia.org/wiki/File_Transfer_Protocol">FTP&lt;/a>
 para intercambio de archivos, hasta ahora he utilizado un wrapper sobre la librería de FTP de.NET.&lt;/p>
 &lt;p>En uno de mis últimos proyectos, necesitaba acceder a &lt;strong>FTPs&lt;/strong> y no pude conseguirlo a través de
@@ -248,7 +248,7 @@ las librerías básicas de.NET. En algunos casos me daban errores de conexión a
 otros errores de comunicación. Existen formas de solventarlo pero me pareció más eficaz e instructivo implementarlo por mí
 mismo.&lt;/p>
 &lt;p>Así que armado con los conocimientos adquiridos en la programacación de mi
-&lt;a href="http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp">servicio de SMTP para desarrollo&lt;/a> y la información del
+&lt;a href="/articles/source-code/servidor-smtp/servidor-smtp">servicio de SMTP para desarrollo&lt;/a> y la información del
 &lt;a href="https://www.w3.org/Protocols/rfc959/">protocolo FTP&lt;/a> me puse manos a la obra. El resultado
 es una librería de acceso tanto a FTP como a FTPs o FTPes cuyo código fuente, como siempre, se puede encontrar
 en &lt;a href="https://github.com/jbautistam/LibFtpClient">GitHub&lt;/a>.&lt;/p>
@@ -310,7 +310,7 @@ para ésto son los siguientes:&lt;/p>
 &lt;code>TestLibFtp&lt;/code> que muestra los parámetros de conexión y cómo utilizar los diferentes comandos y modos de conexión.&lt;/p>
 &lt;p>Por cierto, la librería no trata con el protocolo &lt;a href="https://es.wikipedia.org/wiki/SSH_File_Transfer_Protocol">sFTP&lt;/a>
 que aunque pueda parecer lo mismo que &lt;strong>FTPs&lt;/strong>, en realidad es un protocolo
-completamente diferente. Si necesitan una librería de sFTP les propongo &lt;a href="https://sshnet.codeplex.com/">SSH.Net&lt;/a>.&lt;/p></description></item><item><title>Librería POP3 en C# (I)</title><link>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</guid><description>
+completamente diferente. Si necesitan una librería de sFTP les propongo &lt;a href="https://sshnet.codeplex.com/">SSH.Net&lt;/a>.&lt;/p></description></item><item><title>Librería POP3 en C# (I)</title><link>/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</guid><description>
 &lt;p>En uno de mis últimos proyectos tenía que recoger los correos recibidos en una cuenta de correo y procesarlos para guardarlos en
 una base de datos.&lt;/p>
 &lt;p>Aunque el &lt;strong>Framework.NET&lt;/strong> ofrece librerías para enviar correos (protocolo &lt;strong>SMTP&lt;/strong> ) no incorpora ninguna librería para
@@ -383,8 +383,8 @@ parámetros de conexión al servidor, conectar, obtener el número de mensajes p
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>En este caso nos estamos conectando al servidor de correo de &lt;strong>GMail&lt;/strong> en el puerto 995 utilizando una conexión &lt;strong>SSL&lt;/strong>.&lt;/p>
 &lt;p>Lo que obtenemos del método &lt;code>FetchEMail&lt;/code> es una cadena con el contenido del mensaje sin ningún tratamiento. Esto resulta interesante en algunos casos, por
 ejemplo en depuración, para ver el código recibido y las cabeceras. Lo normal sin embargo, es que deseemos interpretar el mensaje de forma que separemos el
-título del cuerpo y los archivos adjuntos. Para esto utilizamos las clases del espacio de nombres &lt;code>Messages&lt;/code>.&lt;/p></description></item><item><title>Librería POP3 en CSharp (II)</title><link>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</guid><description>
-&lt;p>Siguiendo con la explicación de la &lt;a href="http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp">librería POP3 en CSharp&lt;/a>
+título del cuerpo y los archivos adjuntos. Para esto utilizamos las clases del espacio de nombres &lt;code>Messages&lt;/code>.&lt;/p></description></item><item><title>Librería POP3 en CSharp (II)</title><link>/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</guid><description>
+&lt;p>Siguiendo con la explicación de la &lt;a href="/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp">librería POP3 en CSharp&lt;/a>
 hoy vamos a hablar de mensajes.&lt;/p>
 &lt;p>Como vimos hace ya unos meses, se pueden descargar mensajes de correo fácilmente utilizando el método
 &lt;code>FetchEMail&lt;/code> pero una vez que tenemos este mensaje debemos interpretarlo y tratarlo adecuadamente.&lt;/p>
@@ -422,7 +422,7 @@ para mostrarlo:&lt;/p>
 adjuntos se consideran secciones del correo igual que el cuerpo) de esta forma:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">foreach&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Section&lt;/span> &lt;span class="n">objAttachment&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="n">objMimeMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Attachments&lt;/span>&lt;span class="p">)&lt;/span>
 &lt;span class="ln">2&lt;/span> &lt;span class="n">objAttachment&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Save&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileName&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Servidor SMTP para desarrollo (C#)</title><link>http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Servidor SMTP para desarrollo (C#)</title><link>/articles/source-code/servidor-smtp/servidor-smtp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/servidor-smtp/servidor-smtp/</guid><description>
 &lt;p>Este fin de semana tenía la intención de recuperar el código de una librería antigua para generación de informes y aprovechar
 el tratamiento de plantillas de [NSharpDoc]/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas)
 para hacerla algo más versátil pero el primer correo electrónico de la mañana desbarató mis planes y me llevó a otro desarrollo completamente diferente.&lt;/p>
@@ -774,7 +774,7 @@ real y el mantenimiento de usuarios.&lt;/p>
 nos impide reenviar este texto utilizando SMTP a un servidor real. Esto nos permite por ejemplo liberar el servidor real o
 preprocesar los correos para evitar los filtros de spam lanzando sólo correos cada cierto tiempo o paralelizar el envío de
 correos entre diferentes hilos o servidores STMP.&lt;/p>
-&lt;p>Quién sabe... quizá en un futuro.&lt;/p></description></item><item><title>Soporte para WebSockets de HTML 5 en ASP.Net 4.5</title><link>http://jbautistam.github.io/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</guid><description>
+&lt;p>Quién sabe... quizá en un futuro.&lt;/p></description></item><item><title>Soporte para WebSockets de HTML 5 en ASP.Net 4.5</title><link>/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</guid><description>
 &lt;p>El protocolo de &lt;strong>WebSocket&lt;/strong> es un protocolo estándar para comunicaciones seguras, bidireccionales
 y en tiempo real entre cliente / servidor utilizando HTTP y facilita las tareas de transferencia
 de datos entre diferentes ordenadores.&lt;/p>
@@ -835,7 +835,7 @@ la función &lt;strong>onmessage&lt;/strong>. Para enviar un mensaje desde el na
 &lt;span class="ln">6&lt;/span>
 &lt;span class="ln">7&lt;/span>&lt;span class="c1">// Envía una cadena desde el navegador
 &lt;/span>&lt;span class="ln">8&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Texto del mensaje enviado al servidor&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Fuente: &lt;a href="http://www.asp.net/vnext/whats-new">ASP.Net&lt;/a>&lt;/p></description></item><item><title>Subir un archivo a un servidor FTP utilizando C#</title><link>http://jbautistam.github.io/articles/development/subir-archivo-ftp/subir-archivo-ftp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/subir-archivo-ftp/subir-archivo-ftp/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Fuente: &lt;a href="http://www.asp.net/vnext/whats-new">ASP.Net&lt;/a>&lt;/p></description></item><item><title>Subir un archivo a un servidor FTP utilizando C#</title><link>/articles/development/subir-archivo-ftp/subir-archivo-ftp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/subir-archivo-ftp/subir-archivo-ftp/</guid><description>
 &lt;p>Si deseamos subir archivos a un servidor &lt;strong>FTP&lt;/strong> con C#, podemos utilizar la clase &lt;strong>FtpWebRequest&lt;/strong> del
 espacio de nombre &lt;strong>System.Net&lt;/strong> del &lt;strong>.NET Framework&lt;/strong>.&lt;/p>
 &lt;p>La utilización es bastante sencilla, simplemente creamos una solicitud sobre el servidor &lt;strong>FTP&lt;/strong> indicando
@@ -907,7 +907,7 @@ comunicaciones utilizamos el método &lt;strong>GetRequestStream&lt;/strong> del
 &lt;span class="ln">36&lt;/span> &lt;span class="p">}&lt;/span>
 &lt;span class="ln">37&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> si desea información sobre cómo descargar un archivo de un servidor FTP
-lea el artículo: &lt;a href="http://jbautistam.github.io/articles/development/descargar-archivo-ftp/descargar-archivo-ftp">descargar archivo FTP&lt;/a>.&lt;/p></description></item><item><title>Trazas de comunicaciones en C#</title><link>http://jbautistam.github.io/articles/development/trazas-comunicaciones/trazas-comunicaciones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/trazas-comunicaciones/trazas-comunicaciones/</guid><description>
+lea el artículo: &lt;a href="/articles/development/descargar-archivo-ftp/descargar-archivo-ftp">descargar archivo FTP&lt;/a>.&lt;/p></description></item><item><title>Trazas de comunicaciones en C#</title><link>/articles/development/trazas-comunicaciones/trazas-comunicaciones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/trazas-comunicaciones/trazas-comunicaciones/</guid><description>
 &lt;p>Estos días, he tenido que enfrentarme a una aplicación para transmitir archivos
 por &lt;a href="https://es.wikipedia.org/wiki/SSH_File_Transfer_Protocol">sFTP&lt;/a>.&lt;/p>
 &lt;p>El problema principal, aunque parezca lo contrario, no ha sido la implementación del protocolo en sí, si no

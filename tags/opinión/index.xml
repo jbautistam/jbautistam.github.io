@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Opinión on jbautistam</title><link>http://jbautistam.github.io/tags/opini%C3%B3n/</link><description>Recent content in Opinión on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/opini%C3%B3n/index.xml" rel="self" type="application/rss+xml"/><item><title>Abstracciones de aplicación</title><link>http://jbautistam.github.io/articles/opinion/abstracciones-aplicacion/abstracciones-aplicacion/</link><pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/abstracciones-aplicacion/abstracciones-aplicacion/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Opinión on jbautistam</title><link>/tags/opini%C3%B3n/</link><description>Recent content in Opinión on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 01 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/opini%C3%B3n/index.xml" rel="self" type="application/rss+xml"/><item><title>Abstracciones de aplicación</title><link>/articles/opinion/abstracciones-aplicacion/abstracciones-aplicacion/</link><pubDate>Sun, 01 Nov 2020 00:00:00 +0000</pubDate><guid>/articles/opinion/abstracciones-aplicacion/abstracciones-aplicacion/</guid><description>
 &lt;p>Cuando te pasas mucho tiempo en consultoría, tienes la oportunidad de acumular diferentes tipos de proyectos. No hay
 nada mejor que llegar a un proyecto, comenzar a leer el código fuente y explicar a tu nuevo equipo porqué lo están haciendo mal.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> supongo que el mismo proceso ocurriría cuando alguien me sustituía, maldiciones varias y el momento incómodo
@@ -79,7 +79,7 @@ y las grabe en tablas de datos. No necesitas clases para todo.&lt;/p>
 los posibles filtros y la SQL y un motor de gestión de informes que lea y presente estas estructuras. Al fin y al cabo es lo que hacen las aplicaciones de BI tipo
 Tableau desde hace años.&lt;/p>
 &lt;p>No digo que sea sencillo, nunca lo es, pero recuerda: el tiempo de abstracción, de sentarte a pensar, de modelar en papel, es tiempo bien gastado. No obligues a tu
-equipo a copiar y pegar, obliga a tu equipo a pensar, es de las pocas cosas en esta vida que no provoca ninguna enfermedad.&lt;/p></description></item><item><title>Diferencias entre Scrum y ASM</title><link>http://jbautistam.github.io/articles/opinion/diferencias-scrum-asm/diferencias-scrum-asm/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/diferencias-scrum-asm/diferencias-scrum-asm/</guid><description>
+equipo a copiar y pegar, obliga a tu equipo a pensar, es de las pocas cosas en esta vida que no provoca ninguna enfermedad.&lt;/p></description></item><item><title>Diferencias entre Scrum y ASM</title><link>/articles/opinion/diferencias-scrum-asm/diferencias-scrum-asm/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/diferencias-scrum-asm/diferencias-scrum-asm/</guid><description>
 &lt;p>Al fin ha ocurrido. Tenía que pasar antes o después y ha sido hoy. Por fin el cliente para el que trabajo en este proyecto
 ha decidido dejar la tecnología de gestión de ASM y se pasa a la metodología ágil, concretamente a Scrum.&lt;/p>
 &lt;p>Debería estar contento, siempre he defendido este tipo de técnicas, sin embargo, lejos de alegrarme,
@@ -156,11 +156,11 @@ y no se posponen. Tú traes el café o el té, nosotros llevamos los bollos.&lt;
 &lt;/li>
 &lt;/ul>
 &lt;p>Y sin esas premisas y considerando la experiencia acumulada en estos años, miedo me da. Os mantendré informados. Los próximos meses prometen
-diversión para todos.&lt;/p></description></item><item><title>La inseguridad de los certificados digitales</title><link>http://jbautistam.github.io/articles/opinion/inseguridad-certificados-digitales/inseguridad-certificados-digitales/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/inseguridad-certificados-digitales/inseguridad-certificados-digitales/</guid><description>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/inseguridad-certificados-digitales/inseguridad-certificados-digitales.jpg" alt="">&lt;/p>
+diversión para todos.&lt;/p></description></item><item><title>La inseguridad de los certificados digitales</title><link>/articles/opinion/inseguridad-certificados-digitales/inseguridad-certificados-digitales/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/inseguridad-certificados-digitales/inseguridad-certificados-digitales/</guid><description>
+&lt;p>&lt;img src="/articles/opinion/inseguridad-certificados-digitales/inseguridad-certificados-digitales.jpg" alt="">&lt;/p>
 &lt;p>Vamos a comenzar un proyecto nuevo con una empresa externa. Es sencillo: un servicio REST que envía
 y recibe documentos firmados y encriptados digitalmente con un
-&lt;a href="http://jbautistam.github.io/articles/seguridad/certificados-digitales/certificados-digitales">certificado digital&lt;/a>.&lt;/p>
+&lt;a href="/articles/seguridad/certificados-digitales/certificados-digitales">certificado digital&lt;/a>.&lt;/p>
 &lt;p>En la última reunión, la susodicha empresa externa le pasó a mi jefe una copia en un pendrive del certificado que vamos
 a utilizar. Mi jefe, que nunca deja de sorprenderme, me lo envió adjunto en un correo electrónico y puso en
 copia a dos personas de negocio y a su secretaria, supongo que para que tuvieran constancia de que el proyecto
@@ -208,7 +208,7 @@ para desarrollo y estos deben ser diferentes a los de producción.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> habrá quien se pregunte porqué el artículo tiene como cabecera una imagen de &lt;strong>Ashley Madison&lt;/strong>:
 fijaos en la parte inferior de la imagen. Promete todas las medidas de seguridad y fiabilidad, de hecho,
 tiene incluso el icono de SSL bien visible. Todos sabemos de qué sirvieron esas medidas.&lt;/p>
-&lt;p>Con tres palabras &lt;strong>de absolutamente nada&lt;/strong>.&lt;/p></description></item><item><title>Los algoritmos no llevan bigote: posiblemente luzcan barba</title><link>http://jbautistam.github.io/articles/opinion/algoritmos-bigote/algoritmos-bigote/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/algoritmos-bigote/algoritmos-bigote/</guid><description>
+&lt;p>Con tres palabras &lt;strong>de absolutamente nada&lt;/strong>.&lt;/p></description></item><item><title>Los algoritmos no llevan bigote: posiblemente luzcan barba</title><link>/articles/opinion/algoritmos-bigote/algoritmos-bigote/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/algoritmos-bigote/algoritmos-bigote/</guid><description>
 &lt;p>Es posible que llegue tarde para felicitar a &lt;strong>Fréderic Beigreder&lt;/strong> por su &lt;em>premio Icon a la Agitación cultural 2016&lt;/em>
 aunque espero que haya sido por una serie de artículos documentados y no por uno repleto de estereotipos, tópicos y vanalidades
 como &amp;quot;Ningún algoritmo lleva bigote&amp;quot;.&lt;/p>
@@ -230,7 +230,7 @@ el FBI, pero me alegro que a día de hoy haya descubierto al fin lo que es un al
 de difundir gratuitamente la cultura) un párrafo más, se habría enterado además que la palabra algoritmo viene de
 &lt;a href="https://es.m.wikipedia.org/wiki/Al-Juarismi">Al-Juarismi&lt;/a> (con barba, supuestamente),
 matemático persa del siglo octavo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/algoritmos-bigote/aljuarismi.jpg" alt="Al-Juarismi" title="Al-Juarismi: con barba, por cierto">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/algoritmos-bigote/aljuarismi.jpg" alt="Al-Juarismi" title="Al-Juarismi: con barba, por cierto">&lt;/p>
 &lt;p>Los algoritmos por tanto no son invención informática si no que lleva siglos utilizándose en matemáticas o física y en
 términos más mundanos mi pequeño Padawan (y aquí se acaban todas mis referencias culturales a Star Wars)
 también puede considerar algoritmos inventos tales como los protocolos médicos, los protocolos de seguridad
@@ -259,7 +259,7 @@ seguro que encuentra algún ingeniero que le ayude a entender la diferencia.&lt;
 &lt;p>&lt;strong>Segunda nota al margen:&lt;/strong> si lo que deseaba era advertir sobre los problemas de la privacidad en las aplicaciones informáticas
 gratuitas, posiblemente hubiese resultado mucho más sencillo recurrir a
 &lt;a href="http://www.elladodelmal.com/">Chema Alonso&lt;/a> (doctor en informática especializado en Seguridad):&lt;/p>
-&lt;iframe width="800" height="480" src="https://www.youtube.com/embed/mMI_rYKPapU" frameborder="0" allowfullscreen>&lt;/iframe></description></item><item><title>Seguridad por oscuridad</title><link>http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/seguridad-oscuridad/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/seguridad-oscuridad/</guid><description>
+&lt;iframe width="800" height="480" src="https://www.youtube.com/embed/mMI_rYKPapU" frameborder="0" allowfullscreen>&lt;/iframe></description></item><item><title>Seguridad por oscuridad</title><link>/articles/opinion/seguridad-oscuridad/seguridad-oscuridad/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/seguridad-oscuridad/seguridad-oscuridad/</guid><description>
 &lt;p>La seguridad por oscuridad u ocultación, es una metodología que intenta plantear la seguridad de un sistema a partir del secreto
 de sus técnicas, utilizando procedimientos que no están documentados o se han desarrollado internamente. En otros casos, simplemente
 se confía en que los delincuentes no encuentren nuestra información.&lt;/p>
@@ -278,7 +278,7 @@ bien aplicando parches y recomendaciones.&lt;/p>
 de trabajo de dos programadores a horas sueltas.&lt;/p>
 &lt;p>Otro caso: en 2011, GeoHot publicó la forma de acceder como root a la Playstation 3, con un mensaje mítico
 &lt;a href="http://geohot.com/">en su web&lt;/a> (todo un dechado de técnica): &amp;quot;the keys open doors&amp;quot;.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/geohot.jpg" alt="GeoHot: root en Playstation 3" title="GeoHot: root en Playstation 3">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/seguridad-oscuridad/geohot.jpg" alt="GeoHot: root en Playstation 3" title="GeoHot: root en Playstation 3">&lt;/p>
 &lt;p>No busquéis el mensaje en su Web, Sony, tras una larga lucha, le obligó a quitarlo y a prometer que
 no lo volvería a hacer más. La canción que le dedicó a Sony, también es mítica:&lt;/p>
 &lt;iframe width="780" height="720" src="https://www.youtube.com/embed/9iUvuaChDEg"
@@ -289,7 +289,7 @@ seguridad del sistema era mediante técnicas de ingeniería inversa.&lt;/p>
 &lt;p>Volviendo a Sony y a la PS3: a raíz del juicio contra GeoHot comenzó a recibir una serie de ataques DoS y se filtraron
 77 millones de cuentas de usuario con información sensible como los números de tarjetas de crédito.
 La respuesta de Sony, también es memorable:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/sony.jpg" alt="Sony: permanezcan vigilantes" title="Sony: permanezcan vigilantes">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/seguridad-oscuridad/sony.jpg" alt="Sony: permanezcan vigilantes" title="Sony: permanezcan vigilantes">&lt;/p>
 &lt;p>Sony de hecho, tiene un largo historial de fallos de seguridad por su afán de ocultar e inventar.
 Por ejemplo, en 2005 &lt;a href="https://blogs.technet.microsoft.com/markrussinovich/2005/11/14/sony-no-more-rootkit-for-now/">Mark Russinovich&lt;/a>
 les afeaba su afán de introducir rootkits en sus CD, reproduciendo declaraciones como ésta:&lt;/p>
@@ -314,15 +314,15 @@ por oscuridad que podríamos denominar seguridad entre la multitud.&lt;/p>
 a ciegas, simplemente a ver qué encuentra. Y os encontrará.&lt;/p>
 &lt;p>Tenéis que considerar que una gran parte del tráfico que se origina en Internet es tráfico de ataque automatizado. De hecho,
 podemos seguirlo en tiempo real con mapas como los de &lt;a href="https://cybermap.kaspersky.com/es">Kaspersky&lt;/a>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/mapa-ataques.jpg" alt="Mapa ciberataques en tiempo real" title="Mapa ciberataques en tiempo real">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/seguridad-oscuridad/mapa-ataques.jpg" alt="Mapa ciberataques en tiempo real" title="Mapa ciberataques en tiempo real">&lt;/p>
 &lt;p>¿Os habéis preguntado, por ejemplo, cuánto tiempo tarda un dispositivo IoT en caer en las redes de una botnet?
 &lt;a href="https://www.digicert.com/blog/scaling-identity-for-the-internet-of-things">Rob Graham&lt;/a>
 hizo la prueba (spoiler: un minuto y cuarenta segundos):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/rob-graham.jpg" alt="Una cámara tarda 98 segundo en caer en una botnet" title="Una cámara tarda 98 segundo en caer en una botnet">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/seguridad-oscuridad/rob-graham.jpg" alt="Una cámara tarda 98 segundo en caer en una botnet" title="Una cámara tarda 98 segundo en caer en una botnet">&lt;/p>
 &lt;p>¿Aún no me creeis? ¿Recordáis las []({ href = &amp;quot;Artículos\Seguridad\Hallazgos Shodan&amp;quot; } impresoras 3D y Shodan)?&lt;/p>
 &lt;p>Hace unos meses, preparando una charla sobre seguridad, me pasé un rato en Shodan buscando servidores MongoDB. El primero que
 encontré estaba completamente abierto y parece que no fui el único en tener la idea de conectarse:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/shodan.jpg" alt="Shodan y MongoDb" title="Shodan y MongoDb">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/seguridad-oscuridad/shodan.jpg" alt="Shodan y MongoDb" title="Shodan y MongoDb">&lt;/p>
 &lt;p>Que viene a decir algo así como: &amp;quot;he encontrado tu base de datos, te la he robado porque me los has puesto en bandeja,
 si la quieres paga un rescate&amp;quot;.&lt;/p>
 &lt;p>Puede parecer curioso que para dos veces que entro en Shodan por casualidad encuentro un dispositivo vulnerable y una base de datos secuestrada. Me
@@ -330,7 +330,7 @@ da por pensar que quizá no sea una casualidad.&lt;/p>
 &lt;p>Y no, no es una buena idea deducir que ninguno de vuestros clientes utiliza Shodan o
 &lt;a href="https://scans.io/">Scans.io&lt;/a> o no saben programar un script Python para buscar puertos abiertos porque
 puede que sepan cómo buscar por Google esas contraseñas que os empeñáis en guardar en proyectos públicos de Trello:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/seguridad-oscuridad/trello.jpg" alt="Contraseñas en Trello" title="Trello">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/seguridad-oscuridad/trello.jpg" alt="Contraseñas en Trello" title="Trello">&lt;/p>
 &lt;p>Pero bueno, eso seguro que no os pasa porque vuestros archivos están en carpetas de AWS que aunque sean públicas tienen un nombre
 que sólo conocen los miembros de nuestra empresa y no existe ninguna forma de automatizar estas cosas. No sé algo que se llame así como
 &lt;a href="https://github.com/FishermansEnemy/bucket_finder">Bucket finder&lt;/a>
@@ -339,7 +339,7 @@ Por cierto, no son los únicos, los encontré en el artículo
 &lt;a href="https://www.andreafortuna.org/cybersecurity/how-to-find-unsecured-s3-buckets-some-useful-tools/">How to find unsecured S3 buckets: some useful tools&lt;/a>,
 que podéis imaginar de qué trata.&lt;/p>
 &lt;p>En resumen, no es que la seguridad por ocultación sea mala seguridad, simplemente no es seguridad: es esperanza y la
-esperanza, en seguridad, nunca ha sido una buena estrategia.&lt;/p></description></item><item><title>Tendencias en la programación</title><link>http://jbautistam.github.io/articles/opinion/tendencias-programacion/tendencias-programacion/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/tendencias-programacion/tendencias-programacion/</guid><description>
+esperanza, en seguridad, nunca ha sido una buena estrategia.&lt;/p></description></item><item><title>Tendencias en la programación</title><link>/articles/opinion/tendencias-programacion/tendencias-programacion/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/tendencias-programacion/tendencias-programacion/</guid><description>
 &lt;p>No sé si recuerdan cómo surgieron las metodologías ágiles. No se preocupen, este artículo no va de eso; simplemente recordemos
 que el concepto nace como contraposición a las metodologías como CMMI que anteponían la gestión de los requisitos
 al desarrollo del software.&lt;/p>
@@ -350,7 +350,7 @@ así, pero entendéis la idea.&lt;/p>
 &lt;a href="http://www-scf.usc.edu/~csci201/lectures/Lecture11/royce1970.pdf">Managing the development of large Software systems&lt;/a>
 del Dr Winston W. Royce publicado en 1.970.&lt;/p>
 &lt;p>En ese artículo, se define la metodología en cascada prácticamente en su segunda página con este gráfico que ha pasado a la posteridad:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/tendencias-programacion/metodologia-en-cascada.jpg" alt="Metodología en cascada" title="Definición de la metodología en cascada">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/tendencias-programacion/metodologia-en-cascada.jpg" alt="Metodología en cascada" title="Definición de la metodología en cascada">&lt;/p>
 &lt;p>Sé que esto ya lo sabíais, pero antes que saltéis directamente a otra página, permitidme que os muestre una copia del párrafo
 inmediatemente posterior a ese gráfico (las negritas son mías):&lt;/p>
 &lt;blockquote>
@@ -370,7 +370,7 @@ and/or costs.&lt;/p>
 es un proceso arriesgado y propenso a fallos y que puede llevar a un rediseño completo y por supuesto a sobrecostes si hay
 que rehacer el trabajo.&lt;/p>
 &lt;p>Casi al final del mismo artículo, curiosamente, presenta este gráfico:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/tendencias-programacion/metodologia-en-espiral.jpg" alt="Metodología en espiral" title="Figura de metodología en espiral">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/tendencias-programacion/metodologia-en-espiral.jpg" alt="Metodología en espiral" title="Figura de metodología en espiral">&lt;/p>
 &lt;p>que realmente presenta las bases de la metodología en espiral. Además, el mismo artículo habla de la importancia de las pruebas
 y le dedica un paso, el último, a explicar por qué se debe involucrar al cliente en el desarrollo. Una joya.&lt;/p>
 &lt;p>Por terminar con la presentación, recuerdo a mi profesor diciéndonos: &lt;em>&amp;quot;No se debería utilizar esta metodología,
@@ -425,9 +425,9 @@ a métodos (que ya no se lleva) que sabemos que consume más recursos pero la mo
 abstraigan de la base de datos aunque las consultas sean mas ineficientes y utilizaremos lenguajes de programación diseñados
 en quince días para hacer procesamiento en servidor porque en realidad no hemos aprendido nada.&lt;/p>
 &lt;p>¿Parezco enfadado? Disculpad. No lo estoy. Por si no os habíais dado cuenta este es un artículo en modo irónico, realmente
-me encanta hablar de los aspectos holísticos de la programación. Y de Dijkstra, y de Turing, y de Shannon, pero esa es otra historia.&lt;/p></description></item><item><title>Tu código no habla (o al menos a mí no me dice nada)</title><link>http://jbautistam.github.io/articles/opinion/tu-codigo-no-habla/tu-codigo-no-habla/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/tu-codigo-no-habla/tu-codigo-no-habla/</guid><description>
+me encanta hablar de los aspectos holísticos de la programación. Y de Dijkstra, y de Turing, y de Shannon, pero esa es otra historia.&lt;/p></description></item><item><title>Tu código no habla (o al menos a mí no me dice nada)</title><link>/articles/opinion/tu-codigo-no-habla/tu-codigo-no-habla/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/tu-codigo-no-habla/tu-codigo-no-habla/</guid><description>
 &lt;p>No sé si alguna vez os habéis encontrado este código:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/tu-codigo-no-habla/codigo-fuente.jpg" alt="Código fuente" title="Código fuente">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/tu-codigo-no-habla/codigo-fuente.jpg" alt="Código fuente" title="Código fuente">&lt;/p>
 &lt;p>Para los más curiosos, el código pertenece a una librería escrita en Go para la
 &lt;a href="https://github.com/tealeg/xlsx">lectura de archivos de Excel&lt;/a>
 y en resumen sirve para pasar una fecha del calendario gregoriano a un número
@@ -437,7 +437,7 @@ en una carta al director en la revista Communications of ACM (CACM, volumen 11, 
 página 657). Os dejo un enlace por si queréis leer el
 &lt;a href="http://www.cs.otago.ac.nz/cosc345/resources/Fliegel.pdf">artículo original&lt;/a>.&lt;/p>
 &lt;p>Lo interesante de este código y por lo que encabeza el artículo, es precisamente por el comentario:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/opinion/tu-codigo-no-habla/comentario-codigo-fuente.jpg" alt="Comentario de codigo fuente" title="Comentario de codigo fuente">&lt;/p>
+&lt;p>&lt;img src="/articles/opinion/tu-codigo-no-habla/comentario-codigo-fuente.jpg" alt="Comentario de codigo fuente" title="Comentario de codigo fuente">&lt;/p>
 &lt;p>Al parecer, este código no está únicamente en ese repositorio, también se puede encontrar en las fuentes de
 Linux, Android, Excel… y es fundamental para todas las operaciones con fechas. Sin embargo, el artículo no
 detalla su funcionamiento y como se puede apreciar, los nombres de las variables y las constantes no ayudan mucho.&lt;/p>
@@ -591,7 +591,7 @@ del Sombrerero Loco del libro Alicia en el País de las Maravillas (escribo de m
 &lt;li>¿Eso? ¿Qué es eso?&lt;/li>
 &lt;li>Eso es lo que pensó el arzobispo. ¿No sabes lo que es eso?&lt;/li>
 &lt;li>Sé lo que es eso cuando se trata de una liebre o un pájaro pero no sé que es eso que pensó el arzobispo.&lt;/li>
-&lt;/ul></description></item><item><title>¿Por qué los desarrolladores no se preocupan por la seguridad y por qué deberían?</title><link>http://jbautistam.github.io/articles/opinion/desarrolladores-seguridad/desarrolladores-seguridad/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/desarrolladores-seguridad/desarrolladores-seguridad/</guid><description>
+&lt;/ul></description></item><item><title>¿Por qué los desarrolladores no se preocupan por la seguridad y por qué deberían?</title><link>/articles/opinion/desarrolladores-seguridad/desarrolladores-seguridad/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/desarrolladores-seguridad/desarrolladores-seguridad/</guid><description>
 &lt;p>Este fin de semana, raro en mí, no tenía ningún proyecto de programación en mente excepto la documentación
 de &lt;a href="http://bauplugstudio.webs-interesantes.es/">BauPlugStudio&lt;/a>, es decir,
 era el fin de semana perfecto para procastinar y descansar un poco la mente evitando una tarea desagradable.&lt;/p>

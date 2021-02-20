@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Programación on jbautistam</title><link>http://jbautistam.github.io/tags/programaci%C3%B3n/</link><description>Recent content in Programación on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/programaci%C3%B3n/index.xml" rel="self" type="application/rss+xml"/><item><title>Buscando intervalos consecutivos en SQL</title><link>http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/</link><pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Programación on jbautistam</title><link>/tags/programaci%C3%B3n/</link><description>Recent content in Programación on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/programaci%C3%B3n/index.xml" rel="self" type="application/rss+xml"/><item><title>Buscando intervalos consecutivos en SQL</title><link>/articles/development/slq-strings-hollows/sql-strings-hollows/</link><pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate><guid>/articles/development/slq-strings-hollows/sql-strings-hollows/</guid><description>
 &lt;p>Por mucho que SQL sea un gran lenguaje de consulta de datos hay que reconocer que existen ciertos problemas
 realmente complicados de resolver.&lt;/p>
 &lt;p>Uno de estos problemas me surge de vez en cuando: buscar intervalos consecutivos de fechas en una tabla.&lt;/p>
 &lt;p>Imaginad una tabla de ventas básica: productos, fechas y cantidad vendida.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesIntervalTable.jpg" title="Tabla de ventas">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesIntervalTable.jpg" title="Tabla de ventas">&lt;/p>
 &lt;p>La pregunta a las que nos enfrentamos es ¿cuál es el producto que se ha vendido un número mayor de días consecutivos?&lt;/p>
 &lt;p>En primer lugar, veamos nuestros datos con más detalle, para un producto, partimos de una tabla cómo ésta (las cantidades en realidad no nos interesan, sólo necesitamos
 las fechas):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesTable.jpg" title="Fechas de venta para un producto">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesTable.jpg" title="Fechas de venta para un producto">&lt;/p>
 &lt;p>Lo primero que queremos saber, son las fechas consecutivas, es decir, nos interesa una tabla más de éste estilo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesIntervalTable.jpg" alt="IntervalTable.jpg" title="Intervalos de fechas con venta">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SalesIntervalTable.jpg" alt="IntervalTable.jpg" title="Intervalos de fechas con venta">&lt;/p>
 &lt;p>Pero, ¿cómo lo logramos a partir de la tabla inicial?&lt;/p>
 &lt;p>Antes de empezar, permitidme una pequeña licencia: voy a reducir un poco la tabla anterior y me voy a quedar únicamente con el número de día de octubre.
 Esto no es realmente necesario, luego lo veremos con fechas y nos daremos cuenta que no hay ninguna diferencia, pero creo que para la explicación
 es más fácil verlo así:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/content/articles/development/slq-strings-hollows/images/DaySalesTable.jpg" alt="DaySalesTable.jpg" title="Días de octubre con ventas">&lt;/p>
+&lt;p>&lt;img src="/content/articles/development/slq-strings-hollows/images/DaySalesTable.jpg" alt="DaySalesTable.jpg" title="Días de octubre con ventas">&lt;/p>
 &lt;p>Lo primero que vamos a hacer es numerar las filas:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
 &lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>El resultado de esta tabla es el siguiente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlRowNumber.jpg" alt="SqlRowNumber.jpg" title="Numerando las filas">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SqlRowNumber.jpg" alt="SqlRowNumber.jpg" title="Numerando las filas">&lt;/p>
 &lt;p>&lt;strong>Row_Number&lt;/strong> es una función de ventana. Nos va a dar es el número de fila consecutivo particionando por producto, es decir,
 si en lugar de un único producto, nuestra tabla tuviera más de un producto (como es de suponer), nos comenzará a numerar de nuevo las filas desde uno
 cada vez que cambie de producto.&lt;/p>
@@ -29,7 +29,7 @@ nos va a dar el mismo valor. ¿No me creéis?&lt;/p>
 &lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span>
 &lt;span class="ln">3&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
 &lt;span class="ln">4&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlGroupNumber.jpg" alt="SqlGroupNumber.jpg" title="Agrupando días consecutivos">&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SqlGroupNumber.jpg" alt="SqlGroupNumber.jpg" title="Agrupando días consecutivos">&lt;/p>
 &lt;p>Fijáos en la columna &lt;strong>GroupNumber&lt;/strong>: es el mismo valor siempre que los datos sean consecutivos. Los días 18, 19 y 20 están en el grupo 17, el día 23 (que no es
 consecutivo con los anteriores) está en el grupo 19 y los días 25 a 31 están en el grupo 20.&lt;/p>
 &lt;p>Es decir, son días consecutivos aquellos que están en el mismo grupo, por tanto ya podemos agrupar para obtener la fecha mínima y máxima de ese intervalo
@@ -42,7 +42,7 @@ consecutivo con los anteriores) está en el grupo 19 y los días 25 a 31 están 
 &lt;span class="ln">6&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmpGroup&lt;/span>
 &lt;span class="ln">7&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Que nos da el resultado buscado:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlInterval.jpg" alt="SqlInterval.jpg" title="Intervalos">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SqlInterval.jpg" alt="SqlInterval.jpg" title="Intervalos">&lt;/p>
 &lt;p>Sencillo y elegante ¿verdad? Como decía al principio, la solución no es mía, es un problema relativamente común en las consultas SQL. Se
 suelen llamar problemas de cadenas y huecos porque resuelven esas consultas en las que buscamos hechos consecutivos o huecos, es decir, o bien intervalos
 de cosas que ocurren de forma consecutiva o bien intervalos de cosas que no ocurren.&lt;/p>
@@ -58,7 +58,7 @@ lo demás es exactamente igual:&lt;/p>
 &lt;span class="ln">6&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmpGroup&lt;/span>
 &lt;span class="ln">7&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>¿Ahora comprendéis por qué me gusta el SQL?&lt;/p>
-&lt;p>Por cierto, no he respondido a la pregunta, os la dejo a vosotros: ¿cuál es el producto que se ha vendido durante un número mayor de días consecutivos?&lt;/p></description></item><item><title>A vueltas con las pruebas de base datos</title><link>http://jbautistam.github.io/articles/source-code/pruebas-base-datos/pruebas-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/pruebas-base-datos/pruebas-base-datos/</guid><description>
+&lt;p>Por cierto, no he respondido a la pregunta, os la dejo a vosotros: ¿cuál es el producto que se ha vendido durante un número mayor de días consecutivos?&lt;/p></description></item><item><title>A vueltas con las pruebas de base datos</title><link>/articles/source-code/pruebas-base-datos/pruebas-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/pruebas-base-datos/pruebas-base-datos/</guid><description>
 &lt;p>Dentro del mundo de las pruebas del software, las pruebas de base de datos, para mí, son una de las más complejas.&lt;/p>
 &lt;p>Aunque existe mucha documentación sobre cómo debemos realizar este tipo de pruebas, conozco muy pocos
 entornos actualizados que nos permitan automatizar este tipo de testing.&lt;/p>
@@ -129,7 +129,7 @@ conexiones de este tipo:&lt;/p>
 nuestra base de datos semilla, la segunda (TS) será la base de datos sobre la que ejecutaremos las pruebas.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> La aplicación por ahora está preparada para trabajar con Sql Server y SqLite aunque
 debo reconocer que la mayoría de las pruebas de implementación las he hecho sobre Sql Server. La idea es añadir
-más proveedores de base de datos (quién sabe si utilizando &lt;a href="http://jbautistam.github.io/articles/source-code/plugins-2/plugins-2">MEF&lt;/a>, por ejemplo).&lt;/p>
+más proveedores de base de datos (quién sabe si utilizando &lt;a href="/articles/source-code/plugins-2/plugins-2">MEF&lt;/a>, por ejemplo).&lt;/p>
 &lt;p>Una vez identificadas las conexiones, el segundo paso es definir los scripts y el orden que se va a ejecutar:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-xml" data-lang="xml">&lt;span class="ln"> 1&lt;/span>&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;span class="ln"> 2&lt;/span>&lt;span class="nt">&amp;lt;DbScript&amp;gt;&lt;/span>
@@ -317,7 +317,7 @@ ejecutar el script completo sin variaciones y posteriormente ejecutar los &lt;co
 &lt;li>Falta la documentación del resto de instrucciones: if, while, load... y sobre las diferentes transformaciones de datos.&lt;/li>
 &lt;li>La importación / exportación de CSV aún necesita más pruebas.&lt;/li>
 &lt;/ul>
-&lt;p>Seguimos trabajando en ello. Nuevas noticias en breve.&lt;/p></description></item><item><title>Almacenamiento de contraseñas de usuario</title><link>http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/almacenamiento-contrasenas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/almacenamiento-contrasenas/</guid><description>
+&lt;p>Seguimos trabajando en ello. Nuevas noticias en breve.&lt;/p></description></item><item><title>Almacenamiento de contraseñas de usuario</title><link>/articles/seguridad/almacenamiento-contrasenas/almacenamiento-contrasenas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/almacenamiento-contrasenas/almacenamiento-contrasenas/</guid><description>
 &lt;p>Una de las necesidades básicas de los sistemas de seguridad es el almacenamiento de contraseñas
 de usuario en bases de datos o sistemas de archivos.&lt;/p>
 &lt;p>La principal dificultad en este caso, es impedir que un atacante que obtenga los datos de una tabla de usuarios
@@ -340,16 +340,16 @@ pero añaden una capa de complejidad al proceso.&lt;/p>
 &lt;p>Por eso, lo más común es almacenar las contraseñas utilizando sistemas de hashing como MD5, SHA1, SHA256, SHA384,
 o RIPEMD-160.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> ya hemos hablado en este sitio de cómo obtener los valores
-&lt;a href="http://jbautistam.github.io/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena">MD5&lt;/a>
-y el &lt;a href="http://jbautistam.github.io/articles/seguridad/obtener-valor-sha1/obtener-valor-sha1">SHA1&lt;/a> de una cadena. El resto de sistemas
+&lt;a href="/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena">MD5&lt;/a>
+y el &lt;a href="/articles/seguridad/obtener-valor-sha1/obtener-valor-sha1">SHA1&lt;/a> de una cadena. El resto de sistemas
 funcionan de una forma similar, por eso no se repite aquí ese código.&lt;/p>
 &lt;p>En estos casos, al grabar un usuario / contraseña en la base de datos no grabamos realmente la contraseña del usuario
 si no el resultado de la función Hash sobre la contraseña:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/tabla-usuario-contrasena-md5.jpg" alt="Tabla de usuario y contraseña con MD5" title="Tabla de usuario y contraseña con MD5">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/almacenamiento-contrasenas/tabla-usuario-contrasena-md5.jpg" alt="Tabla de usuario y contraseña con MD5" title="Tabla de usuario y contraseña con MD5">&lt;/p>
 &lt;p>Si ya tenemos el usuario y contraseña codificada en nuestra base de datos, para que un usuario pueda entrar al
 sistema ya no debe enviarla en texto plano: debe enviar el resultado de la función hash de la contraseña introducida
 en el sistema de login. Es decir, la contraseña nunca viaja en plano del cliente al servidor.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/envio-hash.jpg" alt="Envío del resultado de la función hash sobre la contraseña" title="Envío del resultado de la función hash sobre la contraseña">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/almacenamiento-contrasenas/envio-hash.jpg" alt="Envío del resultado de la función hash sobre la contraseña" title="Envío del resultado de la función hash sobre la contraseña">&lt;/p>
 &lt;p>Tampoco el servidor conoce la contraseña del usuario dado que una función hash no se puede deshacer,
 lo que se hace es comparar la cadena recibida con la cadena almacenada en el servidor cuando se dio de alta
 el usuario.&lt;/p>
@@ -358,7 +358,7 @@ para nuestro caso particular. Tengamos en cuenta, eso sí, que MD5 se considera 
 obsoleto en el que es sencillo obtener colisiones y deberíamos descartarlo. Además para SHA1 han comenzado a
 aparecer las &lt;a href="https://security.googleblog.com/2017/02/announcing-first-sha1-collision.html">primeras colisiones&lt;/a>
 y por lo tanto tampoco parece un sistema adecuado estos días:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/collision-sha1.jpg" alt="Colisiones con sistemas SHA1" title="Colisiones con sistemas SHA1">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/almacenamiento-contrasenas/collision-sha1.jpg" alt="Colisiones con sistemas SHA1" title="Colisiones con sistemas SHA1">&lt;/p>
 &lt;p>Mi recomendación sería utilizar sistemas de hash más potentes como SHA128 y SHA256 aunque este
 tipo de sistemas posiblemente sean más lentos a la hora de generar los resultados.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> Aunque sabemos que MD5 es un sistema inseguro para el almacenamiento de datos sigue teniendo otros usos en la comparación de archivos por su velocidad.
@@ -366,20 +366,20 @@ En sistemas donde la fiabilidad no es un requisito y no nos preocupen demasiado 
 &lt;p>Uno de los problemas de almacenar las contraseñas de esta forma, es que cualquier atacante puede utilizar el mismo
 sistema para descifrarlas usando tablas rainbow. Una tabla rainbow es una tabla creada a partir de
 una serie de contraseñas habituales o una lista de contraseñas asociadas a su cadena hash:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/tabla-rainbow.jpg" alt="Ejemplo de tabla rainbow" title="Ejemplo de tabla rainbow">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/almacenamiento-contrasenas/tabla-rainbow.jpg" alt="Ejemplo de tabla rainbow" title="Ejemplo de tabla rainbow">&lt;/p>
 &lt;p>Con estas tablas, el atacante puede buscar la cadena hash almacenada en nuestra tabla y obtener la contraseña
 inicial para suplantar al usuario.&lt;/p>
 &lt;p>Por eso, nunca deberíamos almacenar las contraseñas utilizando una simple transformación, deberíamos añadir
 a la contraseña una cadena adicional (conocida como Salt o Inicialization Vector - IV). Esta cadena puede ser
 cualquier cadena aleatoria independiente para cada usuario. Una vez obtenido el IV debemos almacenarlo en nuestra
 base de datos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/tabla-iv.jpg" alt="Tabla de usuario / hash con IV" title="Tabla de usuario / hash con IV">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/almacenamiento-contrasenas/tabla-iv.jpg" alt="Tabla de usuario / hash con IV" title="Tabla de usuario / hash con IV">&lt;/p>
 &lt;p>Al contrario que la contraseña, la cadena IV se puede almacenar en plano sin ningún problema puesto que su único
 propósito es añadir entropía al resultado.&lt;/p>
 &lt;p>En este caso, el proceso es ligeramente diferente, el usuario nos envía el resultado de la función hashing de su contraseña
 y nosotros almacenamos y comparamos con el resultado de calcular una función hash obtenida de concatenar la cadena IV
 con la cadena enviada por el usuario:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/almacenamiento-contrasenas/envio-iv-hash.jpg" alt="Envío de hash utilizando IV" title="Envío de hash utilizando IV">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/almacenamiento-contrasenas/envio-iv-hash.jpg" alt="Envío de hash utilizando IV" title="Envío de hash utilizando IV">&lt;/p>
 &lt;p>Es un poco más farragoso pero así evitamos los ataques de tablas rainbow y tenemos una aplicación mucho más segura.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> En algunos casos he visto utilizar el usuario como cadena IV. Por supuesto, los
 ciberdelincuentes también conocen esta forma de trabajar y utilizan sistemas similares a los de las tablas rainbow
@@ -394,12 +394,12 @@ arsenal de técnicas de seguridad básica.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> La imagen de cabecera de este artículo es una captura de la web
 &lt;a href="https://haveibeenpwned.com/">Have I been pwned?&lt;/a> que mantiene
 una lista de servicios que han tenido fallos de seguridad en los últimos años y donde podemos
-consultar si nuestra dirección de correo electrónico está en riesgo.&lt;/p></description></item><item><title>Almacenamiento de datos sensibles con DPAPI</title><link>http://jbautistam.github.io/articles/seguridad/dpapi-almacenamiento/dpapi-almacenamiento/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/dpapi-almacenamiento/dpapi-almacenamiento/</guid><description>
+consultar si nuestra dirección de correo electrónico está en riesgo.&lt;/p></description></item><item><title>Almacenamiento de datos sensibles con DPAPI</title><link>/articles/seguridad/dpapi-almacenamiento/dpapi-almacenamiento/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/dpapi-almacenamiento/dpapi-almacenamiento/</guid><description>
 &lt;p>En ocasiones, tenemos que almacenar las contraseñas u otros datos sensibles en un archivo o una base de datos
 para utilizarlos posteriormente.&lt;/p>
 &lt;p>Para guardar estos datos de forma segura, podemos utilizar uno de los &lt;strong>sistemas criptográficos&lt;/strong> existentes
-como &lt;a href="http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-rijndael-aes/encriptacion-utilizando-rijndael-aes">AES&lt;/a> o
-&lt;a href="http://jbautistam.github.io/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des">Triple DES&lt;/a>.&lt;/p>
+como &lt;a href="/articles/seguridad/encriptacion-utilizando-rijndael-aes/encriptacion-utilizando-rijndael-aes">AES&lt;/a> o
+&lt;a href="/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des">Triple DES&lt;/a>.&lt;/p>
 &lt;p>Nuestro problema es que estos sistemas criptográficos precisan una contraseña y de dónde obtener esta contraseña.&lt;/p>
 &lt;p>Si no se la podemos solicitar al usuario si no que debe asociarse a la aplicación, una forma sencilla es
 escribirla directamente en el código. Esto, por supuesto, nos dará problemas en cuanto alguien decodifique
@@ -480,7 +480,7 @@ el ámbito del que debe recogerla, en este ejemplo utiliza una contraseña asoci
 valor de entropía, es decir, una serie de valores aleatorios que mejorarán la encriptación. Para
 ellos podemos usar tanto la función de ejemplo &lt;code>CreateRandomEntropy&lt;/code>, como cualquier otra.&lt;/p>
 &lt;p>En segundo lugar, debemos mantener aparte del stream de datos, la longitud de este stream para poder descifrarlo
-posteriormente.&lt;/p></description></item><item><title>Almacenes de certificados digitales en .NET</title><link>http://jbautistam.github.io/articles/seguridad/almacenes-de-certificados-en-.net/almacenes-de-certificados-en-.net/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/almacenes-de-certificados-en-.net/almacenes-de-certificados-en-.net/</guid><description>
+posteriormente.&lt;/p></description></item><item><title>Almacenes de certificados digitales en .NET</title><link>/articles/seguridad/almacenes-de-certificados-en-.net/almacenes-de-certificados-en-.net/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/almacenes-de-certificados-en-.net/almacenes-de-certificados-en-.net/</guid><description>
 &lt;p>.NET nos permite tratar los certificados del mismo modo que implementa otras librerías con algoritmos criptográficos.
 Las clases para el acceso a los certificados se encuentran en el espacio de nombres &lt;code>System.Security.Cryptography.X509Certificates&lt;/code>
 que implementa los métodos del estándar X.509 v3 (estándar de infraestructura de clave pública PKI – Public Key Infrastructure).&lt;/p>
@@ -737,7 +737,7 @@ método &lt;code>Remove&lt;/code>:&lt;/p>
 &lt;span class="ln">26&lt;/span> &lt;span class="c1">// Cierra el almacén
 &lt;/span>&lt;span class="ln">27&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="n">objStore&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Close&lt;/span>&lt;span class="p">();&lt;/span>
 &lt;span class="ln">28&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Aplicación para copiar proyectos de Visual Studio</title><link>http://jbautistam.github.io/articles/source-code/copiar-proyectos-visual-studio/copiar-proyectos-visual-studio/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/copiar-proyectos-visual-studio/copiar-proyectos-visual-studio/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Aplicación para copiar proyectos de Visual Studio</title><link>/articles/source-code/copiar-proyectos-visual-studio/copiar-proyectos-visual-studio/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/copiar-proyectos-visual-studio/copiar-proyectos-visual-studio/</guid><description>
 &lt;p>Dado que siempre tengo una nueva aplicación entre manos, siempre acabo con soluciones de
 &lt;strong>Visual Studio&lt;/strong> compuestas por montones de proyectos compartidos entre sí.
 De hecho, mi récord está en los 77 proyectos que actualmente componen
@@ -748,7 +748,7 @@ a la misma solución y cambiar las referencias.&lt;/p>
 &lt;p>Como soy un fiel seguidor del credo político de Anguita y su 'Programa, programa, programa' me he creado
 una aplicación que a partir de un archivo de solución copia todos los proyectos en un directorio y
 les cambia las referencias.&lt;/p>
-&lt;p>Lo podéis encontrar en &lt;strong>GitHub&lt;/strong> en &lt;a href="https://github.com/jbautistam/CopySolutionsVisualStudio">CopySolutionsVisualStudio&lt;/a>.&lt;/p></description></item><item><title>BauGridBlazor</title><link>http://jbautistam.github.io/articles/source-code/baugridblazor/baugridblazor/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/baugridblazor/baugridblazor/</guid><description>
+&lt;p>Lo podéis encontrar en &lt;strong>GitHub&lt;/strong> en &lt;a href="https://github.com/jbautistam/CopySolutionsVisualStudio">CopySolutionsVisualStudio&lt;/a>.&lt;/p></description></item><item><title>BauGridBlazor</title><link>/articles/source-code/baugridblazor/baugridblazor/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/baugridblazor/baugridblazor/</guid><description>
 &lt;p>Para mí, una de las mejores formas de aprender a utilizar una nueva tecnología es desarrollar componentes sobre
 ella. Cuando comencé a utilizar Blazor, uno de los componentes que me faltaban era precisamente un grid 'decente',
 no sólo una tabla de datos.&lt;/p>
@@ -818,7 +818,7 @@ se cambia la página u ordenación, simplemente trato esa colección y vuelco la
 &lt;/code>&lt;/pre>&lt;/div>&lt;h2 id="conclusión">Conclusión&lt;/h2>
 &lt;p>Generar componentes en Blazor es muy sencillo, en un día (inspirándonos en código de otros, por supuesto) puedes desarrollar un componente
 complejo sin excesivos problemas.&lt;/p>
-&lt;p>Si quieres ver el código fuente como siempre lo puedes consultar en &lt;a href="https://github.com/jbautistam/BauGridBlazor">GitHub&lt;/a>.&lt;/p></description></item><item><title>BauMessenger: implementación del protocolo XMPP</title><link>http://jbautistam.github.io/articles/source-code/baumessenger/baumessenger/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/baumessenger/baumessenger/</guid><description>
+&lt;p>Si quieres ver el código fuente como siempre lo puedes consultar en &lt;a href="https://github.com/jbautistam/BauGridBlazor">GitHub&lt;/a>.&lt;/p></description></item><item><title>BauMessenger: implementación del protocolo XMPP</title><link>/articles/source-code/baumessenger/baumessenger/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/baumessenger/baumessenger/</guid><description>
 &lt;p>Los más veteranos del lugar quizá recuerden que sobre el año 2.000 surgieron una nueva línea de aplicaciones
 conocidas con el nombre genérico de 'aplicaciones de mensajería instantánea'. Entre estas aplicaciones estaban
 &lt;strong>Icq&lt;/strong> (de Mirabilis), &lt;strong>Yahoo! Messenger&lt;/strong> (de Yahoo, obviamente) o &lt;strong>MSN Messenger&lt;/strong> (de Microsoft) y
@@ -873,11 +873,11 @@ dispone de un método llamado &lt;code>RegisterUser&lt;/code> desde el que podem
 aún no disponemos de ninguna conexión válida.&lt;/p>
 &lt;h2 id="formularios-de-la-aplicación">Formularios de la aplicación&lt;/h2>
 &lt;p>Se puede manejar completamente &lt;strong>BauMessenger&lt;/strong> desde su formulario principal:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/formulario-principal.jpg" alt="Formulario principal de BauMessenger" title="Formulario principal de BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/formulario-principal.jpg" alt="Formulario principal de BauMessenger" title="Formulario principal de BauMessenger">&lt;/p>
 &lt;p>El árbol de la derecha muestra la lista de conexiones y contactos. Podemos registrar un nuevo usuario con el botón de &lt;em>Crear
 usuario&lt;/em> de la barra de herramients superior. Al registrar un nuevo usuario se nos muestra un formulario con los datos necesarios
 para crear una cuenta:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/creacion-usuario.jpg" alt="Creación de nueva cuenta XMPP con BauMessenger" title="Creación de nueva cuenta XMPP con BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/creacion-usuario.jpg" alt="Creación de nueva cuenta XMPP con BauMessenger" title="Creación de nueva cuenta XMPP con BauMessenger">&lt;/p>
 &lt;p>El formulario que aparece es una de las particularidades del protocolo XMPP: no existe una forma predefinida para crear un usuario si no
 que el servidor al que nos conectamos nos envía un XML con los datos que necesita y el cliente los rellena y reenvía para dar de
 alta el usuario. Es decir, nos encontraremos con servidores que nos pidan usuario y contraseña simplemente, otros nos pedirán además
@@ -886,7 +886,7 @@ un captcha y nuestro nombre. Las posibilidades son ilimitadas.&lt;/p>
 captcha se presentan como URL y no como imagen y no presenta combos. Recordemos que esto comenzó siendo una prueba de concepto.&lt;/p>
 &lt;p>Si ya tenemos un usuario podemos añadir la conexión a nuestra colección con el segundo botón por la derecha de la barra de herramientas
 superior:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/conexion-a-servidor.jpg" alt="Conexión a un servidor XMPP con BauMessenger" title="Conexión a un servidor XMPP con BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/conexion-a-servidor.jpg" alt="Conexión a un servidor XMPP con BauMessenger" title="Conexión a un servidor XMPP con BauMessenger">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> como dijimos anteriormente, hay varios servidores disponibles. Yo suelo utilizar &lt;strong>jabberes.org&lt;/strong> pero
 la aplicación debe ser capaz de comunicarse con cualquier servidor.&lt;/p>
 &lt;p>Una vez tenemos una conexión nos podemos conectar y desconectar así como cambiar nuestro estado con el menú del primer
@@ -894,7 +894,7 @@ botón de la barra superior:&lt;/p>
 &lt;p>&lt;img src="articles/source-code/baumessenger/menu-de-conexion.jpg" alt="Menú de conexión y desconexión y cambio de estado de BauMessenger" title="Conexión / desconexión">&lt;/p>
 &lt;p>Por supuesto, podemos añadir contactos una vez conectados a un servidor simplemente añadiendo su nombre de usuario. El nombre de
 usuario en XMPP es similar a las cuentas de correo, es decir, &lt;em>Nombre de usuario@servidor&lt;/em>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/anadir-contacto.jpg" alt="Añadir un contacto a la lista de contactos de BauMessenger" title="Añadir contacto">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/anadir-contacto.jpg" alt="Añadir un contacto a la lista de contactos de BauMessenger" title="Añadir contacto">&lt;/p>
 &lt;p>&lt;strong>Xmpp&lt;/strong> define que al añadir un contacto a nuestra lista se le envíe un mensaje al usuario destino para que acepte o rechace
 nuestra solicitud. Del mismo modo si algún otro usuario solicita añadirnos a su lista de contactos, se abrirá una ventana
 indicando que aceptemos o rechacemos su solicitud.&lt;/p>
@@ -906,7 +906,7 @@ para probar opciones avanzadas desde nuestro propio ordenador.&lt;/p>
 &lt;p>Por supuesto, lo más importante de una aplicación de mensajería es que podamos enviar y recibir mensajes. Para comenzar una
 conversación simplemente debemos pulsar dos veces sobre el icono de un contacto en el árbol de la derecha y se nos abrirá
 una ficha de chat con ese usuario:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/baumessenger/chat.jpg" alt="Ficha de chat de BauMessenger" title="Chat de BauMessenger">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/baumessenger/chat.jpg" alt="Ficha de chat de BauMessenger" title="Chat de BauMessenger">&lt;/p>
 &lt;p>Si la comunicación comienza por uno de nuestros contactos, es decir, si otro contacto intenta comunicarse con nosotros, se
 abrirá automáticamente una ficha de conversación.&lt;/p>
 &lt;h2 id="resumen">Resumen&lt;/h2>
@@ -918,7 +918,7 @@ contactos y enviar y recibir mensajes. Es decir, implementa las opciones princip
 &lt;li>No envía ni recibe archivos aunque la librería &lt;strong>Sharp.Xmpp&lt;/strong> está preparada para ello.&lt;/li>
 &lt;li>No tiene opciones avanzadas como videoconferencia aunque el protocolo lo permite.&lt;/li>
 &lt;/ul>
-&lt;p>Os invito a ampliar la librería y la aplicación con vuestras ideas y a investigar en todas las posibilidades de este protocolo.&lt;/p></description></item><item><title>Codificación de archivos en Base64 C#</title><link>http://jbautistam.github.io/articles/development/conversion-base64/conversion-base64/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/conversion-base64/conversion-base64/</guid><description>
+&lt;p>Os invito a ampliar la librería y la aplicación con vuestras ideas y a investigar en todas las posibilidades de este protocolo.&lt;/p></description></item><item><title>Codificación de archivos en Base64 C#</title><link>/articles/development/conversion-base64/conversion-base64/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/conversion-base64/conversion-base64/</guid><description>
 &lt;p>Codificar una cadena en &lt;strong>Base64&lt;/strong> utilizando CSharp es un proceso bastante sencillo.&lt;/p>
 &lt;p>Simplemente debemos utilizar la función &lt;strong>ToBase64String&lt;/strong> de la clase &lt;strong>Convert&lt;/strong>.&lt;/p>
 &lt;p>Por ejemplo, para codificar el contenido de un archivo en Base64 utilizamos este
@@ -954,7 +954,7 @@ podemos utilizar este código:&lt;/p>
 &lt;span class="ln"> 9&lt;/span> &lt;span class="p">}&lt;/span>
 &lt;span class="ln">10&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;span class="ln">11&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Compresión URL con TinyURL mediante C#</title><link>http://jbautistam.github.io/articles/development/compresion-url/compresion-url/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/compresion-url/compresion-url/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Compresión URL con TinyURL mediante C#</title><link>/articles/development/compresion-url/compresion-url/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/compresion-url/compresion-url/</guid><description>
 &lt;p>A una de las cosas que ha contribuido &lt;strong>Twitter&lt;/strong> en los últimos años ha sido a popularizar los servicios de
 compresión de URL como &lt;a href="http://tinyurl.com">TinyUrl&lt;/a>.&lt;/p>
 &lt;p>Estos servicios se encargan de recoger una Url larga como &lt;code>http://www.urllarga.com/mes/articulo/muy/aburrido.html&lt;/code> y
@@ -984,7 +984,7 @@ si lo escribís en la dirección del navegador os aparecerá como resultado una 
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>La mayor parte de los servicios de este tipo funcionan de forma similar, además proporcionan un enlace
 a la &lt;strong>API&lt;/strong> que explica como hacerlo aunque desafortunadamente no hay un método estándar para todos.
 Por lo tanto habrá que adaptar el código anterior para el servicio de compresión y ya tendremos nuestra rutina
-lista.&lt;/p></description></item><item><title>Consideraciones sobre DateTime en SQLServer con respecto a .Net</title><link>http://jbautistam.github.io/articles/development/datetime-sqlserver/datetime-sqlserver/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/datetime-sqlserver/datetime-sqlserver/</guid><description>
+lista.&lt;/p></description></item><item><title>Consideraciones sobre DateTime en SQLServer con respecto a .Net</title><link>/articles/development/datetime-sqlserver/datetime-sqlserver/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/datetime-sqlserver/datetime-sqlserver/</guid><description>
 &lt;p>Tiendo a pensar que cuando dos elementos tienen el mismo nombre, significan lo mismo, pero en desarrollo
 esto no tiene porqué ser así.&lt;/p>
 &lt;p>Tenemos una de esas diferencias entre la estructura &lt;code>DateTime&lt;/code> de.Net y el tipo de datos
@@ -1010,10 +1010,10 @@ mientras que en SQL Server, el valor mínimo es del 1-1-1753 00:00:00.&lt;/p>
 &lt;p>Si por tanto, intentamos grabar &lt;code>DateTime.MinValue&lt;/code> sobre un registro de base de datos, obtendremos una excepción
 de tipo &amp;quot;out of range&amp;quot; bastante desagradable.&lt;/p>
 &lt;p>De hecho, SQL Server tiene varios tipos de datos para las fechas, cada uno con un tamaño y una precisión diferente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/datetime-sqlserver/tipos-date-sqlserver.jpg" alt="Tipos de fechas en SQLServer" title="Tipos de fechas en SQLServer">&lt;/p>
+&lt;p>&lt;img src="/articles/development/datetime-sqlserver/tipos-date-sqlserver.jpg" alt="Tipos de fechas en SQLServer" title="Tipos de fechas en SQLServer">&lt;/p>
 &lt;p>La recomendación es utilizar &lt;code>DateTime2&lt;/code> si queremos mayor precisión pero debemos tener en cuenta que ciertas
 funciones como &lt;code>GetDate&lt;/code>, según la versión, puede que sigan utilizando tipos de datos &lt;code>DateTime&lt;/code> aunque
-los grabemos en un campo &lt;code>DateTime2&lt;/code>.&lt;/p></description></item><item><title>Consumir servicios Web utilizando SSL/HTTPS en C#</title><link>http://jbautistam.github.io/articles/development/consumir-servicios-web/consumir-servicios-web/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/consumir-servicios-web/consumir-servicios-web/</guid><description>
+los grabemos en un campo &lt;code>DateTime2&lt;/code>.&lt;/p></description></item><item><title>Consumir servicios Web utilizando SSL/HTTPS en C#</title><link>/articles/development/consumir-servicios-web/consumir-servicios-web/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/consumir-servicios-web/consumir-servicios-web/</guid><description>
 &lt;p>En ocasiones, cuando se consumen &lt;strong>servicios Web&lt;/strong> utilizando &lt;strong>SSL / HTTPS&lt;/strong> puede que encontremos errores de este tipo:&lt;/p>
 &lt;blockquote>
 &lt;p>Se ha cerrado la conexión subyacente: no se han podido establecer relaciones de confianza con el servidor remoto /
@@ -1079,7 +1079,7 @@ como válido en el caso que no haya errores utilizaríamos este otro código:&lt
 &lt;span class="ln">11&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">sslPolicyErrors&lt;/span> &lt;span class="p">==&lt;/span> &lt;span class="n">SslPolicyErrors&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">None&lt;/span>&lt;span class="p">;&lt;/span>
 &lt;span class="ln">12&lt;/span> &lt;span class="p">};&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, la utilización del último parámetro nos ofrece muchas posibilidades aunque esto lo dejaremos para
-próximos artículos.&lt;/p></description></item><item><title>Contadores rendimiento</title><link>http://jbautistam.github.io/articles/development/contadores-rendimiento/contadores-rendimiento/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/contadores-rendimiento/contadores-rendimiento/</guid><description>
+próximos artículos.&lt;/p></description></item><item><title>Contadores rendimiento</title><link>/articles/development/contadores-rendimiento/contadores-rendimiento/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/contadores-rendimiento/contadores-rendimiento/</guid><description>
 &lt;p>Los contadores de rendimiento proporcionan información numérica sobre el estado de una operación del sistema operativo o
 una aplicación. Estos contadores se pueden grabar y monitorizar utilizando herramientas estándar del sistema
 (concretamente la aplicación de rendimiento de Windows que puede ejecutarse con la orden: perfmon.msc /s).&lt;/p>
@@ -1164,7 +1164,7 @@ cuarto parámetro por la colección de contadores creada anteriormente:&lt;/p>
 &lt;p>El método &lt;strong>Delete&lt;/strong> de la clase &lt;strong>PerformanceCounterCategory&lt;/strong> permite eliminar una categoría simplemente indicando el nombre
 de la categoría a eliminar:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="n">PerformanceCounterCategory&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Delete&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Facturas&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Conversión imágenes a Base64 y viceversa en C#</title><link>http://jbautistam.github.io/articles/development/conversion-imagenes/conversion-imagenes/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/conversion-imagenes/conversion-imagenes/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Conversión imágenes a Base64 y viceversa en C#</title><link>/articles/development/conversion-imagenes/conversion-imagenes/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/conversion-imagenes/conversion-imagenes/</guid><description>
 &lt;p>En ocasiones, por ejemplo cuando se va a enviar una imagen en un archivo XML, debemos codificar una imagen
 utilizando &lt;strong>Base64&lt;/strong>.&lt;/p>
 &lt;p>El proceso de conversión de la imagen a una cadena en &lt;strong>Base64&lt;/strong> es bastante sencillo.&lt;/p>
@@ -1215,7 +1215,7 @@ estático &lt;code>Image.FromStream&lt;/code>:&lt;/p>
 &lt;span class="ln">19&lt;/span> &lt;span class="c1">// Devuelve la imagen
 &lt;/span>&lt;span class="ln">20&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">objImage&lt;/span>&lt;span class="p">;&lt;/span>
 &lt;span class="ln">21&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Convertir cadena hexadecimal a decimal en C# (y viceversa)</title><link>http://jbautistam.github.io/articles/development/convertir-hexadecimal/convertir-hexadecimal/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/convertir-hexadecimal/convertir-hexadecimal/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Convertir cadena hexadecimal a decimal en C# (y viceversa)</title><link>/articles/development/convertir-hexadecimal/convertir-hexadecimal/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/convertir-hexadecimal/convertir-hexadecimal/</guid><description>
 &lt;p>Una de las cosas que siempre olvido y acabo buscando por Internet.&lt;/p>
 &lt;p>¿Cómo se convierte una cadena en hexadecimal a un número entero en C#?&lt;/p>
 &lt;p>No podía ser más simple, únicamente tenemos que utilizar el método &lt;strong>ToInt32&lt;/strong> (o &lt;strong>ToInt34&lt;/strong> o similar) de la clase estática
@@ -1224,9 +1224,9 @@ estático &lt;code>Image.FromStream&lt;/code>:&lt;/p>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Donde &lt;code>strValue&lt;/code> es nuestra cadena en hexadecimal (por ejemplo FE05A4). No hace falta ponerle los caracteres 0x por delante.&lt;/p>
 &lt;p>Para pasar de un entero a una cadena en hexadecimal, por el contrario, utilizamos el método &lt;code>Format&lt;/code> de la clase &lt;code>String&lt;/code>:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="kt">string&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">format&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;{0:x}&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">decValue&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Muy sencillo, supongo que por eso nunca lo recuerdo.&lt;/p></description></item><item><title>Crear un certificado para pruebas con makeCert</title><link>http://jbautistam.github.io/articles/seguridad/crear-un-certificado-para-pruebas/crear-un-certificado-para-pruebas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/crear-un-certificado-para-pruebas/crear-un-certificado-para-pruebas/</guid><description>
-&lt;p>Los &lt;a href="http://jbautistam.github.io/articles/seguridad/certificados-digitales/certificados-digitales">certificados digitales&lt;/a> nos permiten realizar
-comunicaciones seguras utilizando &lt;a href="http://jbautistam.github.io/articles/seguridad/clave-publica/clave-publica">criptografía asimétrica&lt;/a>.&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Muy sencillo, supongo que por eso nunca lo recuerdo.&lt;/p></description></item><item><title>Crear un certificado para pruebas con makeCert</title><link>/articles/seguridad/crear-un-certificado-para-pruebas/crear-un-certificado-para-pruebas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/crear-un-certificado-para-pruebas/crear-un-certificado-para-pruebas/</guid><description>
+&lt;p>Los &lt;a href="/articles/seguridad/certificados-digitales/certificados-digitales">certificados digitales&lt;/a> nos permiten realizar
+comunicaciones seguras utilizando &lt;a href="/articles/seguridad/clave-publica/clave-publica">criptografía asimétrica&lt;/a>.&lt;/p>
 &lt;p>Los &lt;strong>certificados digitales&lt;/strong> los emite una &lt;strong>entidad certificadora&lt;/strong> que recoge nuestros datos y previo pago
 nos devuelve un archivo que podemos utilizar en nuestro trabajo.&lt;/p>
 &lt;p>Cuando estamos desarrollando muchas veces no deseamos asumir ese coste para las máquinas de desarrollo o preproducción
@@ -1255,11 +1255,11 @@ utilizamos los parámetros:&lt;/p>
 &lt;p>Cuando aparezca el cuadro de diálogo &lt;em>Crear contraseña de clave privada&lt;/em> introduzca la contraseña y su
 confirmación y pulse el botón &lt;em>Aceptar&lt;/em>. Se puede pulsar el botón &lt;em>Ninguna&lt;/em> para no asignar
 contraseña aunque por supuesto no se recomienda.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/crear-un-certificado-para-pruebas/crear-contrasena-de-clave-privada.jpg" alt="Cuadro de diálogo de creación de contraseñas de clave privada" title="Cuadro de diálogo de creación de contraseñas de clave privada">&lt;/p>
+&lt;p>&lt;img src="/articles/seguridad/crear-un-certificado-para-pruebas/crear-contrasena-de-clave-privada.jpg" alt="Cuadro de diálogo de creación de contraseñas de clave privada" title="Cuadro de diálogo de creación de contraseñas de clave privada">&lt;/p>
 &lt;p>Una vez introducida la clave privada, aparece el cuadro de diálogo &lt;em>Escriba la contraseña de la clave
 privada&lt;/em> donde debemos volver a teclear la clave privada y pulsar el botón &lt;em>Aceptar&lt;/em>.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/seguridad/crear-un-certificado-para-pruebas/escribir-contrasena-de-clave-privada.jpg" alt="Cuadro de diálogo Escribir contraseña de clave privada" title="Cuadro de diálogo Escribir contraseña de clave privada">&lt;/p>
-&lt;p>Así tendremos por fin nuestro &lt;strong>certificado de prueba&lt;/strong>.&lt;/p></description></item><item><title>CrioGame: motor de juegos con C#</title><link>http://jbautistam.github.io/articles/source-code/criogame/criogame/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/criogame/criogame/</guid><description>
+&lt;p>&lt;img src="/articles/seguridad/crear-un-certificado-para-pruebas/escribir-contrasena-de-clave-privada.jpg" alt="Cuadro de diálogo Escribir contraseña de clave privada" title="Cuadro de diálogo Escribir contraseña de clave privada">&lt;/p>
+&lt;p>Así tendremos por fin nuestro &lt;strong>certificado de prueba&lt;/strong>.&lt;/p></description></item><item><title>CrioGame: motor de juegos con C#</title><link>/articles/source-code/criogame/criogame/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/criogame/criogame/</guid><description>
 &lt;p>Llevaba ya tiempo leyendo sobre motores de juegos, concretamente con &lt;a href="http://www.monogame.net/">MonoGame&lt;/a>
 y me apetecía dedicar un tiempo a desarrollar juegos. ¿Y qué mejor momento que el verano para dedicarle un par de meses?&lt;/p>
 &lt;p>Dado que mi capacidad como diseñador es bastante escasa, le dí una vuelta de tuerca a la idea de desarrollar un videojuego y decidí ampliar
@@ -1312,7 +1312,7 @@ le falta mucho para ser un motor de creación de videojuegos completo.&lt;/p>
 &lt;p>Aunque nos puede servir como base para juegos sencillos sin demasiado esfuerzo, aún no estoy del todo contento con algunos aspectos como
 el manejo de cámaras o sprites.&lt;/p>
 &lt;p>Dado que el verano se acabó, este proyecto entra en su fase de mejoras. Posiblemente lo vaya ampliando y documentando en tiempos muertos
-pero no puedo prometer nada. Eso sí, espero que los interesados lo prueben y me envíen sus comentarios y mejoras.&lt;/p></description></item><item><title>Cómo convertir una cadena a Unicode con caracteres de escape en C#</title><link>http://jbautistam.github.io/articles/development/convertir-cadena-unicode-c/convertir-cadena-unicode-c/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/convertir-cadena-unicode-c/convertir-cadena-unicode-c/</guid><description>
+pero no puedo prometer nada. Eso sí, espero que los interesados lo prueben y me envíen sus comentarios y mejoras.&lt;/p></description></item><item><title>Cómo convertir una cadena a Unicode con caracteres de escape en C#</title><link>/articles/development/convertir-cadena-unicode-c/convertir-cadena-unicode-c/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/convertir-cadena-unicode-c/convertir-cadena-unicode-c/</guid><description>
 &lt;p>En algunas ocasiones es necesario convertir una cadena en otra cadena Unicode utilizando caracteres de escape.&lt;/p>
 &lt;p>Es decir, lo que queremos es convertir caracteres como la 'ñ' en su codificación equivalente en C# en formato
 Unicode: '\u00f1'.&lt;/p>
@@ -1341,7 +1341,7 @@ decir, debe ir en una clase estática e incluirla utilizando un &lt;strong>using
 &lt;span class="ln">18&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Para utilizarlo simplemente debemos importar la clase con este &lt;strong>método de extensión&lt;/strong> y utilizar una llamada de este tipo:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strConverted&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="s">&amp;#34;Prueba de conversión con ñ&amp;#34;&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToUnicode&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Desarrollo de plugins con .Net</title><link>http://jbautistam.github.io/articles/source-code/plugins/plugins/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/plugins/plugins/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Desarrollo de plugins con .Net</title><link>/articles/source-code/plugins/plugins/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/plugins/plugins/</guid><description>
 &lt;p>El concepto de &lt;strong>plugin&lt;/strong> o &lt;strong>extensión&lt;/strong> es bien conocido para todo desarrollador: un componente dentro de una
 aplicación que se puede cargar y utilizar en tiempo de ejecución sin vincularlo directamente en tiempo de diseño.&lt;/p>
 &lt;p>Los plugins nos permiten añadir funcionalidades a nuestra aplicación para las que no estaba preparada en un principio
@@ -1669,8 +1669,8 @@ de eventos para recoger los mensajes enviado con el temporizador de la clase &lt
 una serie de atributos y cargar los plugins utilizando un contenedor.&lt;/p>
 &lt;p>Lo realmente complicado es definir lo que van a hacer nuestras extensiones y ampliar los interfaces de forma que sean lo más
 flexibles posible.&lt;/p>
-&lt;p>Como siempre, el código fuente de las pruebas lo podeis encontrar en &lt;a href="https://github.com/jbautistam/TestPlugins">GitHub&lt;/a>.&lt;/p></description></item><item><title>Desarrollo de plugins con MEF</title><link>http://jbautistam.github.io/articles/source-code/plugins-2/plugins-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/plugins-2/plugins-2/</guid><description>
-&lt;p>Hace ya algunos años, escribía sobre la &lt;a href="http://jbautistam.github.io/articles/source-code/plugins/plugins">creación de plugins&lt;/a>
+&lt;p>Como siempre, el código fuente de las pruebas lo podeis encontrar en &lt;a href="https://github.com/jbautistam/TestPlugins">GitHub&lt;/a>.&lt;/p></description></item><item><title>Desarrollo de plugins con MEF</title><link>/articles/source-code/plugins-2/plugins-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/plugins-2/plugins-2/</guid><description>
+&lt;p>Hace ya algunos años, escribía sobre la &lt;a href="/articles/source-code/plugins/plugins">creación de plugins&lt;/a>
 para aplicaciones.NET utilizando la primera versión de MEF.&lt;/p>
 &lt;p>Por recordarlo, un plugin es una aplicación o librería a la que podemos acceder desde nuestra aplicación
 sin necesidad de enlazarla en tiempo de compilación. Es decir, no tenemos
@@ -1945,9 +1945,9 @@ en la librería que contiene el ejecutable pero como en realidad no hay ninguna 
 de nuevo. Por eso hay que hacerlo a mano o modificar la configuración del compilador para que siempre compile toda la
 solución. Yo acabé asociando la tecla F7 al comando 'Recompilar toda la solución' pero va en gustos.&lt;/p>
 &lt;p>Y eso es todo, simple y limpio.&lt;/p>
-&lt;p>Como siempre, podéis ver el código fuente en &lt;a href="https://github.com/jbautistam/JobManager">GitHub&lt;/a>.&lt;/p></description></item><item><title>Documentación de código CSharp utilizando plantillas</title><link>http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas/</guid><description>
+&lt;p>Como siempre, podéis ver el código fuente en &lt;a href="https://github.com/jbautistam/JobManager">GitHub&lt;/a>.&lt;/p></description></item><item><title>Documentación de código CSharp utilizando plantillas</title><link>/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas/</guid><description>
 &lt;p>En la parte final del artículo anterior sobre
-&lt;a href="http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp/documentacion-codigo-csharp">documentación de código fuente en CSharp&lt;/a>
+&lt;a href="/articles/source-code/documentacion-codigo-csharp/documentacion-codigo-csharp">documentación de código fuente en CSharp&lt;/a>
 comentaba que había dos formas de generar la documentación o bien con un método que generaba archivos
 por separado en clases, interfaces y métodos o bien otro en el que los archivos se generaban con los
 métodos dentro de las clases.&lt;/p>
@@ -2144,9 +2144,9 @@ entre los documentados, por ejemplo, &lt;code>Int32&lt;/code> no aparece como v�
 pero &lt;code>Class1&lt;/code> incluye el vínculo hacia el documento de la clase &lt;code>Class1&lt;/code> (por supuesto, si está en el proyecto que documentamos).&lt;/p>
 &lt;h3 id="un-ejemplo-de-documentación">Un ejemplo de documentación&lt;/h3>
 &lt;p>Por ejemplo, aquí tenemos una imagen de la salida de la documentación para una clase:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp-plantillas/sample.jpg" alt="Ejemplo de salida de documentación" title="Ejemplo de salida">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/documentacion-codigo-csharp-plantillas/sample.jpg" alt="Ejemplo de salida de documentación" title="Ejemplo de salida">&lt;/p>
 &lt;h2 id="el-futuro">El futuro&lt;/h2>
-&lt;p>El código fuente lo podéis encontrar en &lt;a href="https://github.com/jbautistam/RoslynDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Documentación de código fuente de C#</title><link>http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp/documentacion-codigo-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp/documentacion-codigo-csharp/</guid><description>
+&lt;p>El código fuente lo podéis encontrar en &lt;a href="https://github.com/jbautistam/RoslynDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Documentación de código fuente de C#</title><link>/articles/source-code/documentacion-codigo-csharp/documentacion-codigo-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/documentacion-codigo-csharp/documentacion-codigo-csharp/</guid><description>
 &lt;p>Todo desarrollador sabe que la documentación de un proyecto es muy importante. Todo desarrollador sabe
 también que la documentación de un proyecto es la parte más aburrida de nuestro trabajo.&lt;/p>
 &lt;p>Por eso, para facilitar la documentación del proyecto, prácticamente todos los lenguajes de programación
@@ -2369,11 +2369,11 @@ gráficos de clases y de interconexiones entre las clases o incluso tablas de ll
 sin necesidad de trabajo de interpretación adicional.&lt;/p>
 &lt;p>Supongo por tanto que iré modificando la aplicación para añadirle más funcionalidades. Si alguien quiere sumarse
 al proyecto, como comentaba al principio del artículo, podéis encontrar todos los fuentes en
-&lt;a href="https://github.com/jbautistam/RoslynDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Encriptación RSA utilizando certificados digitales con .NET</title><link>http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-certificados/encriptacion-utilizando-certificados/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-certificados/encriptacion-utilizando-certificados/</guid><description>
-&lt;p>Cuando utilizamos &lt;a href="http://jbautistam.github.io/articles/seguridad/certificados-digitales/certificados-digitales">certificados digitales&lt;/a>
+&lt;a href="https://github.com/jbautistam/RoslynDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Encriptación RSA utilizando certificados digitales con .NET</title><link>/articles/seguridad/encriptacion-utilizando-certificados/encriptacion-utilizando-certificados/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/encriptacion-utilizando-certificados/encriptacion-utilizando-certificados/</guid><description>
+&lt;p>Cuando utilizamos &lt;a href="/articles/seguridad/certificados-digitales/certificados-digitales">certificados digitales&lt;/a>
 para encriptar un mensaje, normalmente vamos a utilizar métodos de &lt;strong>criptografía asimétrica&lt;/strong>.&lt;/p>
 &lt;p>Lo primero que debemos hacer es obtener el &lt;strong>certificado&lt;/strong> del
-&lt;a href="http://jbautistam.github.io/articles/seguridad/almacenes-de-certificados-en-.net/almacenes-de-certificados-en-.net">almacén de certificados&lt;/a>
+&lt;a href="/articles/seguridad/almacenes-de-certificados-en-.net/almacenes-de-certificados-en-.net">almacén de certificados&lt;/a>
 de nuestro ordenador:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="k">private&lt;/span> &lt;span class="n">X509Certificate2&lt;/span> &lt;span class="n">GetCertificate&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strThumbCertificate&lt;/span>&lt;span class="p">)&lt;/span>
 &lt;span class="ln"> 2&lt;/span>&lt;span class="p">{&lt;/span>
@@ -2408,12 +2408,12 @@ la siguiente forma:&lt;/p>
 &lt;span class="ln">5&lt;/span>
 &lt;span class="ln">6&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">Encoding&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ASCII&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objProvider&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Decrypt&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">Convert&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">FromBase64String&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strMessage&lt;/span>&lt;span class="p">),&lt;/span> &lt;span class="k">false&lt;/span>&lt;span class="p">));&lt;/span>
 &lt;span class="ln">7&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Encriptación utilizando Rijndael - AES con .NET</title><link>http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-rijndael-aes/encriptacion-utilizando-rijndael-aes/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-rijndael-aes/encriptacion-utilizando-rijndael-aes/</guid><description>
-&lt;p>Uno de los algoritmos de &lt;a href="http://jbautistam.github.io/articles/seguridad/clave-publica/clave-publica">criptografía asimétrica&lt;/a>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Encriptación utilizando Rijndael - AES con .NET</title><link>/articles/seguridad/encriptacion-utilizando-rijndael-aes/encriptacion-utilizando-rijndael-aes/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/encriptacion-utilizando-rijndael-aes/encriptacion-utilizando-rijndael-aes/</guid><description>
+&lt;p>Uno de los algoritmos de &lt;a href="/articles/seguridad/clave-publica/clave-publica">criptografía asimétrica&lt;/a>
 es el algoritmo &lt;a href="http://en.wikipedia.org/wiki/Rijndael">Rijndael&lt;/a> o &lt;strong>AES&lt;/strong>.&lt;/p>
 &lt;p>Utilizar las librerías de encriptación de.NET (&lt;code>System.Security.Cryptography&lt;/code>) para encriptar o
 desencriptar una cadena utilizando &lt;strong>Rijndael&lt;/strong> es igual de sencillo que utilizar el
-&lt;a href="http://jbautistam.github.io/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des">algoritmo Triple DES&lt;/a>
+&lt;a href="/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des">algoritmo Triple DES&lt;/a>
 simplemente debemos seguir los mismos pasos:&lt;/p>
 &lt;h2 id="inicializando-el-proveedor-criptográfico">Inicializando el proveedor criptográfico&lt;/h2>
 &lt;p>El primer paso antes de encriptar o desencriptar un mensaje es inicializar el proveedor utilizando la
@@ -2461,7 +2461,7 @@ cadena de bytes desencriptada:&lt;/p>
 &lt;span class="ln"> 9&lt;/span> &lt;span class="n">arrBytBuffer&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Length&lt;/span>&lt;span class="p">));&lt;/span>
 &lt;span class="ln">10&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>La rutina anterior espera una cadena codificada en &lt;strong>base 64&lt;/strong>, por eso la primer instrucción de la
-rutina convierte ese texto en un array de bytes (&lt;code>Convert.FromBase64String&lt;/code>).&lt;/p></description></item><item><title>Encriptación utilizando WDP con C#</title><link>http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-wdp/encriptacion-utilizando-wdp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/encriptacion-utilizando-wdp/encriptacion-utilizando-wdp/</guid><description>
+rutina convierte ese texto en un array de bytes (&lt;code>Convert.FromBase64String&lt;/code>).&lt;/p></description></item><item><title>Encriptación utilizando WDP con C#</title><link>/articles/seguridad/encriptacion-utilizando-wdp/encriptacion-utilizando-wdp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/encriptacion-utilizando-wdp/encriptacion-utilizando-wdp/</guid><description>
 &lt;p>&lt;strong>Windows Data Protection (WDP)&lt;/strong> es un sistema de encriptación que proporciona el propio sistema operativo utilizando una clave generada
 automáticamente a partir de la contraseña del usuario que ha iniciado la sesión. Por ejemplo, este es el sistema empleado cuando se utilizan
 los métodos del espacio de nombres &lt;code>System.IO.File.Encrypt&lt;/code> sobre un archivo.&lt;/p>
@@ -2523,7 +2523,7 @@ añadiéndole datos aleatorios y pasándoselos al método de encriptación.&lt;/
 &lt;/span>&lt;span class="ln">51&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="n">UTF8Encoding&lt;/span>&lt;span class="p">().&lt;/span>&lt;span class="n">GetString&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">arrBytDecrypted&lt;/span>&lt;span class="p">);&lt;/span>
 &lt;span class="ln">52&lt;/span> &lt;span class="p">}&lt;/span>
 &lt;span class="ln">53&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Encriptar / desencriptar archivos en C#</title><link>http://jbautistam.github.io/articles/seguridad/encriptar-archivos/encriptar-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/encriptar-archivos/encriptar-archivos/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Encriptar / desencriptar archivos en C#</title><link>/articles/seguridad/encriptar-archivos/encriptar-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/encriptar-archivos/encriptar-archivos/</guid><description>
 &lt;p>Desde la versión 2.0 del Framework de.NET existe una forma sencilla de encriptar y desencriptar
 archivos en C#.&lt;/p>
 &lt;p>Para ello simplemente tenemos que utilizar los métodos &lt;code>Encrypt&lt;/code> y &lt;code>Decrypt&lt;/code> de la clase
@@ -2540,7 +2540,7 @@ sistema operativo (CSP - Cryptographic Service Provider), por eso impone algunas
 &lt;li>El sistema de archivos debe estar formateado como NFTS.&lt;/li>
 &lt;li>El sistema operativo debe ser Windows NT o superior.&lt;/li>
 &lt;li>Puede que no funcione con las versiones más reducidas de Windows Vista o Windows 7 como Home o Basic.&lt;/li>
-&lt;/ul></description></item><item><title>Encriptar cadenas utilizando Triple DES</title><link>http://jbautistam.github.io/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des/</guid><description>
+&lt;/ul></description></item><item><title>Encriptar cadenas utilizando Triple DES</title><link>/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/encriptar-cadenas-utilizando-triple-des/encriptar-cadenas-utilizando-triple-des/</guid><description>
 &lt;p>&lt;strong>DES&lt;/strong> es un algoritmo de encriptación en bloque de clave simétrica, es decir, se utiliza la misma clave para
 encriptar como para desencriptar un mensaje.&lt;/p>
 &lt;p>Encriptar un mensaje utilizando &lt;strong>DES&lt;/strong> con las librerías de.NET (`System.Security.Cryptography^)
@@ -2593,8 +2593,8 @@ una cadena codificada en base 64, por eso la primera línea es la instrucción &
 puede que sea fácil descifrarlo, sin embargo, los usuarios no son demasiado amigos de utilizar claves de más
 de 8 caracteres.&lt;/p>
 &lt;p>Para evitar utilizar en el cifrado una clave demasiado corta se puede emplear en lugar de la clave proporcionada
-por el usuario un &lt;a href="http://jbautistam.github.io/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena">hash MD5&lt;/a>
-de la clave lo que nos dará una cadena más larga que podemos usar con mayor confianza.&lt;/p></description></item><item><title>Firma digital de archivos XML en C#</title><link>http://jbautistam.github.io/articles/development/firma-xml/firma-xml/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/firma-xml/firma-xml/</guid><description>
+por el usuario un &lt;a href="/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena">hash MD5&lt;/a>
+de la clave lo que nos dará una cadena más larga que podemos usar con mayor confianza.&lt;/p></description></item><item><title>Firma digital de archivos XML en C#</title><link>/articles/development/firma-xml/firma-xml/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/firma-xml/firma-xml/</guid><description>
 &lt;p>Cuando se trabaja con archivos XML, en ocasiones nos solicitan que este archivo se firme digitalmente
 utilizando una clave privada.&lt;/p>
 &lt;p>&lt;a href="http://www.w3.org/TR/xmldsig-core/">XmlDSignature&lt;/a> es un protocolo estándar para
@@ -2633,7 +2633,7 @@ en &lt;strong>XmlDSignature&lt;/strong>. Por ejemplo:&lt;/p>
 &lt;span class="ln">19&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="n">Signature&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
 &lt;span class="ln">20&lt;/span>&lt;span class="p">...&lt;/span>
 &lt;span class="ln">21&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="n">documento&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>El código para firmar un archivo XML utilizando un &lt;a href="http://jbautistam.github.io/articles/seguridad/certificados-digitales/certificados-digitales">certificado digital&lt;/a>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>El código para firmar un archivo XML utilizando un &lt;a href="/articles/seguridad/certificados-digitales/certificados-digitales">certificado digital&lt;/a>
 es el siguiente:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1">/// &amp;lt;summary&amp;gt;
 &lt;/span>&lt;span class="ln"> 2&lt;/span>&lt;span class="c1">/// Firma un archivo XML con un certificado
@@ -2699,7 +2699,7 @@ en este parámetro el id del nodo XML que se debe firmar.&lt;/p>
 &lt;span class="ln"> 9&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="n">documento&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
 &lt;span class="ln">10&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="n">code&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
 &lt;span class="ln">11&lt;/span>&lt;span class="p">&amp;lt;/&lt;/span>&lt;span class="n">pre&lt;/span>&lt;span class="p">&amp;gt;&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>si quisiéramos firmar únicamente el nodo &lt;strong>hijo&lt;/strong> le pasaríamos a la función el valor 'id_nodo' como tercer parámetro.&lt;/p></description></item><item><title>Fundamentos de Roslyn</title><link>http://jbautistam.github.io/articles/development/roslyn-1/roslyn-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/roslyn-1/roslyn-1/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>si quisiéramos firmar únicamente el nodo &lt;strong>hijo&lt;/strong> le pasaríamos a la función el valor 'id_nodo' como tercer parámetro.&lt;/p></description></item><item><title>Fundamentos de Roslyn</title><link>/articles/development/roslyn-1/roslyn-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/roslyn-1/roslyn-1/</guid><description>
 &lt;p>De todas las novedades que.NET ha incorporado a lo largo de los años una de las que más me ha llamado la
 atención ha sido &lt;a href="https://github.com/dotnet/roslyn">Roslyn&lt;/a> por la forma
 en que rediseña el modo de comunicarnos con los compiladores y los nuevos servicios que nos ofrece.&lt;/p>
@@ -2733,7 +2733,7 @@ que recurrir &lt;strong>Emit&lt;/strong>, para ejecutar C# como script del mismo
 Update 1 transformandoC# en un lenguaje dinámico como Python o traducir código de un lenguaje a otro como C# a Visual Basic o viceversa.
 Además, al separar el compilador en servicios nos abre posibilidades como generación de nuevos lenguajes para .NET o incluso la
 tan comentada compilación a código nativo de estos últimos meses.&lt;/p>
-&lt;p>En próximos artículos veremos cómo sacar partido de &lt;strong>Roslyn&lt;/strong> y algunas de las posibilidades que nos ofrece.&lt;/p></description></item><item><title>Información del método llamante en C# 4.5</title><link>http://jbautistam.github.io/articles/development/informacion-llamada/informacion-llamada/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/informacion-llamada/informacion-llamada/</guid><description>
+&lt;p>En próximos artículos veremos cómo sacar partido de &lt;strong>Roslyn&lt;/strong> y algunas de las posibilidades que nos ofrece.&lt;/p></description></item><item><title>Información del método llamante en C# 4.5</title><link>/articles/development/informacion-llamada/informacion-llamada/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/informacion-llamada/informacion-llamada/</guid><description>
 &lt;p>En ocasiones, cuando se desarrollan aplicaciones avanzadas en.NET deseamos tener información sobre el
 método que nos está llamando.&lt;/p>
 &lt;p>Uno de los ejemplos más claros son los sistemas de traza y depuración, pero puede que lo debamos utilizar
@@ -2765,7 +2765,7 @@ envía la cadena &lt;code>.ctor&lt;/code> mientras que los destructores utilizan
 &lt;li>&lt;code>CallerFilePath&lt;/code>: cadena con el nombre de archivo fuente donde se encuentra el método que realiza
 la llamada.&lt;/li>
 &lt;li>&lt;code>CallerLineNumber&lt;/code>: número de línea en el archivo fuente en que se encuentra el método llamante.&lt;/li>
-&lt;/ul></description></item><item><title>Instrucción yield de C#</title><link>http://jbautistam.github.io/articles/development/instruccion-yield-de-csharp/instruccion-yield-de-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/instruccion-yield-de-csharp/instruccion-yield-de-csharp/</guid><description>
+&lt;/ul></description></item><item><title>Instrucción yield de C#</title><link>/articles/development/instruccion-yield-de-csharp/instruccion-yield-de-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/instruccion-yield-de-csharp/instruccion-yield-de-csharp/</guid><description>
 &lt;p>La palabra clave &lt;a href="http://msdn.microsoft.com/en-us/library/9k7k7cf0.aspx">yield&lt;/a> de C#
 quizá sea una de las instrucciones más útiles del lenguage y al mismo tiempo una de las más desconocidas.&lt;/p>
 &lt;p>Esta instrucción indica al compilador que el método en el que aparece se va a utilizar dentro de un iterador para que este genere una
@@ -2840,7 +2840,7 @@ cadena:&lt;/p>
 &lt;span class="ln">13&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Podemos encontrar ejemplos mucho más complejos por la red, por ejemplo, uno bastante ilustrativo explica cómo tratar
 &lt;a href="http://ayende.com/blog/3082/pipes-and-filters-the-ienumerable-appraoch">pipes y filtros&lt;/a> utilizando la
-sentencia &lt;code>yield&lt;/code> con muy pocas líneas de código.&lt;/p></description></item><item><title>Introducción a la API de TFS</title><link>http://jbautistam.github.io/articles/source-code/introduccion-api-tfs/introduccion-api-tfs/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/introduccion-api-tfs/introduccion-api-tfs/</guid><description>
+sentencia &lt;code>yield&lt;/code> con muy pocas líneas de código.&lt;/p></description></item><item><title>Introducción a la API de TFS</title><link>/articles/source-code/introduccion-api-tfs/introduccion-api-tfs/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/introduccion-api-tfs/introduccion-api-tfs/</guid><description>
 &lt;p>Estos días he estado jugando con el acceso a &lt;strong>Team Foundation Server&lt;/strong> utilizando sus API y servicios
 Web.&lt;/p>
 &lt;p>Aunque una vez que conoces sus bases es bastante fácil de utilizar, la documentación es, en el mejor de los casos, escasa
@@ -3032,7 +3032,7 @@ tarea es hija de o padre de o se tiene que ejecutar antes o después de.&lt;/p>
 &lt;p>Como siempre, el código fuente de la aplicación que estoy utilizando para pruebas se encuentra en
 &lt;a href="https://github.com/jbautistam/TFSample">GitHub&lt;/a>.&lt;/p>
 &lt;p>La aplicación no está completa. No carga aún las relaciones entre tareas que describíamos en el punto anterior aunque
-espero que sirva como base en vuestras propias pruebas con TFS.&lt;/p></description></item><item><title>Introducción a los certificados digitales</title><link>http://jbautistam.github.io/articles/seguridad/certificados-digitales/certificados-digitales/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/certificados-digitales/certificados-digitales/</guid><description>
+espero que sirva como base en vuestras propias pruebas con TFS.&lt;/p></description></item><item><title>Introducción a los certificados digitales</title><link>/articles/seguridad/certificados-digitales/certificados-digitales/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/certificados-digitales/certificados-digitales/</guid><description>
 &lt;p>Uno de los problemas de la comunicación mediante procesos electrónicos es la imposibilidad de verificar que el emisor
 de la comunicación es realmente quien dice ser. En el Mundo Real™ para verificar la identidad de una persona u
 organización se utilizan documentos como el pasaporte, el DNI, el CIF o similares acompañados de una firma o una
@@ -3095,7 +3095,7 @@ indicando que el certificado es incorrecto.&lt;/p>
 &lt;li>&lt;strong>Fecha de fin de validez:&lt;/strong> fecha en la que expira el certificado.&lt;/li>
 &lt;li>&lt;strong>Algoritmo de huella digital:&lt;/strong> el algoritmo utilizado para el hash del certificado.&lt;/li>
 &lt;li>&lt;strong>Huella digital:&lt;/strong> el hash del certificado utilizado para verificar que no se ha modificado el certificado.&lt;/li>
-&lt;/ul></description></item><item><title>Lector ePub</title><link>http://jbautistam.github.io/articles/source-code/lector-epub/lector-epub/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/lector-epub/lector-epub/</guid><description>
+&lt;/ul></description></item><item><title>Lector ePub</title><link>/articles/source-code/lector-epub/lector-epub/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/lector-epub/lector-epub/</guid><description>
 &lt;p>Estos días ando actualizando mis librerías y proyectos a las nuevas versiones de .Net estándar.
 Comienzo a programar con UWP y Xamarin Forms y me veo compilando y recompilando para diferentes versiones
 de framework, algo que me está trayendo por el camino de la amargura.&lt;/p>
@@ -3168,11 +3168,11 @@ mi modo de ver no eran necesarios y de la peor forma posible, guiado por errores
 &lt;p>Ahora que estamos a las puertas de la versión 2.0, parecería lógico utilizar la versión de Net Standard 1.6 pero en realidad
 no se admite con ningún framework de.Net, ni siquiera el 4.7 (por cierto, yo me lo descargué precisamente para eso aunque
 vendrá bien para comenzar a utilizarC# 7.0):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/source-code/lector-epub/netstandard.jpg" alt="Relación de Net Standard con los frameworks de .Net" title="Net Standard">&lt;/p>
+&lt;p>&lt;img src="/articles/source-code/lector-epub/netstandard.jpg" alt="Relación de Net Standard con los frameworks de .Net" title="Net Standard">&lt;/p>
 &lt;p>No deja de sorprenderme, no es por criticar a Microsoft (bueno, sí), pero el cambio Net.Core, Net.Standard, Net.Framework
 que parecía cosa de unos meses está dando lugar a un ecosistema bastante &amp;quot;inestable&amp;quot; cuanto menos y ahora mismo una fuente
 de incertidumbre considerable.&lt;/p>
-&lt;p>Veremos qué pasa cuando se lance Net.Standard 2.0.&lt;/p></description></item><item><title>Librería FTP en C#</title><link>http://jbautistam.github.io/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</guid><description>
+&lt;p>Veremos qué pasa cuando se lance Net.Standard 2.0.&lt;/p></description></item><item><title>Librería FTP en C#</title><link>/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/libreria-ftp-en-c-1/libreria-ftp-en-c-1/</guid><description>
 &lt;p>En las aplicaciones que utilizan &lt;a href="https://en.wikipedia.org/wiki/File_Transfer_Protocol">FTP&lt;/a>
 para intercambio de archivos, hasta ahora he utilizado un wrapper sobre la librería de FTP de.NET.&lt;/p>
 &lt;p>En uno de mis últimos proyectos, necesitaba acceder a &lt;strong>FTPs&lt;/strong> y no pude conseguirlo a través de
@@ -3180,7 +3180,7 @@ las librerías básicas de.NET. En algunos casos me daban errores de conexión a
 otros errores de comunicación. Existen formas de solventarlo pero me pareció más eficaz e instructivo implementarlo por mí
 mismo.&lt;/p>
 &lt;p>Así que armado con los conocimientos adquiridos en la programacación de mi
-&lt;a href="http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp">servicio de SMTP para desarrollo&lt;/a> y la información del
+&lt;a href="/articles/source-code/servidor-smtp/servidor-smtp">servicio de SMTP para desarrollo&lt;/a> y la información del
 &lt;a href="https://www.w3.org/Protocols/rfc959/">protocolo FTP&lt;/a> me puse manos a la obra. El resultado
 es una librería de acceso tanto a FTP como a FTPs o FTPes cuyo código fuente, como siempre, se puede encontrar
 en &lt;a href="https://github.com/jbautistam/LibFtpClient">GitHub&lt;/a>.&lt;/p>
@@ -3242,7 +3242,7 @@ para ésto son los siguientes:&lt;/p>
 &lt;code>TestLibFtp&lt;/code> que muestra los parámetros de conexión y cómo utilizar los diferentes comandos y modos de conexión.&lt;/p>
 &lt;p>Por cierto, la librería no trata con el protocolo &lt;a href="https://es.wikipedia.org/wiki/SSH_File_Transfer_Protocol">sFTP&lt;/a>
 que aunque pueda parecer lo mismo que &lt;strong>FTPs&lt;/strong>, en realidad es un protocolo
-completamente diferente. Si necesitan una librería de sFTP les propongo &lt;a href="https://sshnet.codeplex.com/">SSH.Net&lt;/a>.&lt;/p></description></item><item><title>Librería para cálculo de expresiones con C#</title><link>http://jbautistam.github.io/articles/source-code/calculo-expresiones/calculo-expresiones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/calculo-expresiones/calculo-expresiones/</guid><description>
+completamente diferente. Si necesitan una librería de sFTP les propongo &lt;a href="https://sshnet.codeplex.com/">SSH.Net&lt;/a>.&lt;/p></description></item><item><title>Librería para cálculo de expresiones con C#</title><link>/articles/source-code/calculo-expresiones/calculo-expresiones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/calculo-expresiones/calculo-expresiones/</guid><description>
 &lt;p>Uno de los requisitos que me encuentro frecuentemente en mis proyectos es la interpretación y el
 cálculo de &lt;strong>expresiones matemáticas&lt;/strong> desde una aplicación.&lt;/p>
 &lt;p>Una librería que pueda interpretar y ejecutar expresiones matemáticas no es un proceso excesivamente complejo,
@@ -3301,7 +3301,7 @@ la propiedad &lt;code>Content&lt;/code> del resultado. Si no debemos evaluar el 
 el valor de cadena del resultado.&lt;/p>
 &lt;h2 id="código-fuente">Código fuente&lt;/h2>
 &lt;p>Puede encontrar y descargar el código fuente de la &lt;strong>librería de cálculo de expresiones&lt;/strong> en
-&lt;a href="https://github.com/jbautistam/ExpressionParser">GitHub&lt;/a>.&lt;/p></description></item><item><title>Librería POP3 en C# (I)</title><link>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</guid><description>
+&lt;a href="https://github.com/jbautistam/ExpressionParser">GitHub&lt;/a>.&lt;/p></description></item><item><title>Librería POP3 en C# (I)</title><link>/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp/</guid><description>
 &lt;p>En uno de mis últimos proyectos tenía que recoger los correos recibidos en una cuenta de correo y procesarlos para guardarlos en
 una base de datos.&lt;/p>
 &lt;p>Aunque el &lt;strong>Framework.NET&lt;/strong> ofrece librerías para enviar correos (protocolo &lt;strong>SMTP&lt;/strong> ) no incorpora ninguna librería para
@@ -3374,8 +3374,8 @@ parámetros de conexión al servidor, conectar, obtener el número de mensajes p
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>En este caso nos estamos conectando al servidor de correo de &lt;strong>GMail&lt;/strong> en el puerto 995 utilizando una conexión &lt;strong>SSL&lt;/strong>.&lt;/p>
 &lt;p>Lo que obtenemos del método &lt;code>FetchEMail&lt;/code> es una cadena con el contenido del mensaje sin ningún tratamiento. Esto resulta interesante en algunos casos, por
 ejemplo en depuración, para ver el código recibido y las cabeceras. Lo normal sin embargo, es que deseemos interpretar el mensaje de forma que separemos el
-título del cuerpo y los archivos adjuntos. Para esto utilizamos las clases del espacio de nombres &lt;code>Messages&lt;/code>.&lt;/p></description></item><item><title>Librería POP3 en CSharp (II)</title><link>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</guid><description>
-&lt;p>Siguiendo con la explicación de la &lt;a href="http://jbautistam.github.io/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp">librería POP3 en CSharp&lt;/a>
+título del cuerpo y los archivos adjuntos. Para esto utilizamos las clases del espacio de nombres &lt;code>Messages&lt;/code>.&lt;/p></description></item><item><title>Librería POP3 en CSharp (II)</title><link>/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/libreria-pop3-en-csharp-1/libreria-pop3-en-csharp-1/</guid><description>
+&lt;p>Siguiendo con la explicación de la &lt;a href="/articles/source-code/libreria-pop3-en-csharp/libreria-pop3-en-csharp">librería POP3 en CSharp&lt;/a>
 hoy vamos a hablar de mensajes.&lt;/p>
 &lt;p>Como vimos hace ya unos meses, se pueden descargar mensajes de correo fácilmente utilizando el método
 &lt;code>FetchEMail&lt;/code> pero una vez que tenemos este mensaje debemos interpretarlo y tratarlo adecuadamente.&lt;/p>
@@ -3413,7 +3413,7 @@ para mostrarlo:&lt;/p>
 adjuntos se consideran secciones del correo igual que el cuerpo) de esta forma:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">foreach&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">Section&lt;/span> &lt;span class="n">objAttachment&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="n">objMimeMessage&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Attachments&lt;/span>&lt;span class="p">)&lt;/span>
 &lt;span class="ln">2&lt;/span> &lt;span class="n">objAttachment&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Save&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">strFileName&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Mezclar archivos PDF con C# e iTextSharp</title><link>http://jbautistam.github.io/articles/development/combinar-pdf/combinar-pdf/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/combinar-pdf/combinar-pdf/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Mezclar archivos PDF con C# e iTextSharp</title><link>/articles/development/combinar-pdf/combinar-pdf/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/combinar-pdf/combinar-pdf/</guid><description>
 &lt;p>La librería &lt;a href="http://sourceforge.net/projects/itextsharp">iTextSharp&lt;/a>, es una traducción en C# del código de
 &lt;strong>iText&lt;/strong> en Java para el tratamiento de archivos &lt;strong>PDF&lt;/strong>.&lt;/p>
 &lt;p>Aparte de permitirnos crear archivos &lt;strong>PDF&lt;/strong> dinámicos, tiene funciones para
@@ -3489,7 +3489,7 @@ del archivo final, el segundo es un array con los nombres de los archivos que de
 &lt;span class="ln">62&lt;/span> &lt;span class="c1">// Devuelve el valor que indica si se han mezclado los archivos
 &lt;/span>&lt;span class="ln">63&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">blnMerged&lt;/span>&lt;span class="p">;&lt;/span>
 &lt;span class="ln">64&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Métodos criptográficos de clave pública</title><link>http://jbautistam.github.io/articles/seguridad/clave-publica/clave-publica/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/clave-publica/clave-publica/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Métodos criptográficos de clave pública</title><link>/articles/seguridad/clave-publica/clave-publica/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/clave-publica/clave-publica/</guid><description>
 &lt;p>La criptografía de clave pública, también conocida como asimétrica, se basa en la utilización de
 un par de claves.&lt;/p>
 &lt;p>De esta pareja de claves una se utiliza para cifrar y la otra para descifrar. La primera de ellas
@@ -3563,7 +3563,7 @@ relativo a p-1.&lt;/li>
 &lt;li>M = s / rxr.&lt;/li>
 &lt;/ul>
 &lt;p>La fortaleza de este método criptográfico se basa en la dificultad del cálculo de logaritmos
-discretos necesarios para descifrar el mensaje.&lt;/p></description></item><item><title>Obtener el valor MD5 de una cadena en C#</title><link>http://jbautistam.github.io/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena/</guid><description>
+discretos necesarios para descifrar el mensaje.&lt;/p></description></item><item><title>Obtener el valor MD5 de una cadena en C#</title><link>/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena/</guid><description>
 &lt;p>Las &lt;a href="http://en.wikipedia.org/wiki/Hashing_function">funciones de Hashing&lt;/a>
 son funciones de una dirección que a partir de un dato de entrada obtienen un dato de salida único.&lt;/p>
 &lt;p>Es decir, cualquier variación en los datos de entrada (aunque sea de únicamente un bit) da como resultado un valor de salida
@@ -3602,7 +3602,7 @@ es el algoritmo &lt;strong>MD5&lt;/strong>.&lt;/p>
 &lt;span class="ln">26&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Para obtener el resultado &lt;strong>MD5&lt;/strong> para una cadena simplemente debemos realizar una llamada a la función:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">strHashValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">MD5Helper&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Compute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hello World&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Obtener el valor SHA1 de una cadena en C#</title><link>http://jbautistam.github.io/articles/seguridad/obtener-valor-sha1/obtener-valor-sha1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/obtener-valor-sha1/obtener-valor-sha1/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Obtener el valor SHA1 de una cadena en C#</title><link>/articles/seguridad/obtener-valor-sha1/obtener-valor-sha1/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/obtener-valor-sha1/obtener-valor-sha1/</guid><description>
 &lt;p>El algoritmo &lt;strong>SHA1&lt;/strong>, del mismo modo que el algoritmo &lt;strong>MD5&lt;/strong>, otiene una cadena única utilizando una
 &lt;a href="http://en.wikipedia.org/wiki/Hashing_function">función de Hashing&lt;/a> sobre una cadena de entrada.&lt;/p>
 &lt;p>Para conseguir una cadena &lt;strong>SHA1&lt;/strong> en C# se puede utilizar la siguiente clase estática:&lt;/p>
@@ -3636,10 +3636,10 @@ es el algoritmo &lt;strong>MD5&lt;/strong>.&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="kt">string&lt;/span> &lt;span class="n">strHashValue&lt;/span> &lt;span class="p">=&lt;/span> &lt;span class="n">SHA1Helper&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Compute&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Hello World&amp;#34;&lt;/span>&lt;span class="p">);&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Los lectores fieles y observadores, se habrán dado cuenta que la forma de trabajar es prácticamente
 la misma que en el artículo que explicaba como
-&lt;a href="http://jbautistam.github.io/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena">obtener el valor MD5 de una cadena&lt;/a>,
+&lt;a href="/articles/seguridad/obtener-el-valor-md5-de-una-cadena/obtener-el-valor-md5-de-una-cadena">obtener el valor MD5 de una cadena&lt;/a>,
 en realidad lo único que cambia es el proveedor criptográfico utilizado, en el caso de &lt;strong>SHA1&lt;/strong> utilizamos
 la clase &lt;code>SHA1CryptoServiceProvider&lt;/code>, mientras que para el caso de &lt;strong>MD5&lt;/strong> utilizamos la
-clase &lt;code>MD5CryptoServiceProvider&lt;/code>.&lt;/p></description></item><item><title>Obtener las aplicaciones instaladas en Windows con C#</title><link>http://jbautistam.github.io/articles/development/aplicaciones-instaladas/aplicaciones-instaladas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/aplicaciones-instaladas/aplicaciones-instaladas/</guid><description>
+clase &lt;code>MD5CryptoServiceProvider&lt;/code>.&lt;/p></description></item><item><title>Obtener las aplicaciones instaladas en Windows con C#</title><link>/articles/development/aplicaciones-instaladas/aplicaciones-instaladas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/aplicaciones-instaladas/aplicaciones-instaladas/</guid><description>
 &lt;p>En ocasiones resulta muy útil saber qué aplicaciones tenemos instaladas en el ordenador bien porque deseamos ver incompabilidades o crear
 un log extenso en caso de error o simplemente porque deseemos crear un inventario de éstas.&lt;/p>
 &lt;p>Podemos saber las aplicaciones instaladas en un ordenador de dos formas: utilizando el registro o
@@ -3669,7 +3669,7 @@ que presenta información sobre los productos instalados utilizando el &lt;stron
 &lt;span class="ln">7&lt;/span> &lt;span class="n">Console&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">objProduct&lt;/span>&lt;span class="p">[&lt;/span>&lt;span class="s">&amp;#34;Name&amp;#34;&lt;/span>&lt;span class="p">]);&lt;/span>
 &lt;span class="ln">8&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Si desea más información sobre cómo utilizar &lt;strong>WMI&lt;/strong> desde el Framework de.NET nada mejor que este artículo en la
-&lt;a href="http://msdn.microsoft.com/en-us/library/aa720264.aspx">MSDN&lt;/a>.&lt;/p></description></item><item><title>Programando un intérprete de cron</title><link>http://jbautistam.github.io/articles/opinion/interprete-de-cron/interprete-de-cron/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/opinion/interprete-de-cron/interprete-de-cron/</guid><description>
+&lt;a href="http://msdn.microsoft.com/en-us/library/aa720264.aspx">MSDN&lt;/a>.&lt;/p></description></item><item><title>Programando un intérprete de cron</title><link>/articles/opinion/interprete-de-cron/interprete-de-cron/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/opinion/interprete-de-cron/interprete-de-cron/</guid><description>
 &lt;p>Para quien no lo conozca, &lt;strong>cron&lt;/strong> es un comando de Unix que ejecuta aplicaciones cada cierto tiempo.&lt;/p>
 &lt;p>Lo curioso es el formato utilizado para definir los intervalos de tiempo, es decir, el momento en que tiene
 que lanzar cada aplicación o comando.&lt;/p>
@@ -3885,8 +3885,8 @@ como &lt;code>* * * * * FEB *&lt;/code> si estamos en diciembre va a hacer un bu
 nos diera la siguiente fecha de una forma más inteligente, simplemente incrementando cada una de las partes. La siguiente versión.&lt;/p>
 &lt;h2 id="y-para-terminar">Y para terminar&lt;/h2>
 &lt;p>Antes de ponerme a programar después de tres horas de escritura incluyendo apagón, una pregunta:&lt;/p>
-&lt;p>¿Vosotros cómo abordáis estos temas? ¿sois de hackaton, puzzles o aplicaciones / librerías?&lt;/p></description></item><item><title>Pruebas base datos - datos de prueba</title><link>http://jbautistam.github.io/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii/</guid><description>
-&lt;p>En el &lt;a href="http://jbautistam.github.io/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii">artículo anterior&lt;/a>, expliqué cómo utilizar
+&lt;p>¿Vosotros cómo abordáis estos temas? ¿sois de hackaton, puzzles o aplicaciones / librerías?&lt;/p></description></item><item><title>Pruebas base datos - datos de prueba</title><link>/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii/</guid><description>
+&lt;p>En el &lt;a href="/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii">artículo anterior&lt;/a>, expliqué cómo utilizar
 scripts para la creación de dos bases de datos: una es la semilla para nuestras pruebas y otra
 sobre la que ejecutaremos las sentencias de test.&lt;/p>
 &lt;p>En este artículo veremos cómo crear los datos de nuestra base de datos semilla y copiarlos a la base de datos de prueba.&lt;/p>
@@ -3947,7 +3947,7 @@ paso no vamos a copiar todos los datos si no únicamente los que estén en el in
 &lt;code>EndDate&lt;/code> de este proceso (que no tienen porqué ser y de hecho no son, los mismos que en el paso anterior).&lt;/p>
 &lt;p>Recuperaremos las definiciones de argumentos locales y globales en futuros artículos.&lt;/p>
 &lt;h2 id="creación-de-los-datos-de-pruebas">Creación de los datos de pruebas&lt;/h2>
-&lt;p>Como decíamos en el &lt;a href="http://jbautistam.github.io/articles/source-code/pruebas-base-datos/pruebas-base-datos">primer artículo de esta serie&lt;/a>, lo normal
+&lt;p>Como decíamos en el &lt;a href="/articles/source-code/pruebas-base-datos/pruebas-base-datos">primer artículo de esta serie&lt;/a>, lo normal
 al hacer pruebas de base de datos es utilizar una base de datos semilla pero para complicar un poco el ejemplo,
 utilizaremos un script para generar los datos de forma más o menos aleatora y aprovechamos para introducir
 las instrucciones &lt;code>print&lt;/code> y &lt;code>for&lt;/code>.&lt;/p>
@@ -4113,7 +4113,7 @@ estamos dentro del mismo servidor por lo que no hay tiempos añadidos de transmi
 &lt;p>En este artículo hemos añadido la posibilidad de crear datos al vuelo utilizando sentencias &lt;code>for&lt;/code> y hemos visto algún ejemplo
 de uso de parámetros.&lt;/p>
 &lt;p>En los siguientes artículos profundizaremos en otros aspectos del motor como los cursores sobre datos, las sentencias &lt;code>if&lt;/code> y &lt;code>while&lt;/code> y posiblemente
-las operaciones matemáticas y condicionales.&lt;/p></description></item><item><title>Pruebas base datos - Exportación e importación</title><link>http://jbautistam.github.io/articles/source-code/pruebas-base-datos-iv/pruebas-base-datos-iv/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/pruebas-base-datos-iv/pruebas-base-datos-iv/</guid><description>
+las operaciones matemáticas y condicionales.&lt;/p></description></item><item><title>Pruebas base datos - Exportación e importación</title><link>/articles/source-code/pruebas-base-datos-iv/pruebas-base-datos-iv/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/pruebas-base-datos-iv/pruebas-base-datos-iv/</guid><description>
 &lt;p>Una de las funciones de la librería de base de datos es exportar e importar archivos CSV.&lt;/p>
 &lt;p>En esta ocasión, veremos las instrucciones para importar y exportar archivos.&lt;/p>
 &lt;h2 id="modificaciones-en-el-archivo-de-pasos">Modificaciones en el archivo de pasos&lt;/h2>
@@ -4137,7 +4137,7 @@ a leer o escribir los archivos.&lt;/p>
 &lt;p>Para exportar archivos, utilizamos la instrucción &lt;code>ExportCsv&lt;/code>. En esta instrucción, indicamos los parámetros
 del archivo de salida así como las columnas del archivo.&lt;/p>
 &lt;p>Por ejemplo, el siguiente script crea cuatro archivos, uno para cada una de las tablas que creamos en
-los ejemplos del &lt;a href="http://jbautistam.github.io/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii">artículo anterior&lt;/a>:&lt;/p>
+los ejemplos del &lt;a href="/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii">artículo anterior&lt;/a>:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-XML" data-lang="XML">&lt;span class="ln"> 1&lt;/span>&lt;span class="cp">&amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;utf-8&amp;#34;?&amp;gt;&lt;/span>
 &lt;span class="ln"> 2&lt;/span>&lt;span class="nt">&amp;lt;DbScript&amp;gt;&lt;/span>
 &lt;span class="ln"> 3&lt;/span> &lt;span class="nt">&amp;lt;Block&lt;/span> &lt;span class="na">Name=&lt;/span>&lt;span class="s">&amp;#34;Export data to CSV&amp;#34;&lt;/span>&lt;span class="nt">&amp;gt;&lt;/span>
@@ -4265,8 +4265,8 @@ si no una tabla física sobre la que se ejecutará un BulkCopy con los datos del
 &lt;h2 id="conclusión">Conclusión&lt;/h2>
 &lt;p>Este artículo lo hemos dedicado exclusivamente a las importaciones y exportaciones, siento no cumplir con las expectativas
 generadas en el artículo anterior y no tratar otro tipo de sentencias pero esta parte parecía algo más lógica para los entornos
-de pruebas donde en muchas ocasiones en lugar de bases de datos tendremos archivos de cálculos anteriores.&lt;/p></description></item><item><title>Pruebas de base de datos - Preparando el entorno</title><link>http://jbautistam.github.io/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/</guid><description>
-&lt;p>Continuando con el &lt;a href="http://jbautistam.github.io/articles/source-code/pruebas-base-datos/pruebas-base-datos">motor de pruebas de base de datos&lt;/a>
+de pruebas donde en muchas ocasiones en lugar de bases de datos tendremos archivos de cálculos anteriores.&lt;/p></description></item><item><title>Pruebas de base de datos - Preparando el entorno</title><link>/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/pruebas-base-datos-ii/pruebas-base-datos-ii/</guid><description>
+&lt;p>Continuando con el &lt;a href="/articles/source-code/pruebas-base-datos/pruebas-base-datos">motor de pruebas de base de datos&lt;/a>
 del que hablábamos la semana pasada, hoy pasaremos a la creación de las bases de datos y dejaremos para
 el próximo día la inserción de datos de pruebas.&lt;/p>
 &lt;p>Aunque el proyecto ha avanzado mucho, aún no tenemos código fuente en GitHub, quién sabe si la próxima semana sea la definitiva.&lt;/p>
@@ -4603,9 +4603,9 @@ en tiempo de ejecución como éste:&lt;/p>
 con la clave de conexión y &lt;code>DbName&lt;/code> con el nombre de base de datos y así, simplemente cambiando los valores de estas dos
 variables podemos utilizar el mismo script para crear dos bases de datos diferentes.&lt;/p>
 &lt;h2 id="conclusión">Conclusión&lt;/h2>
-&lt;p>Por ahora eso es todo. En el &lt;a href="http://jbautistam.github.io/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii">siguiente artículo&lt;/a>
+&lt;p>Por ahora eso es todo. En el &lt;a href="/articles/source-code/pruebas-base-datos-iii/pruebas-base-datos-iii">siguiente artículo&lt;/a>
 continuaré con los scripts de creación de datos de prueba y de copia de datos y veremos algunas
-sentencias un poco más complejas como los bucles.&lt;/p></description></item><item><title>Recorrer un enumerado</title><link>http://jbautistam.github.io/articles/development/recorrer-un-enumerado/recorrer-un-enumerado/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/recorrer-un-enumerado/recorrer-un-enumerado/</guid><description>
+sentencias un poco más complejas como los bucles.&lt;/p></description></item><item><title>Recorrer un enumerado</title><link>/articles/development/recorrer-un-enumerado/recorrer-un-enumerado/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/recorrer-un-enumerado/recorrer-un-enumerado/</guid><description>
 &lt;p>Lo habitual para insertar constantes en nuestro código que contenga determinados valores es utilizar un enumerado:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">public&lt;/span> &lt;span class="k">enum&lt;/span> &lt;span class="n">ModeEnum&lt;/span>
 &lt;span class="ln">2&lt;/span>&lt;span class="p">{&lt;/span>
@@ -4622,15 +4622,15 @@ del enumerado utilizaremos este código:&lt;/p>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Si por el contrario queremos mostrar las valores numéricos utilizamos el método &lt;strong>GetValues()&lt;/strong>:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-csharp" data-lang="csharp">&lt;span class="ln">1&lt;/span>&lt;span class="k">foreach&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="kt">int&lt;/span> &lt;span class="n">intValue&lt;/span> &lt;span class="k">in&lt;/span> &lt;span class="n">Enum&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">GetValues&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="k">typeof&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">ModeEnum&lt;/span>&lt;span class="p">)))&lt;/span>
 &lt;span class="ln">2&lt;/span> &lt;span class="n">System&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Diagnostics&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">Debug&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">WriteLine&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Valor: &amp;#34;&lt;/span> &lt;span class="p">+&lt;/span> &lt;span class="n">intValue&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">ToString&lt;/span>&lt;span class="p">());&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Roslyn 2: funcionamiento de un compilador</title><link>http://jbautistam.github.io/articles/development/roslyn-2/roslyn-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/roslyn-2/roslyn-2/</guid><description>
-&lt;p>Como comentábamos en el &lt;a href="http://jbautistam.github.io/articles/development/roslyn-1/roslyn-1">artículo anterior&lt;/a> lo que nos ofrece
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Roslyn 2: funcionamiento de un compilador</title><link>/articles/development/roslyn-2/roslyn-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/roslyn-2/roslyn-2/</guid><description>
+&lt;p>Como comentábamos en el &lt;a href="/articles/development/roslyn-1/roslyn-1">artículo anterior&lt;/a> lo que nos ofrece
 &lt;strong>Roslyn&lt;/strong> son servicios de compilación, es decir una API completa con métodos de acceso a los procesos internos de compilación.&lt;/p>
 &lt;p>Antes de explicar estos conceptos quizá lo más adecuado sea recordar qué es un compilador y los diferentes
 procesos de una aplicación de este tipo.&lt;/p>
 &lt;p>Un compilador es una aplicación que recoge una serie de archivos escritos en un lenguaje de programación y
 los traduce a una serie de archivos que un ordenador puede ejecutar. A los archivos de entrada los llamamos
 código fuente. A los archivos de salida los denominamos codigo objeto.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/roslyn-2/compilador.jpg" alt="Esquema de un compilador" title="Esquema de un compilador">&lt;/p>
+&lt;p>&lt;img src="/articles/development/roslyn-2/compilador.jpg" alt="Esquema de un compilador" title="Esquema de un compilador">&lt;/p>
 &lt;p>Aunque cuando hablamos de compiladores éste es el proceso habitual, puede que el código objeto no sea directamente
 un ejecutable si no un código intermedio como los bytecode de Java o el MSIL de.Net o bien código que un ordenador
 no puede ejecutar directamente, como por ejemplo los archivos CSS obtenidos al procesar un archivo de SASS. En estos
@@ -4681,11 +4681,11 @@ generados en la lectura del código fuente.&lt;/p>
 &lt;p>En algunos casos además se pasa por una &lt;strong>fase de optimización&lt;/strong> que recoge el código generado y lo procesa
 siguiendo diferentes métodos para que se ejecute más rápidamente.&lt;/p>
 &lt;p>En definitiva, podemos decir que un traductor sigue esta estructura básica:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/roslyn-2/fases-compilacion.jpg" alt="Fases de un compilador" title="Fases de un compilador">&lt;/p>
+&lt;p>&lt;img src="/articles/development/roslyn-2/fases-compilacion.jpg" alt="Fases de un compilador" title="Fases de un compilador">&lt;/p>
 &lt;p>Aparte de la generación de código final, &lt;strong>Roslyn&lt;/strong> nos da acceso al árbol sintáctico y al árbol semántico de
 nuestro código fuente. Para quien se pregunte qué ocurre con la fase de análisis léxico, la cadena de tokens
 resultante no ofrece demasiada información útil aunque &lt;strong>Roslyn&lt;/strong> la incluye en ciertos nodos del árbol sintáctico.&lt;/p>
-&lt;p>Esto será lo que veremos en el próximo artículo.﻿&lt;/p></description></item><item><title>Serializar / deserializar objetos en C#</title><link>http://jbautistam.github.io/articles/development/serializar-objetos/serializar-objetos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/serializar-objetos/serializar-objetos/</guid><description>
+&lt;p>Esto será lo que veremos en el próximo artículo.﻿&lt;/p></description></item><item><title>Serializar / deserializar objetos en C#</title><link>/articles/development/serializar-objetos/serializar-objetos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/serializar-objetos/serializar-objetos/</guid><description>
 &lt;p>Los conceptos de &lt;strong>serialización&lt;/strong> y &lt;strong>deserialización&lt;/strong> son bastante comunes en.NET y hacen referencia a la posibilidad de
 grabar y cargar objetos fácilmente utilizando ciertas características de.NET.&lt;/p>
 &lt;p>Para utilizar la serialización en.NET lo primero que debemos hacer es marcar nuestra clase como &lt;strong>Serializable&lt;/strong> utilizando el
@@ -4760,7 +4760,7 @@ demostrar lo sencillo que es serializar un objeto a la memoria.&lt;/p>
 &lt;span class="ln">24&lt;/span> &lt;span class="c1">// Devuelve el objeto leído
 &lt;/span>&lt;span class="ln">25&lt;/span>&lt;span class="c1">&lt;/span> &lt;span class="k">return&lt;/span> &lt;span class="n">objTarget&lt;/span>
 &lt;span class="ln">26&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Servidor SMTP para desarrollo (C#)</title><link>http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/servidor-smtp/servidor-smtp/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div></description></item><item><title>Servidor SMTP para desarrollo (C#)</title><link>/articles/source-code/servidor-smtp/servidor-smtp/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/servidor-smtp/servidor-smtp/</guid><description>
 &lt;p>Este fin de semana tenía la intención de recuperar el código de una librería antigua para generación de informes y aprovechar
 el tratamiento de plantillas de [NSharpDoc]/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas)
 para hacerla algo más versátil pero el primer correo electrónico de la mañana desbarató mis planes y me llevó a otro desarrollo completamente diferente.&lt;/p>
@@ -5112,7 +5112,7 @@ real y el mantenimiento de usuarios.&lt;/p>
 nos impide reenviar este texto utilizando SMTP a un servidor real. Esto nos permite por ejemplo liberar el servidor real o
 preprocesar los correos para evitar los filtros de spam lanzando sólo correos cada cierto tiempo o paralelizar el envío de
 correos entre diferentes hilos o servidores STMP.&lt;/p>
-&lt;p>Quién sabe... quizá en un futuro.&lt;/p></description></item><item><title>Soporte para WebSockets de HTML 5 en ASP.Net 4.5</title><link>http://jbautistam.github.io/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</guid><description>
+&lt;p>Quién sabe... quizá en un futuro.&lt;/p></description></item><item><title>Soporte para WebSockets de HTML 5 en ASP.Net 4.5</title><link>/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/websockets-en-asp.net-4.5/websockets-en-asp.net-4.5/</guid><description>
 &lt;p>El protocolo de &lt;strong>WebSocket&lt;/strong> es un protocolo estándar para comunicaciones seguras, bidireccionales
 y en tiempo real entre cliente / servidor utilizando HTTP y facilita las tareas de transferencia
 de datos entre diferentes ordenadores.&lt;/p>
@@ -5173,7 +5173,7 @@ la función &lt;strong>onmessage&lt;/strong>. Para enviar un mensaje desde el na
 &lt;span class="ln">6&lt;/span>
 &lt;span class="ln">7&lt;/span>&lt;span class="c1">// Envía una cadena desde el navegador
 &lt;/span>&lt;span class="ln">8&lt;/span>&lt;span class="c1">&lt;/span>&lt;span class="n">socket&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">send&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="n">document&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">getElementById&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s">&amp;#34;Texto del mensaje enviado al servidor&amp;#34;&lt;/span>&lt;span class="p">));&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Fuente: &lt;a href="http://www.asp.net/vnext/whats-new">ASP.Net&lt;/a>&lt;/p></description></item><item><title>Tratamiento de la excepción AppDomain.CurrentDomain.UnhandledException en Windows Forms y WPF</title><link>http://jbautistam.github.io/articles/development/tratamiento-unhandledexception/tratamiento-unhandledexception/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/tratamiento-unhandledexception/tratamiento-unhandledexception/</guid><description>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Fuente: &lt;a href="http://www.asp.net/vnext/whats-new">ASP.Net&lt;/a>&lt;/p></description></item><item><title>Tratamiento de la excepción AppDomain.CurrentDomain.UnhandledException en Windows Forms y WPF</title><link>/articles/development/tratamiento-unhandledexception/tratamiento-unhandledexception/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/development/tratamiento-unhandledexception/tratamiento-unhandledexception/</guid><description>
 &lt;p>Cuando programamos una aplicación, normalmente tratamos las excepciones más o menos habituales en nuestros
 métodos, sin embargo, hay excepciones, que bien por su rareza o bien porque nunca se nos ha dado en las
 pruebas de desarrollo, no tenemos localizadas.&lt;/p>
@@ -5225,7 +5225,7 @@ inicio de la aplicación marcado con el atributo &lt;strong>STAThread&lt;/strong
 una grabación de log o el envío de correos al departamento de sistemas o simplemente mostrarle un mensaje al
 usuario con la descripción de la excepción.&lt;/p>
 &lt;p>Este método depende realmente de nuestra aplicación por eso no lo mostramos aquí, eso sí, deberíamos procurar que
-fuese una rutina lo más rápida posible para que no interrumpa demasiado el trabajo del interface de usuario.&lt;/p></description></item><item><title>Visor de archivos PGN I</title><link>http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn/</guid><description>
+fuese una rutina lo más rápida posible para que no interrumpa demasiado el trabajo del interface de usuario.&lt;/p></description></item><item><title>Visor de archivos PGN I</title><link>/articles/source-code/visor-pgn/visor-pgn/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/visor-pgn/visor-pgn/</guid><description>
 &lt;p>Una de mis deudas pendientes este año, era crear un visor de &lt;a href="https://es.wikipedia.org/wiki/Notaci%C3%B3n_portable_de_juego">archivos PGN&lt;/a> y
 hoy ya tengo la primera versión consumible.&lt;/p>
 &lt;p>En esta quincena, he detenido el proyecto de generación de informes en el que estaba trabajando y me he tomado
@@ -5235,7 +5235,7 @@ antes de tener una prueba de concepto medianamente interesante.&lt;/p>
 &lt;p>Por la presión del tiempo, en lugar de crear mi propio intérprete de archivos PGN decidí utilizar uno ya existente,
 en concreto &lt;a href="https://github.com/iigorr/pgn.net">PGN.Net&lt;/a>, escrito a caballo entre F# yC#.
 Por esta vez, me he saltado mi orgullo como hice con el
-&lt;a href="http://jbautistam.github.io/articles/opinion/interprete-de-cron/interprete-de-cron">intérprete de cron&lt;/a>
+&lt;a href="/articles/opinion/interprete-de-cron/interprete-de-cron">intérprete de cron&lt;/a>
 y he reutilizado un proyecto ya terminado.&lt;/p>
 &lt;p>Esta librería ya devuelve la partida cargada del archivo PGN con sus movimientos, comentarios y anotaciones, aunque
 utilizarlo desde el visor me ha dado algún quebradero de cabeza.&lt;/p>
@@ -5295,9 +5295,9 @@ en que Fischer juegue con blancas y empate&lt;/em> pero se ha quedado en el tint
 cómodo escribiendo este tipo de prototipos en WPF). En cuanto tenga tiempo... por ahora vuelvo al generador de informes, mucho
 menos entretenido pero igualmente interesante.&lt;/p>
 &lt;p>Si alguno quiere echarle un vistazo o proponer modificaciones, podeis encontrar el código fuente en mi cuenta de
-&lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN II</title><link>http://jbautistam.github.io/articles/source-code/visor-pgn-2/visor-pgn-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/visor-pgn-2/visor-pgn-2/</guid><description>
+&lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN II</title><link>/articles/source-code/visor-pgn-2/visor-pgn-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/visor-pgn-2/visor-pgn-2/</guid><description>
 &lt;p>Hace un par de semanas publiqué la primera versión de un pequeño
-&lt;a href="http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn">visor de archivos PGN&lt;/a>.&lt;/p>
+&lt;a href="/articles/source-code/visor-pgn/visor-pgn">visor de archivos PGN&lt;/a>.&lt;/p>
 &lt;p>En esa primera versión dejé una lista de cosas pendientes que llevan molestándome desde entonces, así que
 en tiempos muertos he desarrollado algunas modificaciones que mejoran (creo) la aplicación.&lt;/p>
 &lt;p>Esta segunda versión, aparte de corregir algunos errores, trae las siguiente modificaciones:&lt;/p>
@@ -5322,9 +5322,9 @@ cambiase el modelo de vistas. No sé si esto acabará convirtiéndose en un requ
 en la lista.&lt;/li>
 &lt;li>La versión UWP va a sufrir un retraso indeterminado.&lt;/li>
 &lt;/ul>
-&lt;p>Por supuesto, el código fuente sigue estando en: &lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN III</title><link>http://jbautistam.github.io/articles/source-code/visor-pgn-3/visor-pgn-3/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/visor-pgn-3/visor-pgn-3/</guid><description>
+&lt;p>Por supuesto, el código fuente sigue estando en: &lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN III</title><link>/articles/source-code/visor-pgn-3/visor-pgn-3/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/visor-pgn-3/visor-pgn-3/</guid><description>
 &lt;p>Espero que nadie estuviera aguantando la respiración desde que reescribí la aplicación
-&lt;a href="http://jbautistam.github.io/articles/source-code/visor-pgn-2/visor-pgn-2">BauChessViewer&lt;/a> hace un par de años ya, pero
+&lt;a href="/articles/source-code/visor-pgn-2/visor-pgn-2">BauChessViewer&lt;/a> hace un par de años ya, pero
 hasta estos meses no he encontrado el tiempo para continuar con ella.&lt;/p>
 &lt;p>Ha habido otros proyectos entre medias y realmente no pensaba recuperar esta aplicación pero
 comencé a estudiar &lt;strong>Xamarin Forms&lt;/strong> y, después de terminar con la versión de
@@ -5332,7 +5332,7 @@ comencé a estudiar &lt;strong>Xamarin Forms&lt;/strong> y, después de terminar
 era un buen momento para aplicar los conocimientos adquiridos en un visor de juegos para tablets.&lt;/p>
 &lt;p>Y el primer problema fue precisamente la librería que utilizaba para leer los archivos PGN,
 &lt;a href="https://github.com/iigorr/pgn.net">PGN.Net&lt;/a>.&lt;/p>
-&lt;p>Como &lt;a href="http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn">comentaba&lt;/a>, al comenzar el desarrollo de la aplicación no
+&lt;p>Como &lt;a href="/articles/source-code/visor-pgn/visor-pgn">comentaba&lt;/a>, al comenzar el desarrollo de la aplicación no
 me apetecía dedicarle demasiado tiempo, era más una prueba de concepto y, algo no habitual en mí, busqué una librería
 para interpretar los archivos en lugar de escribir la mía.&lt;/p>
 &lt;p>Aunque esta forma de trabajar tiene sus ventajas, cuando fui a portar la aplicación a Xamarin, me encontré con el
@@ -5448,7 +5448,7 @@ una base de datos asociada.&lt;/li>
 las bases están mejor desarrolladas y el código y el interface de usuario parece más razonable y debería ser más fácil
 de retomar.&lt;/p>
 &lt;p>Como siempre, por si alguien quiere echarle un vistazo, el código fuente está en
-&lt;a href="https://github.com/jbautistam/BauChess">GitHub&lt;/a>.&lt;/p></description></item><item><title>¿Qué es oAuth?</title><link>http://jbautistam.github.io/articles/seguridad/que-es-oauth/que-es-oauth/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/seguridad/que-es-oauth/que-es-oauth/</guid><description>
+&lt;a href="https://github.com/jbautistam/BauChess">GitHub&lt;/a>.&lt;/p></description></item><item><title>¿Qué es oAuth?</title><link>/articles/seguridad/que-es-oauth/que-es-oauth/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/seguridad/que-es-oauth/que-es-oauth/</guid><description>
 &lt;p>A poco que hayáis intentado programar librerías que utilicen las APIs de Twitter, Facebook o Google posiblemente
 os hayáis tropezado con el término OAuth.&lt;/p>
 &lt;p>Pero, ¿qué es oAuth?&lt;/p>
@@ -5478,7 +5478,7 @@ Web. Es decir, si deseamos acceder a un servidor de oAuth, debemos crearnos una 
 solicitar una clave de aplicación.&lt;/p>
 &lt;p>Al crear una aplicación en nuestra cuenta, el proveedor nos proporcionará dos códigos, ConsumerKey y ConsumerKeySecret. Estos dos
 códigos se deben mantener en sitio seguro pues son los que permitirán el acceso posteriormente. Podemos pensar que son similares
-a la clave pública y privada en la &lt;a href="http://jbautistam.github.io/articles/seguridad/clave-publica/clave-publica">criptografía de clave pública&lt;/a>.&lt;/p>
+a la clave pública y privada en la &lt;a href="/articles/seguridad/clave-publica/clave-publica">criptografía de clave pública&lt;/a>.&lt;/p>
 &lt;p>Una vez tenemos nuestros códigos de aplicación, cada vez que deseemos autentificar a un usuario, lo que haremos será delegar
 esta autentilficación al proveedor (siguiendo con el ejemplo anterior a Twitter). Para ello, lo normal es hacer una llamada
 a una página especial del proveedor indicando las claves de nuestra aplicación. El usuario puede en este momento introducir

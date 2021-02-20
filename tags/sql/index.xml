@@ -1,25 +1,25 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>sql on jbautistam</title><link>http://jbautistam.github.io/tags/sql/</link><description>Recent content in sql on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/sql/index.xml" rel="self" type="application/rss+xml"/><item><title>Buscando intervalos consecutivos en SQL</title><link>http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/</link><pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/development/slq-strings-hollows/sql-strings-hollows/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>sql on jbautistam</title><link>/tags/sql/</link><description>Recent content in sql on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/sql/index.xml" rel="self" type="application/rss+xml"/><item><title>Buscando intervalos consecutivos en SQL</title><link>/articles/development/slq-strings-hollows/sql-strings-hollows/</link><pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate><guid>/articles/development/slq-strings-hollows/sql-strings-hollows/</guid><description>
 &lt;p>Por mucho que SQL sea un gran lenguaje de consulta de datos hay que reconocer que existen ciertos problemas
 realmente complicados de resolver.&lt;/p>
 &lt;p>Uno de estos problemas me surge de vez en cuando: buscar intervalos consecutivos de fechas en una tabla.&lt;/p>
 &lt;p>Imaginad una tabla de ventas básica: productos, fechas y cantidad vendida.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesIntervalTable.jpg" title="Tabla de ventas">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesIntervalTable.jpg" title="Tabla de ventas">&lt;/p>
 &lt;p>La pregunta a las que nos enfrentamos es ¿cuál es el producto que se ha vendido un número mayor de días consecutivos?&lt;/p>
 &lt;p>En primer lugar, veamos nuestros datos con más detalle, para un producto, partimos de una tabla cómo ésta (las cantidades en realidad no nos interesan, sólo necesitamos
 las fechas):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesTable.jpg" title="Fechas de venta para un producto">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SalesTable.jpg" alt="SalesTable.jpg" title="Fechas de venta para un producto">&lt;/p>
 &lt;p>Lo primero que queremos saber, son las fechas consecutivas, es decir, nos interesa una tabla más de éste estilo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SalesIntervalTable.jpg" alt="IntervalTable.jpg" title="Intervalos de fechas con venta">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SalesIntervalTable.jpg" alt="IntervalTable.jpg" title="Intervalos de fechas con venta">&lt;/p>
 &lt;p>Pero, ¿cómo lo logramos a partir de la tabla inicial?&lt;/p>
 &lt;p>Antes de empezar, permitidme una pequeña licencia: voy a reducir un poco la tabla anterior y me voy a quedar únicamente con el número de día de octubre.
 Esto no es realmente necesario, luego lo veremos con fechas y nos daremos cuenta que no hay ninguna diferencia, pero creo que para la explicación
 es más fácil verlo así:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/content/articles/development/slq-strings-hollows/images/DaySalesTable.jpg" alt="DaySalesTable.jpg" title="Días de octubre con ventas">&lt;/p>
+&lt;p>&lt;img src="/content/articles/development/slq-strings-hollows/images/DaySalesTable.jpg" alt="DaySalesTable.jpg" title="Días de octubre con ventas">&lt;/p>
 &lt;p>Lo primero que vamos a hacer es numerar las filas:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
 &lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>El resultado de esta tabla es el siguiente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlRowNumber.jpg" alt="SqlRowNumber.jpg" title="Numerando las filas">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SqlRowNumber.jpg" alt="SqlRowNumber.jpg" title="Numerando las filas">&lt;/p>
 &lt;p>&lt;strong>Row_Number&lt;/strong> es una función de ventana. Nos va a dar es el número de fila consecutivo particionando por producto, es decir,
 si en lugar de un único producto, nuestra tabla tuviera más de un producto (como es de suponer), nos comenzará a numerar de nuevo las filas desde uno
 cada vez que cambie de producto.&lt;/p>
@@ -29,7 +29,7 @@ nos va a dar el mismo valor. ¿No me creéis?&lt;/p>
 &lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="n">Row_Number&lt;/span>&lt;span class="p">()&lt;/span> &lt;span class="n">OVER&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="n">PARTITION&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span> &lt;span class="k">ORDER&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="k">Day&lt;/span> &lt;span class="k">ASC&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">RowNumber&lt;/span>&lt;span class="p">,&lt;/span>
 &lt;span class="ln">3&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="k">Day&lt;/span>
 &lt;span class="ln">4&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">Days&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmp&lt;/span>
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlGroupNumber.jpg" alt="SqlGroupNumber.jpg" title="Agrupando días consecutivos">&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SqlGroupNumber.jpg" alt="SqlGroupNumber.jpg" title="Agrupando días consecutivos">&lt;/p>
 &lt;p>Fijáos en la columna &lt;strong>GroupNumber&lt;/strong>: es el mismo valor siempre que los datos sean consecutivos. Los días 18, 19 y 20 están en el grupo 17, el día 23 (que no es
 consecutivo con los anteriores) está en el grupo 19 y los días 25 a 31 están en el grupo 20.&lt;/p>
 &lt;p>Es decir, son días consecutivos aquellos que están en el mismo grupo, por tanto ya podemos agrupar para obtener la fecha mínima y máxima de ese intervalo
@@ -42,7 +42,7 @@ consecutivo con los anteriores) está en el grupo 19 y los días 25 a 31 están 
 &lt;span class="ln">6&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmpGroup&lt;/span>
 &lt;span class="ln">7&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Que nos da el resultado buscado:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/development/slq-strings-hollows/images/SqlInterval.jpg" alt="SqlInterval.jpg" title="Intervalos">&lt;/p>
+&lt;p>&lt;img src="/articles/development/slq-strings-hollows/images/SqlInterval.jpg" alt="SqlInterval.jpg" title="Intervalos">&lt;/p>
 &lt;p>Sencillo y elegante ¿verdad? Como decía al principio, la solución no es mía, es un problema relativamente común en las consultas SQL. Se
 suelen llamar problemas de cadenas y huecos porque resuelven esas consultas en las que buscamos hechos consecutivos o huecos, es decir, o bien intervalos
 de cosas que ocurren de forma consecutiva o bien intervalos de cosas que no ocurren.&lt;/p>
@@ -58,7 +58,7 @@ lo demás es exactamente igual:&lt;/p>
 &lt;span class="ln">6&lt;/span> &lt;span class="p">)&lt;/span> &lt;span class="k">AS&lt;/span> &lt;span class="n">tmpGroup&lt;/span>
 &lt;span class="ln">7&lt;/span> &lt;span class="k">GROUP&lt;/span> &lt;span class="k">BY&lt;/span> &lt;span class="n">ProductId&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="n">GroupNumber&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>¿Ahora comprendéis por qué me gusta el SQL?&lt;/p>
-&lt;p>Por cierto, no he respondido a la pregunta, os la dejo a vosotros: ¿cuál es el producto que se ha vendido durante un número mayor de días consecutivos?&lt;/p></description></item><item><title>Intérprete de scripts SQL</title><link>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</guid><description>
+&lt;p>Por cierto, no he respondido a la pregunta, os la dejo a vosotros: ¿cuál es el producto que se ha vendido durante un número mayor de días consecutivos?&lt;/p></description></item><item><title>Intérprete de scripts SQL</title><link>/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</guid><description>
 &lt;p>Siempre he defendido SQL como un lenguaje ideal para el tratamiento de datos con una salvedad: la falta de instrucciones
 imperativas en el estándar.&lt;/p>
 &lt;p>SQL es un lenguaje declarativo, de ahí viene realmente su potencia: ejecutar una instrucción indicando lo que deseo obtener no
@@ -83,7 +83,7 @@ un lenguaje imperativo: SQL Server tiene TSql, Oracle tiene su PL/SQL, etc...&lt
 combinación perfecta. Siempre que sepas Python, claro. No es nuevo, es lo que hacemos en la mayoría de los lenguajes cuando lanzamos
 una sentencia SQL contra una conexión a base de datos.&lt;/p>
 &lt;p>Pero dejémonos de introducciones ¿a qué viene todo ésto? Pues todo esto viene a que mientras programo
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">BauDbStudio&lt;/a>, cuánto más ejecuto contra Spark Sql, más me
+&lt;a href="/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">BauDbStudio&lt;/a>, cuánto más ejecuto contra Spark Sql, más me
 doy cuenta que necesito un lenguaje imperativo. Echo de menos los &lt;code>if&lt;/code>, &lt;code>for&lt;/code>, &lt;code>while&lt;/code> y demás. No siempre, pero cuando
 hace falta, tengo que reconocer que cuesta horrores pasarlo por alto.&lt;/p>
 &lt;p>Podría haber elegido la opción de ejecutar Python en &lt;strong>BauDbStudio&lt;/strong>, hay librerías para hacerlo pero ¿qué ocurriría con
@@ -105,7 +105,7 @@ otros gestores de bases de datos como SqLite o Postgress?, no me acababa de conv
 &lt;span class="ln">13&lt;/span> GO
 &lt;span class="ln">14&lt;/span> %&amp;gt;
 &lt;span class="ln">15&lt;/span>}
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como se puede ver, es una mezcla entre los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> que teníamos
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como se puede ver, es una mezcla entre los &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> que teníamos
 hasta ahora en &lt;strong>BauDbStudio&lt;/strong> con instrucciones SQL separadas por comandos &lt;code>GO&lt;/code>.&lt;/p>
 &lt;p>Por el momento el lenguaje permite lo básico:&lt;/p>
 &lt;ul>
@@ -132,7 +132,7 @@ sólo tengan una sentencia. Supongo que el lenguaje evolucionará, pero por ahor
 imposible que mi nuevo lenguaje se ejecute en ese entorno.&lt;/p>
 &lt;p>Podríamos hacer una cosa: reproducir el intérprete en Python de forma que recogiera el script y lo interpretara en tiempo de ejecución en
 Databricks. Por supuesto no lo voy a hacer, entre otras cosas porque Python no es mi fuerte. También lo podríamos hacer utilizando
-&lt;a href="http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net">Spark.Net&lt;/a> con C# pero no creo que por hoy por hoy tenga los conocimientos
+&lt;a href="/articles/big-data/experimento-spark-net/experimento-spark-net">Spark.Net&lt;/a> con C# pero no creo que por hoy por hoy tenga los conocimientos
 suficientes como para meterme en ese sembrao.&lt;/p>
 &lt;p>La segunda opción (que me parece la mejor) es transpilar.&lt;/p>
 &lt;p>Como sabemos, la primera fase de la interpretación es el análisis sintáctico que devuelve una colección de sentencias y

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Aplicaciones on jbautistam</title><link>http://jbautistam.github.io/tags/aplicaciones/</link><description>Recent content in Aplicaciones on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 06 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/aplicaciones/index.xml" rel="self" type="application/rss+xml"/><item><title>BauDbStudio: SQL para generación de informes</title><link>http://jbautistam.github.io/applications/baudbstudio/articles/reporting/</link><pubDate>Sun, 06 Dec 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/articles/reporting/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Aplicaciones on jbautistam</title><link>/tags/aplicaciones/</link><description>Recent content in Aplicaciones on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sun, 06 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/aplicaciones/index.xml" rel="self" type="application/rss+xml"/><item><title>BauDbStudio: SQL para generación de informes</title><link>/applications/baudbstudio/articles/reporting/</link><pubDate>Sun, 06 Dec 2020 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/articles/reporting/</guid><description>
 &lt;p>Una de las cosas que más envidio de las herramientas de Bussiness Intelligence o reporting es su capacidad para realizar consultas relativamente
 complejas prácticamente sin programación.&lt;/p>
 &lt;p>Por eso, estos últimos meses he estado trabajando en algunas ideas para reproducir este comportamiento en &lt;strong>BauDbStudio&lt;/strong>.&lt;/p>
@@ -173,7 +173,7 @@ pero debo mantenerlo en mi base de datos de reporting porque sus ventas ya está
 &lt;p>En un ejemplo tan sencillo como éste se están recreando completamente las claves en cada importación, en casos más complejos habría que modificar los scripts
 para que mantenga las claves. Como ejemplo, nos basta así.&lt;/p>
 &lt;p>Una vez importados los datos, nuestra base de datos de reporting tiene este esquema:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/ReportingDbSchema.jpg" alt="Esquema de base de datos" title="Esquema de la base de datos de informes">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/ReportingDbSchema.jpg" alt="Esquema de base de datos" title="Esquema de la base de datos de informes">&lt;/p>
 &lt;p>Si nos fijamos, tenemos dos tipos de nombre en las tablas, unas que empiezan por &lt;em>dim&lt;/em> y otras que comienzan por &lt;em>fact&lt;/em>.&lt;/p>
 &lt;p>Las tablas que comienzan por &lt;em>fact&lt;/em> se llaman tablas de hechos, en una &lt;a href="https://es.wikipedia.org/wiki/Tabla_de_hechos">tabla de hechos&lt;/a> se
 almacenan los valores de negocio y las relaciones con las dimensiones que la definen.&lt;/p>
@@ -183,16 +183,16 @@ se almacenan atributos o campos utilizados para restringir las consultas de los 
 &lt;p>Lo habitual es que las tablas de hechos contengan únicamente valores o cantidades y campos de relación con las tablas de dimensión.&lt;/p>
 &lt;p>Por ejemplo, nuestra tabla de ventas contiene precios y fechas como valores y los códigos de cliente, vendedor, proveedor... que identifican las
 diferentes dimensiones:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/FactSalesTable.jpg" alt="Tabla FactSales" title="Campos de la tabla FactSales">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/FactSalesTable.jpg" alt="Tabla FactSales" title="Campos de la tabla FactSales">&lt;/p>
 &lt;p>Como podemos apreciar, los campos que terminan por &lt;em>Id&lt;/em> son claves foráneas a las tablas de dimensión.&lt;/p>
 &lt;p>Una tabla de dimensión, como &lt;strong>DimCustomers&lt;/strong> por ejemplo, almacena información y atributos sobre el cliente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/DimCustomersTable.jpg" alt="Tabla DimCustomers" title="Campos de la tabla DimCustomers">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/DimCustomersTable.jpg" alt="Tabla DimCustomers" title="Campos de la tabla DimCustomers">&lt;/p>
 &lt;p>En este caso, tenemos el nombre del cliente y su código y una clave foránea a la tabla &lt;em>DimLocations&lt;/em> llamada &lt;em>LocationId&lt;/em>. Es decir,
 una tabla de dimensión puede hacer referencia a otras tablas de dimensión, en nuestro caso la tabla &lt;strong>DimLocations&lt;/strong> tiene estos
 campos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/DimLocationsTable.jpg" alt="Tabla DimLocations" title="Campos de la tabla DimLocations">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/DimLocationsTable.jpg" alt="Tabla DimLocations" title="Campos de la tabla DimLocations">&lt;/p>
 &lt;p>Eso nos permite crear un modelo en estrella o de copo de nieve entre nuestras tablas de dimensión y nuestras tablas de hechos.&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/SnowflakeModel.jpg" alt="Modelo de copo de nieve" title="Modelo de copo de nieve">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/SnowflakeModel.jpg" alt="Modelo de copo de nieve" title="Modelo de copo de nieve">&lt;/p>
 &lt;h2 id="definiendo-metadatos">Definiendo metadatos&lt;/h2>
 &lt;p>Hasta el momento, hemos creado nuestra base de datos de reporting y hemos introducido datos desde nuestra base de datos transaccional, pero
 aún no hemos definido ningún metadato, por tanto, aún no podemos utilizarla para hacer consultas complejas.&lt;/p>
@@ -204,7 +204,7 @@ aún no hemos definido ningún metadato, por tanto, aún no podemos utilizarla p
 &lt;/ul>
 &lt;p>Estos metadatos, por tanto, son los que permitirán que el usuario pueda realizar consultas complejas.&lt;/p>
 &lt;p>Nuestra estructura de metadatos, queda de esta forma:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/Metadata.jpg" alt="Estructura de metadatos" title="Metadatos">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/Metadata.jpg" alt="Estructura de metadatos" title="Metadatos">&lt;/p>
 &lt;p>Para el ejemplo he creado una estructura sencilla:&lt;/p>
 &lt;ul>
 &lt;li>En &lt;strong>orígenes de datos&lt;/strong> tenemos las tablas base del esquema sobre el que vamos a trabajar. En este caso
@@ -225,35 +225,35 @@ hacer consultas por la ciudad del proveedor (dado que los proveedores se relacio
 las posibilidades, no vamos a entrar en el mantenimiento de los metadatos.&lt;/p>
 &lt;h2 id="ejecución-de-informes">Ejecución de informes&lt;/h2>
 &lt;p>Si en &lt;strong>BauDbStudio&lt;/strong> ejecutamos una consulta sobre un informe definido:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySales.jpg" alt="Consulta sobre el informe de ventas" title="Consulta de informe">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySales.jpg" alt="Consulta sobre el informe de ventas" title="Consulta de informe">&lt;/p>
 &lt;p>Nos abrirá una pantalla de ejecución del informe:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesWindow.jpg" alt="Ventana del informe de ventas" title="Informe de ventas">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesWindow.jpg" alt="Ventana del informe de ventas" title="Informe de ventas">&lt;/p>
 &lt;p>En el árbol de la izquierda podemos ver las dimensiones y expresiones que podemos utilizar en este informe.&lt;/p>
 &lt;p>En concreto, para el informe &lt;em>Sales&lt;/em> hemos definido las dimensiones de clientes con sus ubicaciones, empleados con sus ubicaciones, ubicaciones (para el
 lugar en el que se ha producido la venta) y los productos con sus categorías y proveedores con sus ubicaciones.&lt;/p>
 &lt;p>También tenemos dos expresiones en la parte inferior: la fecha y el precio de la venta.&lt;/p>
 &lt;p>Podemos hacer una consulta sencilla para empezar, simplemente veamos las fechas y precios de venta sin seleccionar niguna dimensión, para ello seleccionamos
 las expresiones de fecha y precio y pulsamos sobre la ejecución de consulta. En la ventana nos aparecerá la SQL creada y el resultado de la consulta:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesExpressions.jpg" alt="Consulta sencilla de expresiones" title="Consulta de expresiones">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesExpressions.jpg" alt="Consulta sencilla de expresiones" title="Consulta de expresiones">&lt;/p>
 &lt;p>Vamos a hacer algo un poco más complicado, vamos a obtener la suma de precios agrupados por fecha y ordenados por fecha ascendente.
 Para ello simplemente seleccionamos la agregación de suma y pulsamos sobre el botón de ejecución de consulta:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesExpressionsSum.jpg" alt="Consulta de expresiones con suma" title="Suma de precios ordenado por fecha">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesExpressionsSum.jpg" alt="Consulta de expresiones con suma" title="Suma de precios ordenado por fecha">&lt;/p>
 &lt;p>Pero con expresiones es sencillo, hagamos algo más complejo, visualicemos el nombre de cliente, producto y la ciudad del cliente. Simplemente tenemos
 que seleccionar los campos requeridos en el árbol y ejecutar:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensions.jpg" alt="Consulta con dimensiones" title="Consulta con dimensiones">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesDimensions.jpg" alt="Consulta con dimensiones" title="Consulta con dimensiones">&lt;/p>
 &lt;p>Ahora filtremos por los clientes de &lt;em>Lyon&lt;/em>, para ello añadimos un filtro sobre la ciudad del cliente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/FilterCustomerCity.jpg" alt="Filtro por la ciudad del cliente" title="Filtro de clientes">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/FilterCustomerCity.jpg" alt="Filtro por la ciudad del cliente" title="Filtro de clientes">&lt;/p>
 &lt;p>Y ejecutamos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensionsFiltered.jpg" alt="Consulta con dimensiones filtrado" title="Consulta filtrada con dimensiones">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesDimensionsFiltered.jpg" alt="Consulta con dimensiones filtrado" title="Consulta filtrada con dimensiones">&lt;/p>
 &lt;p>Pero dado que nos van a salir todos los datos de &lt;em>Lyon&lt;/em>, vamos a quitarle este campo del resultado y le vamos a añadir la categoría del producto:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensionsProductFiltered.jpg" alt="Consulta con categoría de producto" title="Consulta filtrada con categoría">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesDimensionsProductFiltered.jpg" alt="Consulta con categoría de producto" title="Consulta filtrada con categoría">&lt;/p>
 &lt;p>Por último, nos puede interesar ver sólo las ventas con una suma total por fecha superior a 300. En ese caso añadimos un filtro sobre precios pero
 en la parte del agregado, es decir, queremos una cláusula HAVING en nuestra consulta final. Para ésto añadimos el filtro al campo agregado:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/FilterPriceHaving.jpg" alt="Filtro sobre la suma de precios" title="Filtro HAVING">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/FilterPriceHaving.jpg" alt="Filtro sobre la suma de precios" title="Filtro HAVING">&lt;/p>
 &lt;p>Y ejecutamos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QuerySalesDimensionsProductHaving.jpg" alt="Consulta con filtro sobre la suma de precios" title="Consulta con un filtro para el total">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QuerySalesDimensionsProductHaving.jpg" alt="Consulta con filtro sobre la suma de precios" title="Consulta con un filtro para el total">&lt;/p>
 &lt;p>Por supuesto, también podemos hacer nuestro pequeño gráfico del resultado aunque aún no estoy muy orgulloso de él:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/articles/QueryChart.jpg" alt="Gráfico del resultado de la consulta" title="Gráfico">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/articles/QueryChart.jpg" alt="Gráfico del resultado de la consulta" title="Gráfico">&lt;/p>
 &lt;p>A partir de aquí, todo es jugar con ordenaciones, filtros, agrupaciones... para que nuestro usuario pueda obtener los datos sin necesidad de saber
 SQL dado que nuestros informes están previamente preparados con una serie de metadatos para facilitarle el trabajo.&lt;/p>
 &lt;p>Por supuesto para nosotros, como programadores, la vida será más fácil porque no vamos a tener que escribir SQL para cada petición de nuestro departamento de negocio.
@@ -273,26 +273,26 @@ con los datos previamente sumados y si el usuario no escoge ninguna dimensión e
 supuesto consultas más complejas como un porcentaje sobre el total o una fórmula sobre los registros. En realidad es un problema del interface de usuario, no
 del generador de SQL e iré añadiendo esta opción en el futuro.&lt;/p>
 &lt;p>Todos estos puntos los iré desarrollando pero el resto es plenamente funcional.&lt;/p>
-&lt;p>Como siempre, tenéis la aplicación en &lt;a href="https://github.com/jbautistam/BauDbStudio/releases">GitHub&lt;/a> por si queréis hacer alguna prueba.&lt;/p></description></item><item><title> Log</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log/</guid><description>
-&lt;p>Toda la información sobre ejecuciones de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a>,
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a> y
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>
+&lt;p>Como siempre, tenéis la aplicación en &lt;a href="https://github.com/jbautistam/BauDbStudio/releases">GitHub&lt;/a> por si queréis hacer alguna prueba.&lt;/p></description></item><item><title> Log</title><link>/applications/baudbstudio/manual/100-log/100-log/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/100-log/100-log/</guid><description>
+&lt;p>Toda la información sobre ejecuciones de &lt;a href="/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a>,
+&lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a> y
+&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>
 aparece en el control de log situado inicialmente en la parte inferior de la ventana.&lt;/p>
 &lt;p>Si entre los registros de log aparece un mensaje de error (indicado en color rojo), se puede ver la información
 completa del error pulsando dos veces sobre él:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/100-log/error.jpg" alt="Información sobre errores" title="Información sobre errores">&lt;/p></description></item><item><title>Archivo de contexto ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Archivo de proyecto ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Archivos de datos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos/</guid><description>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/100-log/error.jpg" alt="Información sobre errores" title="Información sobre errores">&lt;/p></description></item><item><title>Archivo de contexto ETL</title><link>/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Archivo de proyecto ETL</title><link>/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Archivos de datos</title><link>/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos/</guid><description>
 &lt;p>Al trabajar con bases de datos, es muy habitual tener archivos de datos en formato CSV o
 &lt;a href="https://parquet.apache.org/">Parquet&lt;/a> o Excel.&lt;/p>
 &lt;p>Para facilitar el trabajo, &lt;strong>BauDbStudio&lt;/strong> permite visualizar este tipo de archivos. Simplemente pulsando
 dos veces sobre el nodo con el nombre del archivo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/arbol-archivos.jpg" alt="Arbol de archivos" title="Arbol de archivos en BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/095-archivos-de-datos/arbol-archivos.jpg" alt="Arbol de archivos" title="Arbol de archivos en BauDbStudio">&lt;/p>
 &lt;p>En la sección central de la aplicación se nos abrirá el contenido del archivo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/visualizador-archivo-parquet.jpg" alt="Visualizador de archivos parquet" title="Visualizador de archivos parquet en BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/095-archivos-de-datos/visualizador-archivo-parquet.jpg" alt="Visualizador de archivos parquet" title="Visualizador de archivos parquet en BauDbStudio">&lt;/p>
 &lt;p>Si tiene instalado un servidor ODBC de Spark, puede escribir
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas SQL&lt;/a> directamente para ver el contenido del archivo.&lt;/p>
-&lt;p>&lt;strong>Nota:&lt;/strong> en los archivos Excel sólo se visualiza la primera hoja sin formato.&lt;/p></description></item><item><title>Archivos de parámetros</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros/</guid><description>
+&lt;a href="/applications/baudbstudio/manual/090-consultas/090-consultas">consultas SQL&lt;/a> directamente para ver el contenido del archivo.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> en los archivos Excel sólo se visualiza la primera hoja sin formato.&lt;/p></description></item><item><title>Archivos de parámetros</title><link>/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros/</guid><description>
 &lt;p>Cuando escribimos scripts o consultas SQL, en ocasiones necesitamos asociarle parámetros.&lt;/p>
 &lt;p>Por ejemplo, esta consulta sobre una base de datos SqLite:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-SQL" data-lang="SQL">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">OrderID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">CustomerID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">EmployeeID&lt;/span>&lt;span class="p">],&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="n">Orders&lt;/span>&lt;span class="p">].[&lt;/span>&lt;span class="n">OrderDate&lt;/span>&lt;span class="p">],&lt;/span>
@@ -316,7 +316,7 @@ sólo podemos tener un archivo de parámetros activo. Este archivo de parámetro
 &lt;strong>Seleccionar archivo de parámetros&lt;/strong> de la barra de herramientas principal.&lt;/p>
 &lt;p>Una vez seleccionado un archivo de parámetros, veremos su nombre en la barra de herramientas junto a la conexión y al pulsar
 sobre él podemos editar su contenido:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/seleccionarchivoparametros.jpg" alt="Selección de archivo de parámetros" title="Selección de archivo de parámetros">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/045-archivos-de-parametros/seleccionarchivoparametros.jpg" alt="Selección de archivo de parámetros" title="Selección de archivo de parámetros">&lt;/p>
 &lt;p>Dado que es bastante común cambiar de archivo de parámetros, &lt;strong>BauDbStudio&lt;/strong> mantiene una lista con los últimos archivos de parámetros
 seleccionados para que podamos cambiar de uno a otro rápidamente.&lt;/p>
 &lt;p>Aparte de los argumentos de consulta, en los archivos de parámetros podemos definir constantes como por ejemplo
@@ -337,15 +337,15 @@ con el contenido del archivo &lt;strong>DataFile.parquet&lt;/strong> que está e
 &lt;em>/mnt/c/Test/BauDbStudio/Samples/Files/2020-07-26&lt;/em>, es decir, el contenido de la constante &lt;strong>MountPath&lt;/strong> combinado
 con la cadena &lt;em>2020-07-26&lt;/em>.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> puede encontrar más información sobre parámetros en la página dedicada a los
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>.&lt;/p></description></item><item><title>Conexiones a base de datos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones/</guid><description>
+&lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>.&lt;/p></description></item><item><title>Conexiones a base de datos</title><link>/applications/baudbstudio/manual/020-conexiones/020-conexiones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/020-conexiones/020-conexiones/</guid><description>
 &lt;p>Para poder trabajar con base de datos en &lt;strong>BauDbStudio&lt;/strong> primero debemos crear las conexiones oportunas.&lt;/p>
 &lt;p>Inicialmente, las conexiones definidas a base de datos se ven en el panel de la izquierda en la ficha &lt;strong>Conexiones&lt;/strong>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/ficha-conexiones.jpg" alt="Ficha conexiones a base de datos" title="Ficha conexiones a base de datos en BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/ficha-conexiones.jpg" alt="Ficha conexiones a base de datos" title="Ficha conexiones a base de datos en BauDbStudio">&lt;/p>
 &lt;p>Para crear una conexión, lo podemos hacer tanto desde el menú principal con la opción &lt;em>Archivo | Nuevo | Conexión&lt;/em>
 como con el icono de la barra de herramientas como desde el menú secundario sobre el nodo de conexiones:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/crear-conexion.jpg" alt="Crear una nueva conexión" title="Crear una nueva conexión a base de datos en BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/crear-conexion.jpg" alt="Crear una nueva conexión" title="Crear una nueva conexión a base de datos en BauDbStudio">&lt;/p>
 &lt;p>Con cualquiera de estas opciones, se nos abre el cuadro de diálogo de creación de una nueva conexión:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/cuadro-dialogo-conexion.jpg" alt="Crear conexión" title="Crear una nueva conexión en BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/cuadro-dialogo-conexion.jpg" alt="Crear conexión" title="Crear una nueva conexión en BauDbStudio">&lt;/p>
 &lt;p>En &lt;strong>BauDbStudio&lt;/strong> se pueden crear conexiones diferentes servidores de base de datos:&lt;/p>
 &lt;ul>
 &lt;li>Spark&lt;/li>
@@ -355,24 +355,24 @@ como con el icono de la barra de herramientas como desde el menú secundario sob
 &lt;li>PostgreSql&lt;/li>
 &lt;li>ODBC&lt;/li>
 &lt;/ul>
-&lt;p>&lt;strong>Nota:&lt;/strong> la conexión a Spark es algo especial, puede encontrar más información en &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">Crear una conexión Spark&lt;/a>.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> la conexión a Spark es algo especial, puede encontrar más información en &lt;a href="/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">Crear una conexión Spark&lt;/a>.&lt;/p>
 &lt;p>Para cada una de ellas, por supuesto, tendremos que rellenar los datos adecuados, por ejemplo, para una conexión SQL Server
 debemos indicar el servidor, puerto, base de datos y usuario y contraseña:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/conexion-sql-server.jpg" alt="Creación de una conexión" title="Creación de una conexión a un servidor Sql Server con BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/conexion-sql-server.jpg" alt="Creación de una conexión" title="Creación de una conexión a un servidor Sql Server con BauDbStudio">&lt;/p>
 &lt;p>Una vez creada la conexión, al pulsar dos veces sobre su nombre en el árbol o al seleccionar
 la opción &lt;strong>Abrir&lt;/strong> en el menú que aparece cuando pulsamos con el botón secundario del ratón sobre un nodo de conexión,
 podemos modificar los datos de la conexión:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/modificar-conexion.jpg" alt="Modificar una conexión" title="Modificar una conexión a base de datos en BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/modificar-conexion.jpg" alt="Modificar una conexión" title="Modificar una conexión a base de datos en BauDbStudio">&lt;/p>
 &lt;p>Una vez creada la conexión, nos aparecerá en el árbol de conexiones y podemos ver el esquema de datos: tablas y campos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/esquema-base-datos.jpg" alt="Esquema de base datos" title="Esquema de base datos de una conexión en BauDbStudio">&lt;/p>
-&lt;p>Al pulsar dos veces sobre una tabla nos aparecerá una ventana de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consulta&lt;/a>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/consulta-tabla.jpg" alt="Consulta de los datos de una tabla" title="Consulta de los datos de una tabla en BauDbStudio">&lt;/p>
-&lt;p>donde podremos ver el contenido de la tabla.&lt;/p></description></item><item><title>Consola de conversion a databricks</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks/</guid><description>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/esquema-base-datos.jpg" alt="Esquema de base datos" title="Esquema de base datos de una conexión en BauDbStudio">&lt;/p>
+&lt;p>Al pulsar dos veces sobre una tabla nos aparecerá una ventana de &lt;a href="/applications/baudbstudio/manual/090-consultas/090-consultas">consulta&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/020-conexiones/consulta-tabla.jpg" alt="Consulta de los datos de una tabla" title="Consulta de los datos de una tabla en BauDbStudio">&lt;/p>
+&lt;p>donde podremos ver el contenido de la tabla.&lt;/p></description></item><item><title>Consola de conversion a databricks</title><link>/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks/</guid><description>
 &lt;p>Estamos trabajando en ello pero mientras tanto puedes aprender qué son las
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a>.&lt;/p></description></item><item><title>Consola de ejecución de procesos ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Consultas</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas/</guid><description>
-&lt;p>Mientras escribimos &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> o
-investigamos el contenido de una &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión&lt;/a>
+&lt;a href="/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a>.&lt;/p></description></item><item><title>Consola de ejecución de procesos ETL</title><link>/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Consultas</title><link>/applications/baudbstudio/manual/090-consultas/090-consultas/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/090-consultas/090-consultas/</guid><description>
+&lt;p>Mientras escribimos &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> o
+investigamos el contenido de una &lt;a href="/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión&lt;/a>
 a base de datos, necesitaremos sabe cuál es el contenido de nuestras tablas.&lt;/p>
 &lt;p>Para ello, podemos escribir &lt;strong>consultas SQL&lt;/strong> y visualizar el resultado en la ventana de consultas.&lt;/p>
 &lt;p>Para abrir una ventana de consultas, podemos utilizar tanto la opción de menú &lt;strong>Archivo | Nuevo | Consulta&lt;/strong> o
@@ -380,30 +380,30 @@ el botón &lt;strong>Consulta&lt;/strong> de la barra de herramientas, esto nos 
 como la que vemos al inicio de este artículo.&lt;/p>
 &lt;p>También podemos pulsar dos veces sobre una tabla en la lista de conexiones para abrir una consulta sobre
 esa tabla:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/consultatabla.jpg" alt="Consulta sobre una tabla" title="Consulta sobre una tabla">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/090-consultas/consultatabla.jpg" alt="Consulta sobre una tabla" title="Consulta sobre una tabla">&lt;/p>
 &lt;p>En la parte superior de esta ventana se encuentra el cuadro de edición donde escribiremos la consulta, la barra
 de herramientas colocada en la parte inferior nos permite seleccionar la conexión sobre la que ejecutamos
 la consulta y el botón de ejecutar:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/barraherramientas.jpg" alt="Barra de herramientas de consulta" title="Barra de herramientas de consulta">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/090-consultas/barraherramientas.jpg" alt="Barra de herramientas de consulta" title="Barra de herramientas de consulta">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> Observe que hay dos botones de ejecución en la aplicación, uno en la ventana de consulta y
 otro en la barra de herramientas principal. El botón de la barra de herramientas principal nos permite
-ejecutar &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> y
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>, pero no las consultas de esta ventana. Para ejecutar
+ejecutar &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> y
+&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>, pero no las consultas de esta ventana. Para ejecutar
 consultas debemos utilizar su propia barra de herramientas. La razón principal es que la ejecución de scripts
 SQL o ETL puede tardar mucho tiempo y mientras tanto podremos seguir ejecutando en la ventana de consultas sin
 necesidad de detener otros procesos.&lt;/p>
 &lt;p>Cuando pulsamos el botón de ejecutar, veremos el resultado de la consulta en el grid inferior:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/resultadosconsulta.jpg" alt="Visualización de resultados" title="Visualización de resultados consulta">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/090-consultas/resultadosconsulta.jpg" alt="Visualización de resultados" title="Visualización de resultados consulta">&lt;/p>
 &lt;p>Junto al botón de ejecutar, vemos un botón etiquetado como &lt;strong>Plan de ejecución&lt;/strong>, cuando lo pulsemos, veremos en el cuadro de texto
 de la ficha &lt;strong>Plan de ejecución&lt;/strong> el plan que va a ejecutar el servidor de base de datos para obtener el resultado de la consulta:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/planejecucion.jpg" alt="Plan de ejecución" title="Plan de ejecución de una consulta">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/090-consultas/planejecucion.jpg" alt="Plan de ejecución" title="Plan de ejecución de una consulta">&lt;/p>
 &lt;p>La última ficha nos permite visualizar un gráfico básico de la consulta (esta opción aún esta en desarrollo, por ahora es algo limitada):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/graficoconsulta.jpg" alt="Gráfico" title="Gráfico de una consulta">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/090-consultas/graficoconsulta.jpg" alt="Gráfico" title="Gráfico de una consulta">&lt;/p>
 &lt;p>Además, el botón de &lt;strong>Guardar&lt;/strong> nos permite guardar el resultado de la consulta en un archivo
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">CSV o parquet&lt;/a> mientras que el botón de
+&lt;a href="/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">CSV o parquet&lt;/a> mientras que el botón de
 &lt;strong>Paginar consulta&lt;/strong> lanzará automáticamente consultas paginadas sobre el servidor.&lt;/p>
 &lt;p>Las consultas que escribamos en esta ventana, utilizan el mismo
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros">archivo de parámetros&lt;/a> que los
+&lt;a href="/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros">archivo de parámetros&lt;/a> que los
 scripts SQL, es decir, podemos utilizar los valores de los parámetros y constantes de los archivos de parámetros
 en esta ventana.&lt;/p>
 &lt;p>Por ejemplo, podemos escribir esta consulta sobre una conexión a SqLite:&lt;/p>
@@ -418,50 +418,50 @@ en esta ventana.&lt;/p>
 &lt;span class="ln">2&lt;/span> &lt;span class="nt">&amp;#34;StartDate&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;1970-01-01&amp;#34;&lt;/span>
 &lt;span class="ln">3&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>El resultado que obtenemos en este caso será:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/resultadosconsultaparametros.jpg" alt="Resultado de una consulta" title="Resultado de una consulta con parámetros sobre SqLite">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/090-consultas/resultadosconsultaparametros.jpg" alt="Resultado de una consulta" title="Resultado de una consulta con parámetros sobre SqLite">&lt;/p>
 &lt;p>Por último, para facilitar la escritura de consultas:&lt;/p>
 &lt;ul>
 &lt;li>Si arrastramos y soltamos una tabla desde las conexiones al editor de consultas se escribirá el nombre de la tabla.&lt;/li>
 &lt;li>Si arrastramos y soltamos una tabla desde las conexiones al editor de consultas mientras mantenemos pulsada
 la tecla de mayúsculas, se escribirá en la consulta el nombre de la tabla y todos sus campos.&lt;/li>
 &lt;/ul>
-&lt;p>Del mismo modo que en la ventana de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">edición de scripts&lt;/a>,
-si seleccionamos un bloque de código, se ejecutará una consulta sólo sobre el bloque seleccionado.&lt;/p></description></item><item><title>Cómo conectar a Spark</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark/</guid><description>
+&lt;p>Del mismo modo que en la ventana de &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">edición de scripts&lt;/a>,
+si seleccionamos un bloque de código, se ejecutará una consulta sólo sobre el bloque seleccionado.&lt;/p></description></item><item><title>Cómo conectar a Spark</title><link>/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark/</guid><description>
 &lt;p>Para poder ejecutar scripts de &lt;strong>Spark SQL&lt;/strong> sobre un servidor de Spark, antes tenemos que crear una conexión adecuada.&lt;/p>
 &lt;p>Debemos tener en cuenta que los scripts que creemos sobre la aplicación, se van a ejecutar utilizando ODBC, es decir,
 tenemos que tener un servidor ODBC en nuestro equipo o sobre nuestro cluster de Spark.&lt;/p>
-&lt;p>En mi caso, instalé &lt;a href="http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark">Spark sobre WSL&lt;/a> en mi equipo y la versión de
+&lt;p>En mi caso, instalé &lt;a href="/articles/big-data/instalacion-spark/instalacion-spark">Spark sobre WSL&lt;/a> en mi equipo y la versión de
 64 bits del driver &lt;a href="https://www.microsoft.com/en-us/download/details.aspx?id=49883">ODBC para Spark de Microsoft&lt;/a>.&lt;/p>
 &lt;p>Una vez instalado Spark, en lugar de levantar los nodos con &lt;strong>start-master&lt;/strong> y &lt;strong>start-slave&lt;/strong>, debemos levantar
 el servidor [Thrift Server] (&lt;a href="http://www.russellspitzer.com/2017/05/19/Spark-Sql-Thriftserver/">http://www.russellspitzer.com/2017/05/19/Spark-Sql-Thriftserver/&lt;/a>) para Spark ejecutando la siguiente instrucción sobre una consola de WSL:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/start-thriftserver.sh
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Al ejecutar esta instrucción, veremos que se levanta el servidor:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/servidor-odbc-spark.jpg" alt="Conectar al servidor Thrift Server" title="Conectar al servidor Thrift Server de Spark para ODBC">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-conexion-spark/servidor-odbc-spark.jpg" alt="Conectar al servidor Thrift Server" title="Conectar al servidor Thrift Server de Spark para ODBC">&lt;/p>
 &lt;p>Al cabo de unos segundos podemos ver el estado del servidor abriendo un navegador y solicitando la dirección &lt;strong>https://localhost:4040&lt;/strong>:&lt;/p>
 &lt;p>&lt;img src="D:/Projects/Personal/Hugo/test-hugo/content/applications/baudbstudio/manual/025-conexion-spark/estado-thrift-server.jpg" alt="Estado de Thrift Server" title="Estado del servidor ODBC Thrift Server">&lt;/p>
 &lt;p>En esa página encontraremos información sobre los nodos y el estado de las consultas SQL que ejecutemos sobre el servidor.&lt;/p>
 &lt;p>Una vez levantado el servidor, simplemente nos queda crear una conexión ODBC utilizando el driver que nos hemos descargado
 anteriormente. Para ello, abrimos la ventana de orígenes de datos de 64 bits de Windows:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexiones-odbc-64.jpg" alt="Conexiones ODBC de 64bits" title="Conexiones a orígenes de datos ODBC de 64bits de Windows">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-conexion-spark/conexiones-odbc-64.jpg" alt="Conexiones ODBC de 64bits" title="Conexiones a orígenes de datos ODBC de 64bits de Windows">&lt;/p>
 &lt;p>Y agregamos una conexión utilizando el driver:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexion-odbc-spark.jpg" alt="Creación de una conexion ODBC" title="Creación de una conexion a ODBC Spark">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-conexion-spark/conexion-odbc-spark.jpg" alt="Creación de una conexion ODBC" title="Creación de una conexion a ODBC Spark">&lt;/p>
 &lt;p>En mi caso, he seleccionado la dirección del host como local (127.0.0.1) en el puerto 10.000 a la base de datos default. Los datos
 predeterminados, por cierto:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexion-odbc-spark-sample.jpg" alt="Conexion de ejemplo" title="Conexion de ejemplo al servidor ODBC de Spark">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-conexion-spark/conexion-odbc-spark-sample.jpg" alt="Conexion de ejemplo" title="Conexion de ejemplo al servidor ODBC de Spark">&lt;/p>
 &lt;p>Como autentificación, he utilizado el mecanismo &lt;strong>User name&lt;/strong> y como nombre de usuario el administrador
 de mi sistema Linux.&lt;/p>
 &lt;h2 id="configuración-en-baudbstudio">Configuración en BauDbStudio&lt;/h2>
 &lt;p>Una vez hemos creado la DSN de sistema al servidor Thrift Server de Spark, sólo nos queda crear una
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión&lt;/a> a nuestro servidor en BauDbStudio.&lt;/p>
+&lt;a href="/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión&lt;/a> a nuestro servidor en BauDbStudio.&lt;/p>
 &lt;p>Como el resto de las conexiones, simplemente agregamos una nueva conexión, seleccionamos el tipo de conexión Spark y en
 la cadena de conexión escribimos &lt;strong>DSN=LocalSpark&lt;/strong> (donde LocalSpark es el nombre de la conexión ODBC que hemos
 configurado anteriormente en los orígenes de datos ODBC):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/conexion-spark-baudbstudio.jpg" alt="Conexión a un servidor ODBC de Spark" title="Conexión a un servidor ODBC de Spark utilizando BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-conexion-spark/conexion-spark-baudbstudio.jpg" alt="Conexión a un servidor ODBC de Spark" title="Conexión a un servidor ODBC de Spark utilizando BauDbStudio">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> como vamos a ejecutar scripts en teoría pesados sobre nuestro servidor a Spark, yo le suelo
 dejar un timeout para la ejecución de scripts bastante alto, de hecho, 120 minutos en la imagen.&lt;/p>
 &lt;p>A partir de este momento podemos utilizar el servidor a Spark como cualquier otra base de datos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/consulta-spark.jpg" alt="Consulta sobre un servidor Spark" title="Consulta sobre un servidor Spark utilizando ODBC en BauDbStudio">&lt;/p></description></item><item><title>DevConference para Android</title><link>http://jbautistam.github.io/applications/devconference-android/devconference-android/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/devconference-android/devconference-android/</guid><description>
-&lt;p>Uno de mis proyectos personales del año pasado fue &lt;a href="http://jbautistam.github.io/applications/devconference/devconference">DevConference&lt;/a> con &lt;strong>UWP&lt;/strong>:
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-conexion-spark/consulta-spark.jpg" alt="Consulta sobre un servidor Spark" title="Consulta sobre un servidor Spark utilizando ODBC en BauDbStudio">&lt;/p></description></item><item><title>DevConference para Android</title><link>/applications/devconference-android/devconference-android/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/devconference-android/devconference-android/</guid><description>
+&lt;p>Uno de mis proyectos personales del año pasado fue &lt;a href="/applications/devconference/devconference">DevConference&lt;/a> con &lt;strong>UWP&lt;/strong>:
 una aplicación para recoger las conferencias y charlas sobre programación o desarrollo.&lt;/p>
 &lt;p>Este año he comenzado a estudiar &lt;strong>Xamarin Forms&lt;/strong> y para afianzar los conocimientos una de mis tareas ha sido precisamente
 convertir &lt;strong>DevConference&lt;/strong> a una aplicación Android.&lt;/p>
@@ -471,11 +471,11 @@ ya estaba basada en MVVM.&lt;/p>
 &lt;p>Y finalmente ha sido más sencillo de lo que esperaba: simplemente crear las páginas utilizando Xamarin Forms, sustituir el manejo
 de listas por el paquete de &lt;strong>FlowListView&lt;/strong>, cambiar los repositorios internos, modificar
 algunos métodos con await / async que han estado mal desde siempre y poco más.&lt;/p>
-&lt;p>Si queréis, podéis consultar la información sobre la aplicación en el &lt;a href="http://jbautistam.github.io/applications/devconference/devconference">artículo anterior&lt;/a> y
+&lt;p>Si queréis, podéis consultar la información sobre la aplicación en el &lt;a href="/applications/devconference/devconference">artículo anterior&lt;/a> y
 descargarla desde &lt;a href="https://play.google.com/store/apps/details?id=com.bau.devconference">Google Play&lt;/a>.
 Para aquellos que tengan tablet de Amazon, también está disponible en el &lt;strong>Amazon Store&lt;/strong>.&lt;/p>
 &lt;p>La idea sigue siendo evolucionar la aplicación a algo un poco más avanzado y mantener una base de datos en la nube para compartir
-conferencias pero tendrá que esperar hasta el año que viene.&lt;/p></description></item><item><title>DevConference: conferencias de desarrollo</title><link>http://jbautistam.github.io/applications/devconference/devconference/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/devconference/devconference/</guid><description>
+conferencias pero tendrá que esperar hasta el año que viene.&lt;/p></description></item><item><title>DevConference: conferencias de desarrollo</title><link>/applications/devconference/devconference/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/devconference/devconference/</guid><description>
 &lt;p>Ultimamente, casi a diario tenemos nuevas conferencias y charlas sobre programación o desarrollo. Es prácticamente
 imposible asistir a todas aunque, afortunadamente, la mayoría de ellas se graban y se vuelcan en
 plataformas como YouTube o Channel9.&lt;/p>
@@ -492,21 +492,21 @@ resulten interesantes, manteniendo sus favoritos o asociándose a nuevos canales
 &lt;a href="https://www.microsoft.com/es-es/store/p/devconference/9n628w6kxjjw">enlace&lt;/a>.&lt;/p>
 &lt;h2 id="funcionamiento-de-la-aplicación">Funcionamiento de la aplicación&lt;/h2>
 &lt;p>Una vez descargada la aplicación de la tienda, se abre la pantalla principal:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/DevConference/pantalla-principal.jpg" alt="Pantalla principal de la aplicación de DevConference" title="Pantalla principal">&lt;/p>
+&lt;p>&lt;img src="/applications/DevConference/pantalla-principal.jpg" alt="Pantalla principal de la aplicación de DevConference" title="Pantalla principal">&lt;/p>
 &lt;p>Al instalarse por primera vez, descarga los archivos de los canales que mantengo en mi sistema. El usuario puede en cualquier
 momento añadir o modificar sus canales utilizando los iconos de la barra de herramientas superior:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/DevConference/barra-herramientas-principal.jpg" alt="Barra de herramientas principal de DevConference" title="Barra de herramientas principal">&lt;/p>
+&lt;p>&lt;img src="/applications/DevConference/barra-herramientas-principal.jpg" alt="Barra de herramientas principal de DevConference" title="Barra de herramientas principal">&lt;/p>
 &lt;p>Para añadir o modificar un canal, basta con darle un nombre y seleccionar la dirección donde se encuentra el
 archivo del canal (veremos cómo se crea un archivo de canal más adelante en este mismo artículo):&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/content/applications/DevConference/creacion-de-canales.jpg" alt="Mantenimiento de canales en DevConference" title="Mantenimiento de canales">&lt;/p>
+&lt;p>&lt;img src="/content/applications/DevConference/creacion-de-canales.jpg" alt="Mantenimiento de canales en DevConference" title="Mantenimiento de canales">&lt;/p>
 &lt;p>Cuando se descargue este archivo, en el árbol de la izquierda se muestra la relación de canales y categorías donde se indica
 el número de archivos pendientes de visualizar:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/DevConference/arbol-canales.jpg" alt="Arbol de canales y categorías en DevConference" title="Arbol de canales y categorías">&lt;/p>
+&lt;p>&lt;img src="/applications/DevConference/arbol-canales.jpg" alt="Arbol de canales y categorías en DevConference" title="Arbol de canales y categorías">&lt;/p>
 &lt;p>Bajo ese árbol de canales, hay otra barra de herramientas con el filtro de entradas (leidas, no leidas o
 favoritas) o para cambiar el modo de visualización:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/DevConference/barra-herramientas-secundaria.jpg" alt="Barra de herramientas secundaria de DevConference" title="Barra de herramientas secundaria">&lt;/p>
+&lt;p>&lt;img src="/applications/DevConference/barra-herramientas-secundaria.jpg" alt="Barra de herramientas secundaria de DevConference" title="Barra de herramientas secundaria">&lt;/p>
 &lt;p>Para ver un vídeo, basta con pulsar sobre una de las entradas de una categoría:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/DevConference/ver-video.jpg" alt="Ver vídeo de una conferencia en DevConference" title="Ver vídeo de una conferencia">&lt;/p>
+&lt;p>&lt;img src="/applications/DevConference/ver-video.jpg" alt="Ver vídeo de una conferencia en DevConference" title="Ver vídeo de una conferencia">&lt;/p>
 &lt;h2 id="los-formatos-de-archivos-de-devconference">Los formatos de archivos de DevConference&lt;/h2>
 &lt;p>El formato de los archivos de &lt;strong>DevConference&lt;/strong> es muy similar a RSS, Atom y OPML aunque más reducidos.&lt;/p>
 &lt;p>El archivo más importante, el que los usuarios utilizan al añadir un canal y desde el que se descargan las entradas,
@@ -566,27 +566,27 @@ descrito).&lt;/p>
 &lt;p>Como siempre, el futuro de la aplicación, depende de su acogida y del tiempo que pueda dedicarle estos meses entre
 mis otros proyectos. La intención es escribir una aplicación Xamarin Forms que la complemente para así
 aprender un poco más de la tecnología.&lt;/p>
-&lt;p>Por supuesto, pretendo mantener actualizados mis canales aunque sea sólo para mi propio uso.&lt;/p></description></item><item><title>Directorios de trabajo</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos/</guid><description>
+&lt;p>Por supuesto, pretendo mantener actualizados mis canales aunque sea sólo para mi propio uso.&lt;/p></description></item><item><title>Directorios de trabajo</title><link>/applications/baudbstudio/manual/010-archivos/010-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/010-archivos/010-archivos/</guid><description>
 &lt;p>Para trabajar con archivos de script de SQL o ETL u otros archivos, primero debemos asociar directorios
 al proyecto en BauDbStudio.&lt;/p>
 &lt;p>Para añadir un directorio al []({ href = &amp;quot;Aplicaciones\BauDbStudio\Manual\110 Marco trabajo&amp;quot; } marco de trabajo)
 actual de la aplicación podemos utilizar tanto la opción del menú &lt;strong>Archivo | Nuevo | Directorio&lt;/strong> como el
 botón &lt;strong>Añadir carpeta&lt;/strong> de la barra de herramientas como el menú secundario de la ficha &lt;strong>Archivos&lt;/strong>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/nuevo-directorio.jpg" alt="Añadir un directorio al árbol de archivos" title="Añadir un directorio al árbol de archivos">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/010-archivos/nuevo-directorio.jpg" alt="Añadir un directorio al árbol de archivos" title="Añadir un directorio al árbol de archivos">&lt;/p>
 &lt;p>Sólo debemos seleccionar un directorio de nuestro sistema donde vamos a almacenar nuestros archivos SQL o archivos de
 datos.&lt;/p>
 &lt;p>Para los ejemplo de este tutorial, me he creado éste árbol de directorios:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/arbol-directorios.jpg" alt="Arbol de directorios de ejemplo" title="Arbol de directorios de ejemplo">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/010-archivos/arbol-directorios.jpg" alt="Arbol de directorios de ejemplo" title="Arbol de directorios de ejemplo">&lt;/p>
 &lt;p>Sobre el árbol de directorios podemos crear carpetas o archivos de diferente tipo
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>,
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts para procesos ETL&lt;/a> o
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a>
+&lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>,
+&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts para procesos ETL&lt;/a> o
+&lt;a href="/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a>
 CSV o parquet.&lt;/p>
 &lt;p>Normalmente suelo dejar por separado los directorios donde almaceno archivos de datos de los scripts porque así
 puedo asociar las carpetas de proyecto a un repositorio de control de código fuente pero en este caso de ejemplo
 he dejado todos los archivos sobre la misma carpeta de trabajo.&lt;/p>
 &lt;p>Por supuesto, al pulsar dos veces sobre cada uno de los archivos se nos abrirá el editor o visualizador adecuado:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/visualizador-sql.jpg" alt="Editor de SQL de BauDbStudio" title="Editor de SQL de BauDbStudio">&lt;/p></description></item><item><title>Distribuciones</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones/</guid><description>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/010-archivos/visualizador-sql.jpg" alt="Editor de SQL de BauDbStudio" title="Editor de SQL de BauDbStudio">&lt;/p></description></item><item><title>Distribuciones</title><link>/applications/baudbstudio/manual/025-distribuciones/025-distribuciones/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/025-distribuciones/025-distribuciones/</guid><description>
 &lt;p>&lt;strong>BauDbStudio&lt;/strong> permite ejecutar scripts de Spark Sql contra un servidor ODBC en local o remoto pero
 para trabajar con grandes cantidades de datos, podemos utilizar servicios como &lt;a href="https://databricks.com/">Databricks&lt;/a>.&lt;/p>
 &lt;p>El problema es que &lt;strong>Databricks&lt;/strong> no acepta los scripts SQL que tenemos hasta ahora, por tanto, debemos
@@ -609,7 +609,7 @@ tenemos la posibilidad de crear distribuciones.&lt;/p>
 &lt;p>Para dar de alta una distribución, simplemente debemos elegir la opción de menú &lt;strong>Archivo | Nuevo | Distribución&lt;/strong> o seleccionar
 la opción &lt;strong>Nueva | Distribución&lt;/strong> en el menú secundario del árbol de conexiones. Esto nos abrirá un formulario
 similar al que mostrábamos al principio de este artículo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones.jpg" alt="Administración de distribuciones" title="Formulario de administración de distribuciones">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-distribuciones/025-distribuciones.jpg" alt="Administración de distribuciones" title="Formulario de administración de distribuciones">&lt;/p>
 &lt;p>Aparte del nombre y la descripción, debemos seleccionar tanto el directorio en el que se encuentran nuestros scripts originales
 escritos en Spark Sql y el directorio donde se dejarán los archivos traducidos al formato de notebooks de Databricks.&lt;/p>
 &lt;p>Además podemos controlar si en la traducción deseamos:&lt;/p>
@@ -619,13 +619,13 @@ escritos en Spark Sql y el directorio donde se dejarán los archivos traducidos 
 &lt;li>Sustituir los argumentos utilizados en Spark Sql del tipo &lt;strong>$NombreArgumento&lt;/strong> por la llamada a función &lt;strong>GetArgument(&amp;quot;NombreArgumento&amp;quot;)&lt;/strong> que recomiendan en DataBricks.&lt;/li>
 &lt;/ul>
 &lt;p>Por último podemos seleccionar los valores que van a sustituir los parámetros fijos, es decir,
-las constantes del tipo &lt;strong>{{Valor}}&lt;/strong> que utilizamos al escribir nuestros &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>.&lt;/p>
+las constantes del tipo &lt;strong>{{Valor}}&lt;/strong> que utilizamos al escribir nuestros &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a>.&lt;/p>
 &lt;p>Una vez definida una distribución, podemos ejecutarla con la opción de menú &lt;strong>Distribuir&lt;/strong> del menú secundario del árbol de conexiones:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/distribuir.jpg" alt="Distribuir scripts" title="Distribuir scripts">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/025-distribuciones/distribuir.jpg" alt="Distribuir scripts" title="Distribuir scripts">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> Aunque podemos ejecutar manualmente esta distribución y copiar los notebooks manualmente a un WorkSpace de Databricks,
-también existe una &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks">consola&lt;/a>
-que puede integrarse en los pipelines de CI/CD para automatizar el proceso.&lt;/p></description></item><item><title>Documentación de base de datos con NSharpDoc</title><link>http://jbautistam.github.io/applications/nsharpdoc/documentacion-base-datos/documentacion-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/nsharpdoc/documentacion-base-datos/documentacion-base-datos/</guid><description>
-&lt;p>Estas últimas semanas he realizado algunos cambios en el proyecto &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a>,
+también existe una &lt;a href="/applications/baudbstudio/manual/130-consola-conversion-databricks/130-consola-conversion-databricks">consola&lt;/a>
+que puede integrarse en los pipelines de CI/CD para automatizar el proceso.&lt;/p></description></item><item><title>Documentación de base de datos con NSharpDoc</title><link>/applications/nsharpdoc/documentacion-base-datos/documentacion-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/nsharpdoc/documentacion-base-datos/documentacion-base-datos/</guid><description>
+&lt;p>Estas últimas semanas he realizado algunos cambios en el proyecto &lt;a href="/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a>,
 concretamente en la documentación de los procedimientos de base de datos.&lt;/p>
 &lt;p>Hasta este momento, el documentador obtenía la estructura de tablas y documentaba sus nombres y descripciones y la relaciones
 entre ellos.&lt;/p>
@@ -671,9 +671,9 @@ por &lt;code>/**&lt;/code> y terminando por &lt;code>*/&lt;/code>, observad el d
 &lt;span class="ln">33&lt;/span> &lt;span class="n">PRINT&lt;/span> &lt;span class="s1">&amp;#39;------------------------------------------------------------------------------&amp;#39;&lt;/span>
 &lt;span class="ln">34&lt;/span>&lt;span class="k">END&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Genera una documentación de este tipo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/documentacion-base-datos/documentacion-base-datos.jpg" alt="Documentacion base datos" title="Documentacion base datos">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/documentacion-base-datos/documentacion-base-datos.jpg" alt="Documentacion base datos" title="Documentacion base datos">&lt;/p>
 &lt;p>Para obtener este resultado, por supuesto hay que cambiar la
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantilla de generación&lt;/a>, para indicar que un valor se
+&lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantilla de generación&lt;/a>, para indicar que un valor se
 tiene que interpretar como Markdown añadiéndolo como máscara de la variable. Algo así:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-XML" data-lang="XML">&lt;span class="ln">1&lt;/span>{{Remarks|Markdown}}
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>De esta forma, la plantilla de generación para los procedimientos almacenados queda de la siguiente forma:&lt;/p>
@@ -712,36 +712,36 @@ tiene que interpretar como Markdown añadiéndolo como máscara de la variable. 
 &lt;span class="ln">33&lt;/span>&lt;span class="nt">&amp;lt;/Page&amp;gt;&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Aprovechando que estaba modificando partes del documentador, también he cambiado los proyectos de librería para utilizar
 .Net Standard y modernizar un poco el proyecto.&lt;/p>
-&lt;p>Como siempre, el código fuente está en &lt;a href="https://github.com/jbautistam/NSharpDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Espacios de trabajo</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo/</guid><description>
+&lt;p>Como siempre, el código fuente está en &lt;a href="https://github.com/jbautistam/NSharpDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Espacios de trabajo</title><link>/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo/</guid><description>
 &lt;p>En ocasiones, cuando estamos trabajando con diferentes proyectos, acabamos con demasiados directorios y conexiones
 en nuestro explorador.&lt;/p>
 &lt;p>Los &lt;strong>espacios de trabajo&lt;/strong> nos permiten crear diferentes entornos de trabajo para diferentes soluciones.&lt;/p>
 &lt;p>Para crear un nuevo espacio de trabajo, seleccione la opción de menú &lt;strong>Archivo | Espacio de trabajo | Nuevo&lt;/strong>, esto
 solicitará un nombre para el marco de trabajo que vamos a crear.&lt;/p>
 &lt;p>Cuando estamos en un nuevo espacio de trabajo, la pantalla estará vacía, es decir, debemos añadir los
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">directorios de trabajo&lt;/a> y
-las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones&lt;/a> que necesitemos
+&lt;a href="/applications/baudbstudio/manual/010-archivos/010-archivos">directorios de trabajo&lt;/a> y
+las &lt;a href="/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones&lt;/a> que necesitemos
 para nuestro proyecto.&lt;/p>
 &lt;p>Si queremos pasar a otro proyecto, sólo tenemos que seleccionar el nombre del espacio de trabajo en la
 lista que aparece en &lt;strong>Archivo | Espacio de trabajo&lt;/strong>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo.jpg" alt="Selección del espacio de trabajo" title="Selección del espacio de trabajo">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo.jpg" alt="Selección del espacio de trabajo" title="Selección del espacio de trabajo">&lt;/p>
 &lt;p>En mi caso, tengo definidos tres espacios de trabajo: Formación, Manual y Studio.Configuration.&lt;/p>
 &lt;p>El espacio de trabajo Studio.Configuration es el espacio que se crea al abrir la aplicación y no se puede borrar, el resto
 de los espacios de trabajo los podemos eliminar usando la opción &lt;strong>Archivo | Espacio de trabajo | Borrar&lt;/strong>.&lt;/p>
-&lt;p>Por supuesto, el borrado del espacio de trabajo no implica ningún borrado de datos.&lt;/p></description></item><item><title>Estructuras de documentación</title><link>http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion/</guid><description>
+&lt;p>Por supuesto, el borrado del espacio de trabajo no implica ningún borrado de datos.&lt;/p></description></item><item><title>Estructuras de documentación</title><link>/applications/nsharpdoc/estructuras-de-documentacion/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/nsharpdoc/estructuras-de-documentacion/</guid><description>
 &lt;p>Las &lt;strong>estructuras de documentación&lt;/strong> son las estructuras básicas para la generación de documentación
 en &lt;strong>NSharpDoc&lt;/strong>.&lt;/p>
-&lt;p>Como hemos explicado en otras secciones de esta Web, &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a> es un
+&lt;p>Como hemos explicado en otras secciones de esta Web, &lt;a href="/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a> es un
 sistema que nos permite documentar código fuente y otros orígenes de datos frecuentes en el desarrollo de software como
 bases de datos o requisitos. Para ello necesitamos una estructura normalizada que hemos llamado precisamente &lt;strong>estructuras
 de documentación&lt;/strong>.&lt;/p>
 &lt;p>El esquema de la aplicación de &lt;strong>NSharpDoc&lt;/strong> es el siguiente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/esquema-aplicacion.jpg" alt="Esquema de la aplicación NSharpDoc" title="Esquema de la aplicación">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/esquema-aplicacion.jpg" alt="Esquema de la aplicación NSharpDoc" title="Esquema de la aplicación">&lt;/p>
 &lt;p>En esta imagen vemos en rojo los diferentes
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedores de documentación&lt;/a>
+&lt;a href="/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedores de documentación&lt;/a>
 que son las aplicaciones que leen el código fuente o la estructura de base de datos o la fuente XML que se desea documentar
 y devuelven &lt;strong>estructuras de documentación&lt;/strong> que se pasan al
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">motor de plantillas&lt;/a> que genera los documentos finales.&lt;/p>
+&lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">motor de plantillas&lt;/a> que genera los documentos finales.&lt;/p>
 &lt;p>Por tanto, las &lt;strong>estructuras de documentación&lt;/strong> constituyen la salida de los &lt;strong>proveedores de documentación&lt;/strong> y la entrada para
 los &lt;strong>generadores de documentación&lt;/strong>. Esta estructura intermedia nos permite añadir nuevos proveedores y nuevos generadores
 sin hacer grandes cambios en el sistema.&lt;/p>
@@ -776,7 +776,7 @@ llamado &lt;strong>Bau.Libraries.LibHelper.API&lt;/strong> con una clase llamada
 'Almacena la información sobre las preferencias de usuario'.&lt;/p>
 &lt;p>El tipo de estructura se almacena en la etiqueta &lt;strong>Type&lt;/strong>. En nuestro ejemplo, los diferentes tipos son &lt;em>Program&lt;/em>,
 &lt;em>NameSpace&lt;/em>, y &lt;em>Class&lt;/em>. Este tipo de estructura es la que posteriormente utilizan los elementos &lt;code>ForEach&lt;/code> de las
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas&lt;/a> para generar la documentación de cada
+&lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas&lt;/a> para generar la documentación de cada
 uno de los elementos de documentación.&lt;/p>
 &lt;p>Por supuesto, este es un ejemplo reducido, en una estructura de documentación real, bajo los elementos de clase tendríamos
 métodos o estructuras o enumerados con sus propias estructuras hija como argumentos o propiedades.&lt;/p>
@@ -803,13 +803,13 @@ métodos o estructuras o enumerados con sus propias estructuras hija como argume
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>En este esquema dentro de una estructura de tipo &lt;strong>DataBase&lt;/strong> llamada &lt;strong>NorthWind&lt;/strong> tenemos una estructura de tipo &lt;strong>Table&lt;/strong>
 llamada &lt;strong>Categories&lt;/strong> que contiene una estructura de tipo &lt;strong>Column&lt;/strong> llamada &lt;strong>CategoryID&lt;/strong> con una serie de parámetros.&lt;/p>
 &lt;p>Como vemos, &lt;strong>NSharpDoc&lt;/strong> no impone una serie de tipos dentro de las estructuras de documentación si no que el programador
-del &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedor&lt;/a> define sus propios tipos y el diseñador
-de &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas&lt;/a> utiliza estos tipos para definir las salidas.&lt;/p>
-&lt;p>Este juego de estructuras / plantillas es lo que convierte a &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a> en un generador
-de documentación válido para diferentes fuentes.&lt;/p></description></item><item><title>Etl de almacenamiento en la nube</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Etl de procesos Rest</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Etl procesos de base datos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Manual de BauDbStudio</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/manual/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/manual/</guid><description>
+del &lt;a href="/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedor&lt;/a> define sus propios tipos y el diseñador
+de &lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas&lt;/a> utiliza estos tipos para definir las salidas.&lt;/p>
+&lt;p>Este juego de estructuras / plantillas es lo que convierte a &lt;a href="/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a> en un generador
+de documentación válido para diferentes fuentes.&lt;/p></description></item><item><title>Etl de almacenamiento en la nube</title><link>/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Etl de procesos Rest</title><link>/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Etl procesos de base datos</title><link>/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Manual de BauDbStudio</title><link>/applications/baudbstudio/manual/manual/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/manual/</guid><description>
 &lt;p>&lt;strong>BauDbStudio&lt;/strong> es una herramienta para la edición y ejecución de scripts de SQL y proyectos de transformación
 de datos o ETL - Extract Transform and load.&lt;/p>
 &lt;p>Aunque &lt;strong>BauDbStudio&lt;/strong> nació como una herramienta de ejecución de scripts para Spark Sql (conocida
@@ -826,11 +826,11 @@ SqLite, ODBC y Spark.&lt;/li>
 &lt;/ul>
 &lt;h2 id="tutorial-de-baudbstudio">Tutorial de BauDbStudio&lt;/h2>
 &lt;p>Para explicar mejor cómo cómo utilizar la explicación he preparado este
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">tutorial de BauDbStudio&lt;/a>.&lt;/p>
+&lt;a href="/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">tutorial de BauDbStudio&lt;/a>.&lt;/p>
 &lt;h2 id="descarga-de-la-aplicación">Descarga de la aplicación&lt;/h2>
 &lt;p>Las diferentes versiones del ejecutable de esta aplicación, se pueden encontrar en Github:
 &lt;a href="https://github.com/jbautistam/BauDbStudio/releases">Versiones de BauDbStudio&lt;/a>.&lt;/p>
-&lt;p>El código fuente de la aplicación se encuentra en &lt;a href="https://github.com/jbautistam/BauDbStudio">GitHub&lt;/a>&lt;/p></description></item><item><title>NSharpDoc</title><link>http://jbautistam.github.io/applications/nsharpdoc/nsharpdoc/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/nsharpdoc/nsharpdoc/</guid><description>
+&lt;p>El código fuente de la aplicación se encuentra en &lt;a href="https://github.com/jbautistam/BauDbStudio">GitHub&lt;/a>&lt;/p></description></item><item><title>NSharpDoc</title><link>/applications/nsharpdoc/nsharpdoc/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/nsharpdoc/nsharpdoc/</guid><description>
 &lt;p>&lt;strong>NSharpDoc&lt;/strong> es una aplicación para documentación de código fuente y bases de datos.&lt;/p>
 &lt;p>En esta primera versión de &lt;strong>NSharpDoc&lt;/strong>, podemos documentar de forma sencilla tanto código fuente en C# como
 bases de datos SQL Server.&lt;/p>
@@ -842,11 +842,11 @@ diferentes fuentes de documentación interesantes para el desarrollo de software
 &lt;p>&lt;strong>NSharpDoc&lt;/strong> nos permite la gestión de &lt;strong>proyectos de documentación&lt;/strong> es decir, la unión de varias fuentes de documentación
 como bases de datos o código fuente en un único proyecto o sitio de documentación de destino.&lt;/p>
 &lt;p>Para definir un &lt;strong>proyecto de documentación&lt;/strong> simplemente debemos indicar el tipo de salida que deseemos, el directorio de
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas de generación de documentación&lt;/a> y
+&lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas de generación de documentación&lt;/a> y
 el directorio de salida de la documentación final.&lt;/p>
 &lt;p>Una vez seleccionado, podemos añadir los elementos que deseamos documentar en la lista de la ficha de proveedores utilizando la barra
 de herramientas:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/pantalla-proveedor.jpg" alt="Pantalla de definición de un proveedor de documentación para NSharpDoc" title="Pantalla de definición de un proveedor de documentación">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/pantalla-proveedor.jpg" alt="Pantalla de definición de un proveedor de documentación para NSharpDoc" title="Pantalla de definición de un proveedor de documentación">&lt;/p>
 &lt;p>Actualmente existen tres tipos de proveedores:&lt;/p>
 &lt;ul>
 &lt;li>&lt;strong>C#:&lt;/strong> permite la documentación de código fuente escrito en C#. En este caso podemos seleccionar la solución o el
@@ -860,35 +860,35 @@ podemos seleccionar el proyecto o solución a documentar.&lt;/li>
 &lt;p>El directorio de documentación adicional de esta ventana le indica a la aplicación dónde se encuentran los archivos adicionales (esta
 versión aún no utiliza esta información).&lt;/p>
 &lt;p>Por supuesto, podemos definir tantos proveedores como necesitemos y de los tipos adecuados:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/pantalla-principal-proyecto.jpg" alt="Proyecto con proveedores definidos de NSharDoc" title="Proyecto con proveedores definidos">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/pantalla-principal-proyecto.jpg" alt="Proyecto con proveedores definidos de NSharDoc" title="Proyecto con proveedores definidos">&lt;/p>
 &lt;p>Una vez definidos los proveedores de nuestro proyecto podemos grabarlo para volver a utilizarlo más adelante y pulsar el botón &lt;strong>Procesar&lt;/strong>
 para generar la documentación.&lt;/p>
 &lt;h2 id="documentación-generada">Documentación generada&lt;/h2>
 &lt;p>Al generar la documentación del proyecto que hemos configurado en la pantalla principal, se crean una serie de páginas HTML de acuerdo con la
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantilla&lt;/a> seleccionada. Para el ejemplo, he generado
+&lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantilla&lt;/a> seleccionada. Para el ejemplo, he generado
 documentación de un proyecto en C#, un par de bases de datos y un par de estructuras XML. La página principal es
 la siguiente:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/indice-documentacion.jpg" alt="Indice de la documentación generada por NSharpDoc" title="Indice de la documentación">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/indice-documentacion.jpg" alt="Indice de la documentación generada por NSharpDoc" title="Indice de la documentación">&lt;/p>
 &lt;p>Donde vemos los diferentes proyectos y las bases de datos. Si seleccionamos uno de los proyectos, nos aparecerá
 el índice principal del proyecto con la lista de espacios de nombres y clases:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/documentacion-proyecto.jpg" alt="Indice de la documentación de un proyecto" title="Indice de la documentación">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/documentacion-proyecto.jpg" alt="Indice de la documentación de un proyecto" title="Indice de la documentación">&lt;/p>
 &lt;p>y si pulsamos sobre una de ellas llegaremos a la documentación específica de la clase:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/documentacion-clase.jpg" alt="Documentación de clase" title="Documentación de clase">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/documentacion-clase.jpg" alt="Documentación de clase" title="Documentación de clase">&lt;/p>
 &lt;p>Lo mismo ocurre si en el índice de la documentación pulsamos sobre una base de datos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/content/applications/nsharpdoc/documentacion-base-datos.jpg" alt="Indice de documentación de base datos" title="Documentación de base datos">&lt;/p>
+&lt;p>&lt;img src="/content/applications/nsharpdoc/documentacion-base-datos.jpg" alt="Indice de documentación de base datos" title="Documentación de base datos">&lt;/p>
 &lt;p>y posteriormente seleccionamos la documentación de una tabla:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/documentacion-tabla.jpg" alt="Documentación de tabla de base de datos" title="Documentación de tabla de base de datos">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/documentacion-tabla.jpg" alt="Documentación de tabla de base de datos" title="Documentación de tabla de base de datos">&lt;/p>
 &lt;p>Por supuesto, el aspecto de la documentación es completamente configurable modificando las
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas de NSharpDoc&lt;/a>.&lt;/p>
+&lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas de NSharpDoc&lt;/a>.&lt;/p>
 &lt;h2 id="funcionamiento-interno-de-la-aplicación">Funcionamiento interno de la aplicación&lt;/h2>
 &lt;p>Aunque intento explicar la forma de extender &lt;strong>NSharpDoc&lt;/strong> mediante diferentes
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedores&lt;/a> en otra sección, creo que es importante
+&lt;a href="/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedores&lt;/a> en otra sección, creo que es importante
 añadir aquí parte de esta información como base.&lt;/p>
 &lt;p>Como todos los desarrolladores saben, existen una gran cantidad de aplicaciones destinadas a la gestión de la documentación
 de código fuente pero muchas de ellas se basan en un entorno en concreto o simplemente en el código fuente y no permiten
 documentar otros aspectos del desarrollo como las bases de datos o los requisitos.&lt;/p>
 &lt;p>En &lt;strong>NSharpDoc&lt;/strong> el planteamiento es diferente, al comenzar con las primeras pruebas del artículo
-&lt;a href="http://jbautistam.github.io/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas">documentación de código C# utilizando Roslyn&lt;/a>
+&lt;a href="/articles/source-code/documentacion-codigo-csharp-plantillas/documentacion-codigo-csharp-plantillas">documentación de código C# utilizando Roslyn&lt;/a>
 y añadirle plantillas de generación me di cuenta que las estructuras de documentación tenían un aspecto similar independientemente
 de su origen, es decir, podía hacer una aplicación que utilizase plantillas para documentar estructuras de datos
 independientemente de si estos datos venían de proyectos de código fuente o de una base de datos e incluso de otras
@@ -896,12 +896,12 @@ fuentes siempre que tuviesen una estructura normalizada.&lt;/p>
 &lt;p>Esto permite facilitar todo el proceso: a partir de diferentes entradas (código fuente, base de datos...) generar
 estructuras de documentación normalizadas y a partir de estas estructuras normalizadas generar documentación.
 Quizá quede más claro si vemos un esquema de estructura de la aplicación:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/esquema-aplicacion.jpg" alt="Esquema de la aplicación NSharpDoc" title="Esquema de la aplicación">&lt;/p>
-&lt;p>En este diagrama, los cuadros rojos identifican los &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedores&lt;/a>,
+&lt;p>&lt;img src="/applications/nsharpdoc/esquema-aplicacion.jpg" alt="Esquema de la aplicación NSharpDoc" title="Esquema de la aplicación">&lt;/p>
+&lt;p>En este diagrama, los cuadros rojos identifican los &lt;a href="/applications/nsharpdoc/proveedores-de-nsharpdoc">proveedores&lt;/a>,
 es decir, las aplicaciones encargadas de interpretar código fuente o esquemas de bases de datos o estructuras de documentación
 en XML. Estas aplicaciones leen los datos de origen, código fuente o esquema de base de datos, y generan un
 objeto de estructura de documentación.&lt;/p>
-&lt;p>Un objeto de &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion">estructura de documentación&lt;/a>
+&lt;p>Un objeto de &lt;a href="/applications/nsharpdoc/estructuras-de-documentacion">estructura de documentación&lt;/a>
 mantiene la estructura jerárquica de la fuente. Es decir, una aplicación tiene espacios
 de nombres que contienen clases que contienen métodos; una base de datos por su parte contiene tablas que contienen columnas.
 Ambos tipos se pueden mantener con una estructura recursiva en forma de árbol.&lt;/p>
@@ -914,11 +914,11 @@ en el caso de HTML generaría el sitio Web final con la documentación.&lt;/p>
 &lt;p>Las estructuras de documentación XML son un caso específico de documentación que permite extender la aplicación sin necesidad de
 programación. En realidad a &lt;strong>NSharpDoc&lt;/strong> no le importa de dónde hayan salido estos archivos para poder generar la documentación
 siempre y cuando tengan la estructura adecuada (que se explica en la sección
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>. Este
+&lt;a href="/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>. Este
 tipo de archivos nos permiten extender &lt;strong>NSharpDoc&lt;/strong> de una forma sencilla con otros lenguajes o sistemas de bases de datos
 o fuentes diversas sin necesidad de modificar el motor de gestión de plantillas.&lt;/p>
 &lt;h2 id="descarga-de-la-aplicación">Descarga de la aplicación&lt;/h2>
-&lt;p>El código fuente de la aplicación se puede descargar de &lt;a href="https://github.com/jbautistam/NSharpDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Plantillas de NSharpDoc</title><link>http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc/</guid><description>
+&lt;p>El código fuente de la aplicación se puede descargar de &lt;a href="https://github.com/jbautistam/NSharpDoc">GitHub&lt;/a>.&lt;/p></description></item><item><title>Plantillas de NSharpDoc</title><link>/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc/</guid><description>
 &lt;p>&lt;a href="C:/Users/jbautistam/Proyectos/WebSites/Hugo/test-hugo/content/applications/nsharpdoc/nsharpdoc">nsharpdoc.md&lt;/a>
 incorpora un sistema de plantillas que nos permite
 personalizar completamente la documentación generada.&lt;/p>
@@ -928,7 +928,7 @@ XML que identifican las plantillas utilizadas en cada caso.&lt;/p>
 &lt;p>&lt;strong>NSharpDoc&lt;/strong> incluye un directorio de plantillas básico que se encuentra en el subdirectorio
 &lt;em>/Data/Templates/Main&lt;/em> de la aplicación principal. En la siguiente imagen podemos ver la
 lista de archivos de este directorio:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/directorio-plantillas.jpg" alt="Directorio de plantillas de NSharpDoc" title="Directorio de plantillas">&lt;/p>
+&lt;p>&lt;img src="/applications/nsharpdoc/plantillas-de-nsharpdoc/directorio-plantillas.jpg" alt="Directorio de plantillas de NSharpDoc" title="Directorio de plantillas">&lt;/p>
 &lt;p>Por supuesto, podemos generar nuestras propias plantillas en cualquier directorio. Simplemente se requieren cuatro
 archivos básicos:&lt;/p>
 &lt;ol>
@@ -982,7 +982,7 @@ en la páginas de índice mientras que las etiquetas &lt;strong>Page&lt;/strong>
 corresponde la página y en &lt;em>File&lt;/em> el archivo de plantilla que vamos a utilizar.&lt;/p>
 &lt;p>Debemos tener en cuenta que &lt;strong>NSharpDoc&lt;/strong> es un sistema de documentación de código un tanto especial puesto que no se limita
 a documentar código fuente si no que nos permite documentar cualquier tipo de información estructurada como se explica
-en la página &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>.&lt;/p>
+en la página &lt;a href="/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>.&lt;/p>
 &lt;p>El atributo &lt;em>RootTemplate&lt;/em> indica la plantilla raíz, es decir la plantilla común para todas las páginas de
 salida (por supuesto, podríamos definir tantos archivos de plantilla raíz como quisiéramos aunque en el caso
 de ejemplo siempre es el mismo). En el caso de HTML sería en esta plantilla en la que definiríamos las cabeceras y los pies
@@ -1250,24 +1250,24 @@ valor:&lt;/p>
 &lt;span class="ln">30&lt;/span> &lt;span class="nt">&amp;lt;/IfExists&amp;gt;&lt;/span>
 &lt;span class="ln">31&lt;/span>&lt;span class="nt">&amp;lt;/Page&amp;gt;&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Con dos secciones, una que lista las estructuras de tipo &lt;strong>Program&lt;/strong> con la documentación de código fuente y otra
-que lista las estructuras de tipo &lt;strong>DataBase&lt;/strong> con la documentación de base de datos.&lt;/p></description></item><item><title>Procesos Etl de tratamiento de archivos</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Proveedores de NSharpDoc</title><link>http://jbautistam.github.io/applications/nsharpdoc/proveedores-de-nsharpdoc/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/nsharpdoc/proveedores-de-nsharpdoc/</guid><description>
-&lt;p>&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a>) es un sistema extensible para generación de documentación asociada
+que lista las estructuras de tipo &lt;strong>DataBase&lt;/strong> con la documentación de base de datos.&lt;/p></description></item><item><title>Procesos Etl de tratamiento de archivos</title><link>/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Proveedores de NSharpDoc</title><link>/applications/nsharpdoc/proveedores-de-nsharpdoc/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/nsharpdoc/proveedores-de-nsharpdoc/</guid><description>
+&lt;p>&lt;a href="/applications/nsharpdoc/nsharpdoc">NSharpDoc&lt;/a>) es un sistema extensible para generación de documentación asociada
 al desarrollo, es decir, permite añadir nuevos módulos o métodos para documentar diferentes
 sistemas como bases de datos u otros lenguajes de programación distintos a C#.&lt;/p>
 &lt;p>Para permitir la implementación de otras &lt;strong>fuentes de documentación&lt;/strong> en &lt;strong>NSharpDoc&lt;/strong>, se utilizan los conceptos
 de proveedores que explicamos en este artículo y de
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>
-y &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas&lt;/a>]
+&lt;a href="/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>
+y &lt;a href="/applications/nsharpdoc/plantillas-de-nsharpdoc/plantillas-de-nsharpdoc">plantillas&lt;/a>]
 que se detallan en otras secciones de esta Web.&lt;/p>
 &lt;p>Los proveedores de &lt;strong>NSharpDoc&lt;/strong> actualmente no son más que clases que esperan una serie de parámetros y devuelven
-una colección de &lt;a href="http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>
+una colección de &lt;a href="/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>
 a partir de las que &lt;strong>NSharpDoc&lt;/strong> puede generar la documentación basándose en &lt;strong>plantillas&lt;/strong>.&lt;/p>
 &lt;p>Los proveedores de &lt;strong>NSharpDoc&lt;/strong> deben implementar la interface &lt;code>IDocumenter&lt;/code> que se define en el espacio de nombres
 &lt;code>Bau.Libraries.LibNSharpDoc.Models.Interfaces&lt;/code>. En esta interface tenemos un único método llamado &lt;code>Parse&lt;/code> que
 espera una colección de parámetros de tipo &lt;code>StructParameterModelDictionary&lt;/code> y devuelve un objeto
 &lt;code>StructDocumentationModel&lt;/code> con el resultado de la documentación (es decir, las
-&lt;a href="http://jbautistam.github.io/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>.&lt;/p>
+&lt;a href="/applications/nsharpdoc/estructuras-de-documentacion">estructuras de documentación&lt;/a>.&lt;/p>
 &lt;p>La clase &lt;code>StructParameterModelDictionary&lt;/code> contiene los parámetros para la generación de la documentación
 en un diccionario de tipo &lt;em>Clave - Valor&lt;/em> que depende del proveedor dado que cada uno de ellos necesita
 argumentos diferentes. Un proveedor para documentación de código fuente sólo necesita el nombre de proyecto
@@ -1280,12 +1280,12 @@ y recompilar el sistema antes de poder utilizarlas. Aún no estoy seguro de si i
 o plugins sobre la librería de proceso o bien crear un sistema de paso de información entre diferentes consolas. El primer
 sistema nos daría un 'ecosistema' de proveedores pero limita las posibilidades para creación de proveedores a sistemas
 escritos dentro del framework.NET mientras que un sistema de consolas o ejecutables nos daría la posiblidad de crear
-extensiones en cualquier lenguaje de programación o framework aunque de un forma más 'fea' en sentido arquitectónico.&lt;/p></description></item><item><title>Scripts</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql/</guid><description>
+extensiones en cualquier lenguaje de programación o framework aunque de un forma más 'fea' en sentido arquitectónico.&lt;/p></description></item><item><title>Scripts</title><link>/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql/</guid><description>
 &lt;p>La principal función de &lt;strong>BauDbStudio&lt;/strong> es la ejecución de scripts de SQL.&lt;/p>
-&lt;p>Para crear un script de SQL simplemente debemos añadir un &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">archivo&lt;/a>
+&lt;p>Para crear un script de SQL simplemente debemos añadir un &lt;a href="/applications/baudbstudio/manual/010-archivos/010-archivos">archivo&lt;/a>
 con extensión SQL a nuestro directorio de proyecto.&lt;/p>
 &lt;p>Los scripts a ejecutar en &lt;strong>BauDbStudio&lt;/strong> se componen de instrucciones SQL (SELECT, INSERT, CREATE TABLE...) adecuadas
-para la &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión a base de datos&lt;/a> que estemos utilizando.&lt;/p>
+para la &lt;a href="/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexión a base de datos&lt;/a> que estemos utilizando.&lt;/p>
 &lt;p>El único requisito es que debemos separar las sentencias SQL con el comando &lt;strong>GO&lt;/strong> que sirve como separador de sentencias
 en &lt;strong>BauDbStudio&lt;/strong>.&lt;/p>
 &lt;p>Por ejemplo, veamos un script de creación de una tabla a partir de un archivo parquet utilizando una conexión SparkSql:&lt;/p>
@@ -1299,20 +1299,20 @@ en &lt;strong>BauDbStudio&lt;/strong>.&lt;/p>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> en mi caso, el archivo parquet se encuentra en el directorio &lt;em>c:/Test/BauDbStudio/Samples/Files/Input/Sales.parquet&lt;/em>, dado que estoy utilizando Spark con WSL,
 el directorio se debe indicar en formato Linux, por eso he utilizado el nombre de archivo &lt;em>/mnt/c/Test/BauDbStudio/Samples/Files/Input/Sales.parquet&lt;/em>.&lt;/p>
 &lt;p>Si queremos ejecutar este script, debemos seleccionar la
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">conexión a nuestro servidor de Spark&lt;/a>
+&lt;a href="/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">conexión a nuestro servidor de Spark&lt;/a>
 en la barra de herramientas y pulsar el botón de &lt;strong>Ejecutar&lt;/strong> de la barra de herramientas:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/ejecutar-script-sql.jpg" alt="Ejecutar script SQL" title="Ejecutar script SQL desde la barra de herramientas">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/ejecutar-script-sql.jpg" alt="Ejecutar script SQL" title="Ejecutar script SQL desde la barra de herramientas">&lt;/p>
 &lt;p>También podemos utilizar la tecla de función &lt;strong>F5&lt;/strong> para ejecutar el script. Podemos seleccionar parte del texto
 para ejecutar únicamente ua parte del script.&lt;/p>
-&lt;p>&lt;strong>Nota:&lt;/strong> al ejecutar un script, se muestra en la &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log">ventana de log&lt;/a> el resultado de la ejecución. Si deseamos
-ver el resultado de una consulta debemos utilizar la ventana de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a>.&lt;/p>
+&lt;p>&lt;strong>Nota:&lt;/strong> al ejecutar un script, se muestra en la &lt;a href="/applications/baudbstudio/manual/100-log/100-log">ventana de log&lt;/a> el resultado de la ejecución. Si deseamos
+ver el resultado de una consulta debemos utilizar la ventana de &lt;a href="/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a>.&lt;/p>
 &lt;p>Mientras ejecutemos el script, en la barra de herramientas vemos el tiempo de ejecución:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/ejecucion-script.jpg" alt="Ejecución de un script SQL" title="Ejecución de un script SQL">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/ejecucion-script.jpg" alt="Ejecución de un script SQL" title="Ejecución de un script SQL">&lt;/p>
 &lt;p>En cualquier momento podemos detener la ejecución del script pulsando el botón &lt;strong>Cancelar&lt;/strong> de la barra de herramientas.&lt;/p>
 &lt;p>Por supuesto, podemos cerrar la ventana del script y seguir trabajando mientras termina la ejecución.&lt;/p>
 &lt;p>El script anterior creaba una tabla de ventas con los datos del archivo parquet, una vez ejecutado podemos ver la
 tabla creada en nuestra lista de conexiones:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/nueva-tabla.jpg" alt="Creación de una tabla" title="Creación de una tabla en la base de datos">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/nueva-tabla.jpg" alt="Creación de una tabla" title="Creación de una tabla en la base de datos">&lt;/p>
 &lt;h2 id="parámetros-de-consulta">Parámetros de consulta&lt;/h2>
 &lt;p>Una vez tenemos la tabla de ventas en nuestra base de datos, siempre podemos crear una tabla de resumen con la suma de datos entre
 fechas, por ejemplo:&lt;/p>
@@ -1342,7 +1342,7 @@ sin tener que volver a escribir el script?&lt;/p>
 los argumentos en Spark Sql con un signo de dólar seguido por el nombre del argumento.&lt;/p>
 &lt;p>Pero antes de ejecutar esta instrucción, debemos indicarle a la aplicación el valor de los parámetros que vamos a utilizar.&lt;/p>
 &lt;p>Para ello primero creamos un archivo de parámetros en nuestro árbol de archivo y lo llamamos, por ejemplo, &lt;em>Parameters.json&lt;/em>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/creacion-archivo-parametros.jpg" alt="Creación de un archivo de parámetros" title="Creación de un archivo de parámetros">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/creacion-archivo-parametros.jpg" alt="Creación de un archivo de parámetros" title="Creación de un archivo de parámetros">&lt;/p>
 &lt;p>Los archivos de parámetros tienen formato JSON, en nuestro caso, va a tener un único parámetro, nuestra variable &lt;strong>StartDate&lt;/strong>,
 escribiendo el siguiente texto en el archivo:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-JSON" data-lang="JSON">&lt;span class="ln">1&lt;/span>&lt;span class="p">{&lt;/span>
@@ -1350,15 +1350,15 @@ escribiendo el siguiente texto en el archivo:&lt;/p>
 &lt;span class="ln">3&lt;/span>&lt;span class="p">}&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Lo último que nos falta es asociar este archivo de parámetros con la ejecución de nuestros scripts. Para ésto, pulsamos el
 botón &lt;strong>Seleccionar archivo de parámetros&lt;/strong> situado en la barra de herramientas a la derecha de la conexión seleccionada:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/barra-de-herramientas-seleccion-archivo-parametros.jpg" alt="Selección de archivo parametros" title="Selección de archivo parametros en la barra de herramientas">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/barra-de-herramientas-seleccion-archivo-parametros.jpg" alt="Selección de archivo parametros" title="Selección de archivo parametros en la barra de herramientas">&lt;/p>
 &lt;p>Este botón nos abre una ventana donde podemos seleccionar el archivo de parámetros que acabamos de escribir (por ahora,
-podemos dejar vacío el archivo de contexto ETL que se utiliza con los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/seleccion-archivo-parametros.jpg" alt="Selección de archivo de parámetros" title="Selección de archivo de parámetros">&lt;/p>
+podemos dejar vacío el archivo de contexto ETL que se utiliza con los &lt;a href="/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a>:&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/seleccion-archivo-parametros.jpg" alt="Selección de archivo de parámetros" title="Selección de archivo de parámetros">&lt;/p>
 &lt;p>Una vez seleccionado el archivo de parámetros, nos aparecerá el nombre de archivo en la barra de herramientas:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/barra-de-herramientas-archivo-parametros.jpg" alt="Visualizar el archivo de parámetros" title="Barra de herramientas: visualizar el archivo de parámetros">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/barra-de-herramientas-archivo-parametros.jpg" alt="Visualizar el archivo de parámetros" title="Barra de herramientas: visualizar el archivo de parámetros">&lt;/p>
 &lt;p>Al pulsar el nombre del archivo de parámetros, se nos abrirá una ventana de edición del archivo en la que podemos hacer las
 modificaciones necesarias:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/ver-archivo-parametros.jpg" alt="Modificación del archivo de parámetros" title="Modificación del archivo de parámetros">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/040-scripts-sql/ver-archivo-parametros.jpg" alt="Modificación del archivo de parámetros" title="Modificación del archivo de parámetros">&lt;/p>
 &lt;p>Ahora ya podemos ejecutar la consulta con el argumento seleccionado, por supuesto, podemos modificar estos parámetros cuando
 queramos y tener tantos archivos de parámetros como necesitemos.&lt;/p>
 &lt;h2 id="constantes">Constantes&lt;/h2>
@@ -1373,7 +1373,7 @@ parquet:&lt;/p>
 &lt;span class="ln">7&lt;/span>&lt;span class="k">GO&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>No va a poder ejecutar esta consulta en su ordenador a menos que tenga exactamente el mismo directorio. Esto
 nos dará problemas cuando trabajamos en un equipo puesto que obligamos a todos sus componentes a tener los archivos
-en los mismos directorios. Además, cuando &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuyamos&lt;/a>
+en los mismos directorios. Además, cuando &lt;a href="/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuyamos&lt;/a>
 nuestros scripts a otros entornos como DataBricks, debemos asegurarnos de cambiar estos directorios.&lt;/p>
 &lt;p>Para evitarlo, utilizaremos un parámetro especial, una constante en realidad.&lt;/p>
 &lt;p>Para definir una constante, utilizaremos el mismo archivo de parámetros que teníamos hasta ahora, pero le vamos a añadir
@@ -1451,7 +1451,7 @@ por debajo de mi directorio &lt;strong>MountPath&lt;/strong> donde Spark deja su
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Una vez ejecutado, aparecerá la nueva base de datos bajo mi conexión:&lt;/p>
 &lt;p>&lt;img src="D:/Projects/Personal/Hugo/test-hugo/content/applications/baudbstudio/manual/040-scripts-sql/conexion-dbsample.jpg" alt="Base de datos DBSample" title="Base de datos DBSample">&lt;/p>
 &lt;p>Las constantes que hemos visto, son muy importantes no sólo en la ejecución de scripts si no también en la
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribución de nuestros scripts&lt;/a> a DataBricks.&lt;/p></description></item><item><title>Scripts de ETL</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl/</guid><description>
+&lt;a href="/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribución de nuestros scripts&lt;/a> a DataBricks.&lt;/p></description></item><item><title>Scripts de ETL</title><link>/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl/</guid><description>
 &lt;p>Al trabajar con datos, normalmente nos encontramos con la necesidad de ejecutar procesos repetitivos como copiar
 archivos, realizar consultas, copiar datos resumidos entre base de datos, etc...&lt;/p>
 &lt;p>Este tipo de trabajos se conocen como procesos ETL (Extract, Transform, Load). &lt;strong>BauDbStudio&lt;/strong> permite la definición
@@ -1461,14 +1461,14 @@ y ejecución de este tipo de procesos.&lt;/p>
 de un tipo de trabajo.&lt;/p>
 &lt;p>Actualmente podemos definir procesos de:&lt;/p>
 &lt;ul>
-&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos">Tratamiento de archivos&lt;/a>&lt;/strong>:
+&lt;li>&lt;strong>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos">Tratamiento de archivos&lt;/a>&lt;/strong>:
 copia, borrado de archivos, ejecución de comandos del sistema operativo, transformación de archivos (CSV, Excel, Parquet).&lt;/li>
-&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage">Tratamiento de archivos en la nube&lt;/a>&lt;/strong>:
+&lt;li>&lt;strong>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage">Tratamiento de archivos en la nube&lt;/a>&lt;/strong>:
 tratamiento de archivos en sistemas de almacenamiento en la nube (actualmente Azure Storage Blob),
 sobre todo para descarga y subida de archivos.&lt;/li>
-&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest">Procesos REST&lt;/a>&lt;/strong>:
+&lt;li>&lt;strong>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest">Procesos REST&lt;/a>&lt;/strong>:
 llamadas a procesos REST (actualmente en desarrollo).&lt;/li>
-&lt;li>&lt;strong>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos">Procesos de base datos&lt;/a>&lt;/strong>:
+&lt;li>&lt;strong>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos">Procesos de base datos&lt;/a>&lt;/strong>:
 procesos de consulta, copia y conversión de datos entre bases de datos relacionales.&lt;/li>
 &lt;/ul>
 &lt;h2 id="definición-de-procesos">Definición de procesos&lt;/h2>
@@ -1482,78 +1482,78 @@ diferentes&lt;/li>
 &lt;/ul>
 &lt;p>Cada tipo de proceso tiene sentencias y esquemas diferentes que se explica en su propia página.&lt;/p>
 &lt;ul>
-&lt;li>Información del &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>&lt;/li>
-&lt;li>Información del &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto">archivo de contexto&lt;/a>&lt;/li>
+&lt;li>Información del &lt;a href="/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>&lt;/li>
+&lt;li>Información del &lt;a href="/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto">archivo de contexto&lt;/a>&lt;/li>
 &lt;li>Información de procesos
 &lt;ul>
-&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos">Procesos de archivos&lt;/a>&lt;/li>
-&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage">Procesos sobre archivos en la nube&lt;/a>&lt;/li>
-&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest">Procesos REST&lt;/a>&lt;/li>
-&lt;li>&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos">Procesos de base datos&lt;/a>&lt;/li>
+&lt;li>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/005-etl-archivos/005-etl-archivos">Procesos de archivos&lt;/a>&lt;/li>
+&lt;li>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/010-etl-cloud-storage/010-etl-cloud-storage">Procesos sobre archivos en la nube&lt;/a>&lt;/li>
+&lt;li>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/020-etl-rest/020-etl-rest">Procesos REST&lt;/a>&lt;/li>
+&lt;li>&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/025-etl-base-datos/025-etl-base-datos">Procesos de base datos&lt;/a>&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;/ul>
 &lt;h2 id="ejecución-de-procesos-de-etl">Ejecución de procesos de ETL&lt;/h2>
-&lt;p>Para ejecutar los procesos ETL, si nos colocamos sobre un &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>
+&lt;p>Para ejecutar los procesos ETL, si nos colocamos sobre un &lt;a href="/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>
 en el árbol de archivos y pulsamos la opción de menú &lt;strong>Ejecutar&lt;/strong>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/menuejecucionetl.jpg" alt="Menú de ejecución de procesos ETL" title="Menú de ejecución">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/120-scripts-etl/menuejecucionetl.jpg" alt="Menú de ejecución de procesos ETL" title="Menú de ejecución">&lt;/p>
 &lt;p>Se nos abrirá la ventana de ejecución de &lt;strong>procesos ETL&lt;/strong>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/ejecucionetl.jpg" alt="Ejecucion de procesos Etl" title="Ejecucion de procesos Etl">&lt;/p>
-&lt;p>En la sección izquierda vemos el contenido del &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>.&lt;/p>
-&lt;p>En la parte derecha debemos seleccionar el &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto">archivo de contexto&lt;/a>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/120-scripts-etl/ejecucionetl.jpg" alt="Ejecucion de procesos Etl" title="Ejecucion de procesos Etl">&lt;/p>
+&lt;p>En la sección izquierda vemos el contenido del &lt;a href="/applications/baudbstudio/manual/120-scripts-etl/000-etl-proyecto/000-etl-proyecto">archivo de proyecto&lt;/a>.&lt;/p>
+&lt;p>En la parte derecha debemos seleccionar el &lt;a href="/applications/baudbstudio/manual/120-scripts-etl/002-etl-contexto/002-etl-contexto">archivo de contexto&lt;/a>
 con el que deseamos ejecutar el proceso:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/ejecucionetlcontext.jpg" alt="Ejecución de procesos Etl sobre un contexto" title="Ejecución de procesos Etl sobre un contexto">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/120-scripts-etl/ejecucionetlcontext.jpg" alt="Ejecución de procesos Etl sobre un contexto" title="Ejecución de procesos Etl sobre un contexto">&lt;/p>
 &lt;p>Una vez seleccionado un contexto correcto, podemos pulsar sobre el botón &lt;strong>Ejecutar&lt;/strong> para procesar los diferentes pasos del script.&lt;/p>
-&lt;p>Existe una &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl">consola&lt;/a>
-asociada a &lt;strong>BauDbStudio&lt;/strong> que nos permite ejecutar los proyectos por separado.&lt;/p></description></item><item><title>Storage</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage/</guid><description>
-&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Tutorial de BauDbStudio</title><link>http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio/</guid><description>
+&lt;p>Existe una &lt;a href="/applications/baudbstudio/manual/140-consola-ejecucion-etl/140-consola-ejecucion-etl">consola&lt;/a>
+asociada a &lt;strong>BauDbStudio&lt;/strong> que nos permite ejecutar los proyectos por separado.&lt;/p></description></item><item><title>Storage</title><link>/applications/baudbstudio/manual/030-storage/030-storage/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/030-storage/030-storage/</guid><description>
+&lt;p>Estamos trabajando en ello&lt;/p></description></item><item><title>Tutorial de BauDbStudio</title><link>/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio/</guid><description>
 &lt;p>Cuando se ejecuta la aplicación &lt;strong>BauDbStudio&lt;/strong> por primera vez, nos enfrentamos a un escenario vacío
 que debemos configurar antes de comenzar a utilizar la aplicación.&lt;/p>
 &lt;p>Vamos a ver las diferentes partes de la ventana antes de continuar:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/baudbstudio-primera.jpg" alt="Pantalla inicial" title="Pantalla inicial de BauDbStudio">&lt;/p>
+&lt;p>&lt;img src="/applications/baudbstudio/manual/001-tutorial-baudbstudio/baudbstudio-primera.jpg" alt="Pantalla inicial" title="Pantalla inicial de BauDbStudio">&lt;/p>
 &lt;p>Como cualquier aplicación de Windows, en la parte superior encontramos los menús y las barras de herramientas.&lt;/p>
 &lt;ul>
 &lt;li>A la izquierda tenemos una ficha con dos pestañas: archivos y conexiones.
 &lt;ul>
-&lt;li>En la ficha de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">archivos&lt;/a> vemos el árbol de nuestra solución
+&lt;li>En la ficha de &lt;a href="/applications/baudbstudio/manual/010-archivos/010-archivos">archivos&lt;/a> vemos el árbol de nuestra solución
 y nuestros proyectos una vez seleccionados (en un momento explicamos cómo).&lt;/li>
-&lt;li>En la ficha de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones&lt;/a> tendremos la lista de conexiones
-a base de datos y &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a>.&lt;/li>
+&lt;li>En la ficha de &lt;a href="/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones&lt;/a> tendremos la lista de conexiones
+a base de datos y &lt;a href="/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a>.&lt;/li>
 &lt;/ul>
 &lt;/li>
 &lt;li>La parte derecha de la ventana contiene una ficha donde podemos mantener una lista de conexiones a
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage">Azure blob storage&lt;/a> asociadas a nuestros proyectos de datos.&lt;/li>
+&lt;a href="/applications/baudbstudio/manual/030-storage/030-storage">Azure blob storage&lt;/a> asociadas a nuestros proyectos de datos.&lt;/li>
 &lt;li>En la parte central, por ahora vacía, tenemos el espacio donde editaremos y visualizaremos nuestros
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a>,
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas de base de datos&lt;/a> o
-el contenido de los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a> (CSV o parquet).&lt;/li>
+&lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a>,
+&lt;a href="/applications/baudbstudio/manual/090-consultas/090-consultas">consultas de base de datos&lt;/a> o
+el contenido de los &lt;a href="/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a> (CSV o parquet).&lt;/li>
 &lt;/ul>
-&lt;p>En la parte inferior de la ventana vemos una pestaña de &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/100-log/100-log">log&lt;/a> donde
+&lt;p>En la parte inferior de la ventana vemos una pestaña de &lt;a href="/applications/baudbstudio/manual/100-log/100-log">log&lt;/a> donde
 se muestran los mensajes y errores de la aplicación.&lt;/p>
 &lt;p>Por supuesto, puede cambiar el aspecto de la ventana en cualquier momento y mover las pestañas al punto de la pantalla donde
 le resulte más cómodo.&lt;/p>
 &lt;h2 id="configuración-inicial">Configuración inicial&lt;/h2>
 &lt;p>Para comenzar a utilizar la aplicación, le recomiendo que siga los siguientes pasos:&lt;/p>
 &lt;ol>
-&lt;li>Configure las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones a base de datos&lt;/a> con las que
+&lt;li>Configure las &lt;a href="/applications/baudbstudio/manual/020-conexiones/020-conexiones">conexiones a base de datos&lt;/a> con las que
 va a trabajar (si va a utilizar Spark Sql, recomiendo que lea también cómo establecer una
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">conexión a Spark con ODBC&lt;/a>.&lt;/li>
-&lt;li>Seleccione las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/010-archivos/010-archivos">carpetas&lt;/a> de su ordenador donde
-se van a encontrar los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a>,
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a> y
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a>.&lt;/li>
-&lt;li>Aprenda a ejecutar &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a> sobre las
+&lt;a href="/applications/baudbstudio/manual/025-conexion-spark/025-conexion-spark">conexión a Spark con ODBC&lt;/a>.&lt;/li>
+&lt;li>Seleccione las &lt;a href="/applications/baudbstudio/manual/010-archivos/010-archivos">carpetas&lt;/a> de su ordenador donde
+se van a encontrar los &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts SQL&lt;/a>,
+&lt;a href="/applications/baudbstudio/manual/120-scripts-etl/120-scripts-etl">scripts de ETL&lt;/a> y
+&lt;a href="/applications/baudbstudio/manual/095-archivos-de-datos/095-archivos-de-datos">archivos de datos&lt;/a>.&lt;/li>
+&lt;li>Aprenda a ejecutar &lt;a href="/applications/baudbstudio/manual/090-consultas/090-consultas">consultas&lt;/a> sobre las
 conexiones de base de datos&lt;/li>
-&lt;li>Aprenda qué son los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros">archivos de parámetros&lt;/a> y
+&lt;li>Aprenda qué son los &lt;a href="/applications/baudbstudio/manual/045-archivos-de-parametros/045-archivos-de-parametros">archivos de parámetros&lt;/a> y
 para qué se utilizan.&lt;/li>
-&lt;li>En el caso de trabajar con &lt;strong>Databricks&lt;/strong>, prepare las &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a> adecuadas.&lt;/li>
+&lt;li>En el caso de trabajar con &lt;strong>Databricks&lt;/strong>, prepare las &lt;a href="/applications/baudbstudio/manual/025-distribuciones/025-distribuciones">distribuciones&lt;/a> adecuadas.&lt;/li>
 &lt;li>Si necesita acceder a archivos que se encuentren en &lt;strong>Azure Blob Storage&lt;/strong> configure las diferentes
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/030-storage/030-storage">conexiones a storage&lt;/a>.&lt;/li>
+&lt;a href="/applications/baudbstudio/manual/030-storage/030-storage">conexiones a storage&lt;/a>.&lt;/li>
 &lt;/ol>
 &lt;h2 id="instalación">Instalación&lt;/h2>
 &lt;p>Para instalar la aplicación, puede descargar la última versión desde la página de &lt;a href="https://github.com/jbautistam/BauDbStudio/releases">GitHub&lt;/a>.&lt;/p>
 &lt;p>La aplicación necesita que tenga instalado en su ordenador la versión 3.0 o superior de
-&lt;a href="https://dotnet.microsoft.com/download/dotnet-core/3.1">.Net Core&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN I</title><link>http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn/</guid><description>
+&lt;a href="https://dotnet.microsoft.com/download/dotnet-core/3.1">.Net Core&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN I</title><link>/articles/source-code/visor-pgn/visor-pgn/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/visor-pgn/visor-pgn/</guid><description>
 &lt;p>Una de mis deudas pendientes este año, era crear un visor de &lt;a href="https://es.wikipedia.org/wiki/Notaci%C3%B3n_portable_de_juego">archivos PGN&lt;/a> y
 hoy ya tengo la primera versión consumible.&lt;/p>
 &lt;p>En esta quincena, he detenido el proyecto de generación de informes en el que estaba trabajando y me he tomado
@@ -1563,7 +1563,7 @@ antes de tener una prueba de concepto medianamente interesante.&lt;/p>
 &lt;p>Por la presión del tiempo, en lugar de crear mi propio intérprete de archivos PGN decidí utilizar uno ya existente,
 en concreto &lt;a href="https://github.com/iigorr/pgn.net">PGN.Net&lt;/a>, escrito a caballo entre F# yC#.
 Por esta vez, me he saltado mi orgullo como hice con el
-&lt;a href="http://jbautistam.github.io/articles/opinion/interprete-de-cron/interprete-de-cron">intérprete de cron&lt;/a>
+&lt;a href="/articles/opinion/interprete-de-cron/interprete-de-cron">intérprete de cron&lt;/a>
 y he reutilizado un proyecto ya terminado.&lt;/p>
 &lt;p>Esta librería ya devuelve la partida cargada del archivo PGN con sus movimientos, comentarios y anotaciones, aunque
 utilizarlo desde el visor me ha dado algún quebradero de cabeza.&lt;/p>
@@ -1623,9 +1623,9 @@ en que Fischer juegue con blancas y empate&lt;/em> pero se ha quedado en el tint
 cómodo escribiendo este tipo de prototipos en WPF). En cuanto tenga tiempo... por ahora vuelvo al generador de informes, mucho
 menos entretenido pero igualmente interesante.&lt;/p>
 &lt;p>Si alguno quiere echarle un vistazo o proponer modificaciones, podeis encontrar el código fuente en mi cuenta de
-&lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN II</title><link>http://jbautistam.github.io/articles/source-code/visor-pgn-2/visor-pgn-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/visor-pgn-2/visor-pgn-2/</guid><description>
+&lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN II</title><link>/articles/source-code/visor-pgn-2/visor-pgn-2/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/visor-pgn-2/visor-pgn-2/</guid><description>
 &lt;p>Hace un par de semanas publiqué la primera versión de un pequeño
-&lt;a href="http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn">visor de archivos PGN&lt;/a>.&lt;/p>
+&lt;a href="/articles/source-code/visor-pgn/visor-pgn">visor de archivos PGN&lt;/a>.&lt;/p>
 &lt;p>En esa primera versión dejé una lista de cosas pendientes que llevan molestándome desde entonces, así que
 en tiempos muertos he desarrollado algunas modificaciones que mejoran (creo) la aplicación.&lt;/p>
 &lt;p>Esta segunda versión, aparte de corregir algunos errores, trae las siguiente modificaciones:&lt;/p>
@@ -1650,9 +1650,9 @@ cambiase el modelo de vistas. No sé si esto acabará convirtiéndose en un requ
 en la lista.&lt;/li>
 &lt;li>La versión UWP va a sufrir un retraso indeterminado.&lt;/li>
 &lt;/ul>
-&lt;p>Por supuesto, el código fuente sigue estando en: &lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN III</title><link>http://jbautistam.github.io/articles/source-code/visor-pgn-3/visor-pgn-3/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/source-code/visor-pgn-3/visor-pgn-3/</guid><description>
+&lt;p>Por supuesto, el código fuente sigue estando en: &lt;a href="https://github.com/jbautistam/BauChessViewer">GitHub&lt;/a>.&lt;/p></description></item><item><title>Visor de archivos PGN III</title><link>/articles/source-code/visor-pgn-3/visor-pgn-3/</link><pubDate>Fri, 11 Oct 2019 00:00:00 +0000</pubDate><guid>/articles/source-code/visor-pgn-3/visor-pgn-3/</guid><description>
 &lt;p>Espero que nadie estuviera aguantando la respiración desde que reescribí la aplicación
-&lt;a href="http://jbautistam.github.io/articles/source-code/visor-pgn-2/visor-pgn-2">BauChessViewer&lt;/a> hace un par de años ya, pero
+&lt;a href="/articles/source-code/visor-pgn-2/visor-pgn-2">BauChessViewer&lt;/a> hace un par de años ya, pero
 hasta estos meses no he encontrado el tiempo para continuar con ella.&lt;/p>
 &lt;p>Ha habido otros proyectos entre medias y realmente no pensaba recuperar esta aplicación pero
 comencé a estudiar &lt;strong>Xamarin Forms&lt;/strong> y, después de terminar con la versión de
@@ -1660,7 +1660,7 @@ comencé a estudiar &lt;strong>Xamarin Forms&lt;/strong> y, después de terminar
 era un buen momento para aplicar los conocimientos adquiridos en un visor de juegos para tablets.&lt;/p>
 &lt;p>Y el primer problema fue precisamente la librería que utilizaba para leer los archivos PGN,
 &lt;a href="https://github.com/iigorr/pgn.net">PGN.Net&lt;/a>.&lt;/p>
-&lt;p>Como &lt;a href="http://jbautistam.github.io/articles/source-code/visor-pgn/visor-pgn">comentaba&lt;/a>, al comenzar el desarrollo de la aplicación no
+&lt;p>Como &lt;a href="/articles/source-code/visor-pgn/visor-pgn">comentaba&lt;/a>, al comenzar el desarrollo de la aplicación no
 me apetecía dedicarle demasiado tiempo, era más una prueba de concepto y, algo no habitual en mí, busqué una librería
 para interpretar los archivos en lugar de escribir la mía.&lt;/p>
 &lt;p>Aunque esta forma de trabajar tiene sus ventajas, cuando fui a portar la aplicación a Xamarin, me encontré con el

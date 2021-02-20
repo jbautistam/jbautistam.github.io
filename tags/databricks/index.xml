@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>databricks on jbautistam</title><link>http://jbautistam.github.io/tags/databricks/</link><description>Recent content in databricks on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sat, 10 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/databricks/index.xml" rel="self" type="application/rss+xml"/><item><title>Cosas que me gustaría que me hubiesen explicado sobre databricks</title><link>http://jbautistam.github.io/articles/big-data/cositas-databricks/cositas-databricks/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/cositas-databricks/cositas-databricks/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>databricks on jbautistam</title><link>/tags/databricks/</link><description>Recent content in databricks on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sat, 10 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/databricks/index.xml" rel="self" type="application/rss+xml"/><item><title>Cosas que me gustaría que me hubiesen explicado sobre databricks</title><link>/articles/big-data/cositas-databricks/cositas-databricks/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>/articles/big-data/cositas-databricks/cositas-databricks/</guid><description>
 &lt;p>Llevo algunos meses trabajando con &lt;a href="https://databricks.com/">DataBricks&lt;/a> en local y me he encontrado algunas rarezas que he tenido que ir puliendo poco a poco.&lt;/p>
 &lt;p>Me habría ahorrado un montón de dolores de cabeza si alguien me las hubiese contado previamente, por eso escribo este
 artículo. Por si ayuda a alguien en una situación parecida.&lt;/p>
@@ -12,7 +12,7 @@ a base de celdas es, digámoslo así, ligeramente complicada, la búsqueda tiene
 integración con el control de versiones y las ramas es algo peculiar, etc, etc.&lt;/p>
 &lt;p>Además tiene un segundo problema mucho más grave: el coste. Depurar contra clusters cuando estamos escribiendo una aplicación
 que probamos paso a paso veinte veces al día puede llegar a resultar bastante caro.&lt;/p>
-&lt;p>Nuestra solución pasa por programar directamente en &lt;a href="http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark">Spark Sql en local&lt;/a>
+&lt;p>Nuestra solución pasa por programar directamente en &lt;a href="/articles/big-data/instalacion-spark/instalacion-spark">Spark Sql en local&lt;/a>
 utilizando una aplicación que desarrollamos nosotros: &lt;a href="Aplicaciones%5CBauDbStudio%5CManual">BauDbStudio&lt;/a>.&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> El manual no está completo aún y la versión en la Web está algo desactualizada, prometo
 ponerme las pilas con ello pero últimamente el tiempo me puede.&lt;/p>
@@ -116,7 +116,7 @@ la elimina, si no existe continúa con la siguiente instrucción.&lt;/p>
 &lt;p>Bueno, pues Databricks no, Databricks da un error. Bueno,
 realmente da un error de vez en cuando. Veamos la documentación de la instrucción
 &lt;a href="https://docs.databricks.com/spark/latest/spark-sql/language-manual/drop-table.html">DROP TABLE&lt;/a>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/cositas-databricks/images/Error-drop-table.jpg" alt="DROP TABLE en Databricks" title="Instrucción DROP TABLE en Databricks">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/cositas-databricks/images/Error-drop-table.jpg" alt="DROP TABLE en Databricks" title="Instrucción DROP TABLE en Databricks">&lt;/p>
 &lt;p>Lo dice bien claro: si la tabla no existe, lanza una excepción. A veces.&lt;/p>
 &lt;p>Os cuento. En la práctica puedes utilizar bases de datos en Databricks (para mí no son bases
 de datos si no esquemas pero para el caso es lo mismo). En caso que utilices un nombre de base de datos creado
@@ -131,7 +131,7 @@ es decir, un multitenant de libro.&lt;/p>
 &lt;p>La teoría es que estos cluster deben poder ejecutarse a la vez y en teoría deberían ser aislados pero ¿cómo ejecuta
 databricks estos cluster? ¿cuál es su nivel de aislamiento? Bueno, pues digamos simplemente que
 &lt;a href="https://docs.databricks.com/notebooks/notebooks-use.html">depende&lt;/a>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/cositas-databricks/images/Isolation-levels.jpg" alt="Databricks Isolation levels" title="Isolation levels">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/cositas-databricks/images/Isolation-levels.jpg" alt="Databricks Isolation levels" title="Isolation levels">&lt;/p>
 &lt;p>¿Os ha quedado claro? A mí no.&lt;/p>
 &lt;p>Hagamos una prueba. Vamos a montar un storage sobre un directorio de DBFS utilizando Python:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-python" data-lang="python">&lt;span class="ln"> 1&lt;/span>&lt;span class="c1"># Obtiene los parámetros&lt;/span>

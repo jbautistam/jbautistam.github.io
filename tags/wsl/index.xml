@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>wsl on jbautistam</title><link>http://jbautistam.github.io/tags/wsl/</link><description>Recent content in wsl on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sat, 10 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://jbautistam.github.io/tags/wsl/index.xml" rel="self" type="application/rss+xml"/><item><title>Instalación de Spark en local</title><link>http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/instalacion-spark/instalacion-spark/</guid><description>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>wsl on jbautistam</title><link>/tags/wsl/</link><description>Recent content in wsl on jbautistam</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><copyright>Copyright © 2008–2020, Jose Antonio Bautista Montejo; all rights reserved.</copyright><lastBuildDate>Sat, 10 Oct 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/wsl/index.xml" rel="self" type="application/rss+xml"/><item><title>Instalación de Spark en local</title><link>/articles/big-data/instalacion-spark/instalacion-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>/articles/big-data/instalacion-spark/instalacion-spark/</guid><description>
 &lt;p>En estos últimos meses, me he tenido que enfrentar con mayor o menor éxito con &lt;a href="https://spark.apache.org/">Spark&lt;/a>.&lt;/p>
 &lt;p>A muy alto nivel, Spark es un motor de proceso distribuido al que podemos mandar trabajos utilizando Python, Scala, R y SQL.&lt;/p>
 &lt;p>Estos días he estado instalándolo sobre mi equipo con WSL y creo que es interesante detallar los pasos seguidos (sobre todo
@@ -10,10 +10,10 @@ que alguien lo considerará una herejía pero en este caso he utilizado WSL más
 Programas y características&lt;/strong> y seleccionamos *&lt;em>Activar o desactivar las características de Windows&lt;/em>, donde debemos
 activar, por supuesto, el &lt;strong>Subsistema de Windows para Linux&lt;/strong> (que no sé vosotros, pero opino que debería
 llamarse al revés).&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Caracteristicas-de-Windows.jpg" alt="Activar o desactivar las características de Windows" title="Activar o desactivar las características de Windows">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Caracteristicas-de-Windows.jpg" alt="Activar o desactivar las características de Windows" title="Activar o desactivar las características de Windows">&lt;/p>
 &lt;p>Una vez instalado (que si no me equivoco, necesita un reinicio)source-code/big-data/big-data/al Store de Windows y seleccionamos un sistema
 Linux. Yo he elegido Ubuntu, más que nada por el instalador de paquetes, pero sentíos libres:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Ubuntu.jpg" alt="Ubuntu" title="Ubuntu">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Ubuntu.jpg" alt="Ubuntu" title="Ubuntu">&lt;/p>
 &lt;p>Cuando esté instalado, al ejecutarlo, nos pedirá el usuario y la clave del administrador y a partir de ese momento podemos trabajar
 con el shell sin problemas.&lt;/p>
 &lt;p>Supongo que es cosa de costumbre, pero particularmente prefiero trabajar con &lt;a href="https://cmder.net/">cmder&lt;/a> abriendo una consola de tipo WSL en lugar de directamente
@@ -29,7 +29,7 @@ de gustos.&lt;/p>
 &lt;span class="ln">3&lt;/span>sudo apt install openjdk-8-jre-headless
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Ahora ya podemos instalar Spark. Para ello vamos a seleccionar la versión desde la
 &lt;a href="https://spark.apache.org/downloads.html">página de descargas&lt;/a>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Download-spark.jpg" alt="Página de descargas de Spark" title="Página de descargas de Spark">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Download-spark.jpg" alt="Página de descargas de Spark" title="Página de descargas de Spark">&lt;/p>
 &lt;p>Yo he elegido la versión 2.4.4 con Hadoop2.7 (spark-2.4.4-bin-hadoop2.7) así que vamos a descargarlo, descomprimirlo y dejarlo
 en un directorio un poco más amigable:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>wget https://www-us.apache.org/dist/spark/spark-2.4.4/spark-2.4.4-bin-hadoop2.7.tgz
@@ -52,7 +52,7 @@ que Spark 2.4 no se lleva bien con Java 11.&lt;/p>
 &lt;p>Primero vamos a arrancar un nodo master:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>start-master.sh
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>A partir de este momento podemos abrir un navegador para ver la interface de usuario sobre &lt;code>localhost:8080&lt;/code>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-UI-master.jpg" alt="Interface de usuario de master" title="Interface de usuario de master">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Spark-UI-master.jpg" alt="Interface de usuario de master" title="Interface de usuario de master">&lt;/p>
 &lt;p>Abrir el navegador (al menos la primera vez), es importante porque nos va a dar la dirección del nodo master que vamos
 a necesitar a la hora de añadir nodos al cluster. En mi caso: &lt;code>spark://jbautistam-PC.localdomain:7077&lt;/code> que podéis ver
 en la cabecera en negrita.&lt;/p>
@@ -60,20 +60,20 @@ en la cabecera en negrita.&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>start-slave.sh spark://dirección del nodo master:7077
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Por supuesto, este es un nodo que corre sobre mi máquina pero para añadir nodos en otras máquinas el proceso es el mismo.&lt;/p>
 &lt;p>Y ya podemos ver el nodo worker en la UI:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-UI-Worker.jpg" alt="Interface de usuario con un nodo master y otro worker" title="Interface de usuario con un nodo master y otro worker">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Spark-UI-Worker.jpg" alt="Interface de usuario con un nodo master y otro worker" title="Interface de usuario con un nodo master y otro worker">&lt;/p>
 &lt;p>Para el futuro, cuando queramos detener los nodos utilizaremos estas instrucciones:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/stop-slave.sh
 &lt;span class="ln">2&lt;/span>&lt;span class="nv">$SPARK_HOME&lt;/span>/sbin/stop-master.sh
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>Un par de cosas más, podéis abrir la consola de Spark con:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>spark-shell
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-shell.jpg" alt="Shell de Spark" title="Shell de Spark">&lt;/p>
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Spark-shell.jpg" alt="Shell de Spark" title="Shell de Spark">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> para salir, escribid &lt;code>:quit&lt;/code> (de nada).&lt;/p>
 &lt;p>Esta es la consola predefinida, con Scala, pero si sois más de Python, podéis instalar PySpark utilizando pip:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="ln">1&lt;/span>sudo apt install python-pip
 &lt;span class="ln">2&lt;/span>pip install pyspark
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>&lt;strong>Nota:&lt;/strong> la primera instrucción es precisamente para instalar pip.&lt;/p>
 &lt;p>Para ejecutar la consola de Python, simplemente ejecutad &lt;code>pyspark&lt;/code>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Pyspark.jpg" alt="Pyspark" title="Pyspark">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Pyspark.jpg" alt="Pyspark" title="Pyspark">&lt;/p>
 &lt;p>Por cierto, tenéis un directorio &lt;code>examples&lt;/code> con ejemplos de aplicaciones en Scala, Python y R y algunos archivos CSV, parquet,
 Avro y json para pruebas.&lt;/p>
 &lt;h2 id="conectando-a-spark-con-jdbc">Conectando a Spark con JDBC&lt;/h2>
@@ -92,38 +92,38 @@ par de pasos más.&lt;/p>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>No da ningún error aunque no funcione (al menos a mí no me lo ha dado), los errores los encontraréis en el archivo de log. Tardé
 un par de horas en encontrar que no levantaba el servicio porque la versión de Java estaba mal definida.&lt;/p>
 &lt;p>El caso es que si todo ha ido bien, ya podéis entrar en la interface de usuario de Thrift en &lt;code>localhost:4040&lt;/code>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Thrift-UI.jpg" alt="Interface de usuario Thrift" title="Interface de usuario Thrift">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Thrift-UI.jpg" alt="Interface de usuario Thrift" title="Interface de usuario Thrift">&lt;/p>
 &lt;p>Que parece muy interesante pero en realidad no nos permite lanzar ninguna consulta, sólo ver el estado de los trabajos (y creedme,
 la consultaréis a menudo).&lt;/p>
 &lt;p>Siempre podemos utilizar la consola con &lt;code>spark-sql&lt;/code>:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Spark-sql.jpg" alt="Spark Sql" title="Spark Sql">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Spark-sql.jpg" alt="Spark Sql" title="Spark Sql">&lt;/p>
 &lt;p>Que francamente, acostumbrado al manager de SQL Server, tampoco me entusiasma. Pero ya que tenemos un servidor JDBC vamos a abrir
 &lt;a href="https://dbeaver.io/">DBeaver&lt;/a> contra él.&lt;/p>
 &lt;p>Si no lo habéis utilizado nunca, Dbeaver es un aplicación para administrar todo tipo de base de datos: Postgres,
 MySql, Sql Server, SqLite y sobre todo (y por lo que nos interesa) Spark.&lt;/p>
 &lt;p>Así que abrimos Dbeaver y creamos una conexión a Spark:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Conexion-dbeaver.jpg" alt="Conexión a Spark con Dbeaver" title="Conexión a Spark con Dbeaver">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Conexion-dbeaver.jpg" alt="Conexión a Spark con Dbeaver" title="Conexión a Spark con Dbeaver">&lt;/p>
 &lt;p>y la configuramos:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Configuracion-dbeaver.jpg" alt="Configuracion de la conexión con Dbeaver" title="Configuracion de la conexión con Dbeaver">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Configuracion-dbeaver.jpg" alt="Configuracion de la conexión con Dbeaver" title="Configuracion de la conexión con Dbeaver">&lt;/p>
 &lt;p>En este caso, que voy a conectarme a mi equipo, no me hace falta usuario y contraseña pero por supuesto, se puede configurar
 en el servidor.&lt;/p>
 &lt;p>Cuando pulsemos sobre &lt;strong>Aceptar&lt;/strong>, la primera vez se descargará los drivers JDBC adecuados y nos abrirá la conexión a
 nuestro servidor:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Dbeaver-con-Spark.jpg" alt="Dbeaver conectado a Spark" title="Dbeaver conectado a Spark">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Dbeaver-con-Spark.jpg" alt="Dbeaver conectado a Spark" title="Dbeaver conectado a Spark">&lt;/p>
 &lt;p>Ahora, ya podemos lanzar consultas SQL contra nuestro servidor Spark, por ejemplo, vamos a consultar con SQL uno de esos
 archivos parquet de ejemplo de los que hablábamos hace un rato:&lt;/p>
 &lt;div class="highlight">&lt;pre class="chroma">&lt;code class="language-sql" data-lang="sql">&lt;span class="ln">1&lt;/span>&lt;span class="k">SELECT&lt;/span> &lt;span class="o">*&lt;/span>
 &lt;span class="ln">2&lt;/span> &lt;span class="k">FROM&lt;/span> &lt;span class="n">parquet&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="o">`&lt;/span>&lt;span class="n">examples&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">src&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">main&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">resources&lt;/span>&lt;span class="o">/&lt;/span>&lt;span class="n">users&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="n">parquet&lt;/span>&lt;span class="o">`&lt;/span>
 &lt;/code>&lt;/pre>&lt;/div>&lt;p>y vemos el resultado:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/dbeaver-query.jpg" alt="Resultado consulta con Dbeaver" title="Resultado consulta con Dbeaver">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/dbeaver-query.jpg" alt="Resultado consulta con Dbeaver" title="Resultado consulta con Dbeaver">&lt;/p>
 &lt;p>También podemos ir a la consola de Thrift para ver cómo se ha ejecutado todo:&lt;/p>
-&lt;p>&lt;img src="http://jbautistam.github.io/articles/big-data/instalacion-spark/images/Thrift-jobs.jpg" alt="Información sobre procesos de Thrift" title="Información sobre procesos de Thrift">&lt;/p>
+&lt;p>&lt;img src="/articles/big-data/instalacion-spark/images/Thrift-jobs.jpg" alt="Información sobre procesos de Thrift" title="Información sobre procesos de Thrift">&lt;/p>
 &lt;p>&lt;strong>Nota:&lt;/strong> la documentación de Spark Sql en la propia web de Spark es bastante reducida,
 simplemente nos redirigen a la de Hive pero para mi gusto la de
 &lt;a href="https://docs.databricks.com/spark/latest/spark-sql/index.html#sql-language-manual">Databricks&lt;/a>
 está bastante más cuidada.&lt;/p>
 &lt;p>Pues eso es todo, en poco más de 20 minutos tenemos un entorno de Spark montado al que podemos acceder no sólo con
-Python y Scala si no también con SQL.&lt;/p></description></item><item><title>Intérprete de scripts SQL</title><link>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>http://jbautistam.github.io/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</guid><description>
+Python y Scala si no también con SQL.&lt;/p></description></item><item><title>Intérprete de scripts SQL</title><link>/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</link><pubDate>Sat, 10 Oct 2020 00:00:00 +0000</pubDate><guid>/articles/big-data/interprete-scripts-spark/interprete-scripts-spark/</guid><description>
 &lt;p>Siempre he defendido SQL como un lenguaje ideal para el tratamiento de datos con una salvedad: la falta de instrucciones
 imperativas en el estándar.&lt;/p>
 &lt;p>SQL es un lenguaje declarativo, de ahí viene realmente su potencia: ejecutar una instrucción indicando lo que deseo obtener no
@@ -148,7 +148,7 @@ un lenguaje imperativo: SQL Server tiene TSql, Oracle tiene su PL/SQL, etc...&lt
 combinación perfecta. Siempre que sepas Python, claro. No es nuevo, es lo que hacemos en la mayoría de los lenguajes cuando lanzamos
 una sentencia SQL contra una conexión a base de datos.&lt;/p>
 &lt;p>Pero dejémonos de introducciones ¿a qué viene todo ésto? Pues todo esto viene a que mientras programo
-&lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">BauDbStudio&lt;/a>, cuánto más ejecuto contra Spark Sql, más me
+&lt;a href="/applications/baudbstudio/manual/001-tutorial-baudbstudio/001-tutorial-baudbstudio">BauDbStudio&lt;/a>, cuánto más ejecuto contra Spark Sql, más me
 doy cuenta que necesito un lenguaje imperativo. Echo de menos los &lt;code>if&lt;/code>, &lt;code>for&lt;/code>, &lt;code>while&lt;/code> y demás. No siempre, pero cuando
 hace falta, tengo que reconocer que cuesta horrores pasarlo por alto.&lt;/p>
 &lt;p>Podría haber elegido la opción de ejecutar Python en &lt;strong>BauDbStudio&lt;/strong>, hay librerías para hacerlo pero ¿qué ocurriría con
@@ -170,7 +170,7 @@ otros gestores de bases de datos como SqLite o Postgress?, no me acababa de conv
 &lt;span class="ln">13&lt;/span> GO
 &lt;span class="ln">14&lt;/span> %&amp;gt;
 &lt;span class="ln">15&lt;/span>}
-&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como se puede ver, es una mezcla entre los &lt;a href="http://jbautistam.github.io/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> que teníamos
+&lt;/code>&lt;/pre>&lt;/div>&lt;p>Como se puede ver, es una mezcla entre los &lt;a href="/applications/baudbstudio/manual/040-scripts-sql/040-scripts-sql">scripts de SQL&lt;/a> que teníamos
 hasta ahora en &lt;strong>BauDbStudio&lt;/strong> con instrucciones SQL separadas por comandos &lt;code>GO&lt;/code>.&lt;/p>
 &lt;p>Por el momento el lenguaje permite lo básico:&lt;/p>
 &lt;ul>
@@ -197,7 +197,7 @@ sólo tengan una sentencia. Supongo que el lenguaje evolucionará, pero por ahor
 imposible que mi nuevo lenguaje se ejecute en ese entorno.&lt;/p>
 &lt;p>Podríamos hacer una cosa: reproducir el intérprete en Python de forma que recogiera el script y lo interpretara en tiempo de ejecución en
 Databricks. Por supuesto no lo voy a hacer, entre otras cosas porque Python no es mi fuerte. También lo podríamos hacer utilizando
-&lt;a href="http://jbautistam.github.io/articles/big-data/experimento-spark-net/experimento-spark-net">Spark.Net&lt;/a> con C# pero no creo que por hoy por hoy tenga los conocimientos
+&lt;a href="/articles/big-data/experimento-spark-net/experimento-spark-net">Spark.Net&lt;/a> con C# pero no creo que por hoy por hoy tenga los conocimientos
 suficientes como para meterme en ese sembrao.&lt;/p>
 &lt;p>La segunda opción (que me parece la mejor) es transpilar.&lt;/p>
 &lt;p>Como sabemos, la primera fase de la interpretación es el análisis sintáctico que devuelve una colección de sentencias y
