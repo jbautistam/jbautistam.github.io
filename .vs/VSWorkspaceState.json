@@ -5,12 +5,11 @@
     "\\content\\post",
     "\\data",
     "\\layouts",
-    "\\public",
     "\\resources",
     "\\static",
     "\\themes",
     "\\themes\\clarity"
   ],
-  "SelectedNode": "\\content\\_index.md",
+  "SelectedNode": "\\config.toml",
   "PreviewInSolutionExplorer": false
 }

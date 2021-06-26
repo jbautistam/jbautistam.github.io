@@ -28,7 +28,7 @@ Al ejecutar esta instrucción, veremos que se levanta el servidor:
 			
 Al cabo de unos segundos podemos ver el estado del servidor abriendo un navegador y solicitando la dirección **https://localhost:4040**:
 	
-![Estado de Thrift Server](D:/Projects/Personal/Hugo/test-hugo/content/applications/baudbstudio/manual/025-conexion-spark/estado-thrift-server.jpg "Estado del servidor ODBC Thrift Server")
+![Estado de Thrift Server](/applications/baudbstudio/manual/025-conexion-spark/estado-thrift-server.jpg "Estado del servidor ODBC Thrift Server")
  
 En esa página encontraremos información sobre los nodos y el estado de las consultas SQL que ejecutemos sobre el servidor.
 

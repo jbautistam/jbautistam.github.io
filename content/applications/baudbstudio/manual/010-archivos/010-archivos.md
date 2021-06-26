@@ -10,7 +10,7 @@ series = ["BauDbStudio"]
 Para trabajar con archivos de script de SQL o ETL u otros archivos, primero debemos asociar directorios
 al proyecto en BauDbStudio.
 	
-Para añadir un directorio al []({ href = "Aplicaciones\BauDbStudio\Manual\110 Marco trabajo" } marco de trabajo)
+Para añadir un directorio al [marco de trabajo](/applications/baudbstudio/manual/110-marco-trabajo/110-marco-trabajo)
 actual de la aplicación podemos utilizar tanto la opción del menú **Archivo | Nuevo | Directorio** como el 
 botón **Añadir carpeta** de la barra de herramientas como el menú secundario de la ficha **Archivos**:
 
