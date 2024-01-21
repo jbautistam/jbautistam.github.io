@@ -5,4 +5,4 @@ cascade:
   type: docs
 ---
 
-Mi página de documentación
+En su momento, aquí irá la documentación de mis aplicaciones y librerías.

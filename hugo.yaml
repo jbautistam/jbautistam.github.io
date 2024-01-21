@@ -8,11 +8,11 @@ module:
     
 menu:
   main:
-    - name: Documentación
-      pageRef: /docs
-      weight: 1
     - name: Blog
       pageRef: /blog
+      weight: 1
+    - name: Documentación
+      pageRef: /docs
       weight: 2
     - name: About
       pageRef: /about
