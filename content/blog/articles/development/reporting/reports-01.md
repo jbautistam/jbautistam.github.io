@@ -19,8 +19,8 @@ Mi forma de gestionar los informes desde hace varios proyectos es bastante simil
 
 Podría resumirlo como: *intentemos no complicarnos la vida*.
 
-La idea es que desde negocio, antes o después, nos van a solicitar informes, algunos de estos serán simples y otros muy
-complicados, los necesitan rápido, algunos de ellos para consumirlos en el momento y olvidarlos y de vez en cuando, hasta les gustaría
+La idea es que desde negocio, antes o después, nos van a solicitar informes, algunos de ellos serán simples y otros muy
+complicados, los necesitan rápido, para consumirlos en el momento y de vez en cuando, hasta les gustaría
 crearse sus propios informes.
 
 Con esos requisitos, suelo crear una tabla de `Reports` en mi base de datos, con esta estructura:
@@ -31,8 +31,8 @@ Con esos requisitos, suelo crear una tabla de `Reports` en mi base de datos, con
 | Name    |
 | SQL     |
 
-Sencillo ¿verdad? Puedo leer la tabla y mostrar los diferentes informes en un formulario y que el usuario
-seleccione el listado que desea ver y una vez que el usuario haya seleccionado el listado, ejecuto el SQL y obtengo un `IDataReader`:
+Sencillo ¿verdad? Así sólo tenemos que leer la tabla y mostrar los diferentes informes en un formulario y que el usuario
+seleccione el listado que desea ver y una vez que el usuario haya seleccionado el listado, ejecuto la consulta SQL y obtengo un `IDataReader`:
 
 ```csharp
 await connection.ExecuteReaderAsync(sql, null, System.Data.CommandType.Text, TimeSpan.FromMinutes(5), cancellationToken);
@@ -136,12 +136,12 @@ con los parámetros que el usuario puede rellenar con una estructura similar a e
 | Default          |
 | SqlVariable      |
 
-Para cada informe podemos tener varios parámetros con su tipo (enteros, cadenas, valores lógicos...), su nombre, el
+En cada informe podemos tener varios parámetros con su tipo (enteros, cadenas, valores lógicos...), su nombre, el
 valor predeterminado, etc... Con estos datos ya podemos mostrar en la pantalla los controles específicos para cada parámetro y cuando
 el usuario introduzca los datos, podemos filtrarlos.
 
-En este momento, tenemos que modificar la cadena SQL del registro de la tabla `Reports` para
-que considere estos parámetros. Por ejemplo, para un informe de clientes por delegación:
+Con este nuevo requisito, tenemos que modificar la cadena SQL del registro de la tabla `Reports` para
+que considere los parámetros de esa tabla. Por ejemplo, para un informe de clientes por delegación:
 
 ```sql
 SELECT Customers.Name, Customers.LastName, Customers.Address, Delegations.Name
@@ -160,7 +160,7 @@ Tenemos dos parámetros `@CustomerName` y `@DelegationName` que se corresponder�
 | 1  |  2       | string | Customer   | false    |          | @CustomerName    |
 | 2  |  2       | string | Delegation | false    |          | @DelegationName  |
 
-En el momento de obtener el informe sólo tenemos que añadir los parámetros que hayamos recogido del usuario y pasárselo
+Para obtener el informe sólo tenemos que añadir los parámetros que hayamos recogido del usuario y pasárselo
 a nuestra SQL.
 
 Según pase el tiempo, nuestra generación de informes se complicará: podemos añadir una tabla de columnas
@@ -176,17 +176,17 @@ se ha reducido a añadir registros a una o varias tablas (o a varios archivos o 
 
 ## Clases
 
-Pero ¿por qué no tenemos clases para cada informe? Quizá os parezca una pregunta absurda pero la verdad es que parece lógico,
+Pero ¿por qué no tenemos clases separadas por informe? Quizá os parezca una pregunta absurda pero la verdad es que parece lógico,
 sobre todo a aquellos que estamos acostumbrados a acceder a la base de datos utilizando ORMs: si tengo un informe de clientes 
 ¿por qué no tener una clase de clientes para generar el informe? ¿no será mejor para cumplir el principio de mínima responsabilidad? 
 
-Pues depende de cómo lo mires, si a partir de tus requisitos obtienes "preparar un informe de clientes", 
+Pues depende de cómo lo mires: si a partir de tus requisitos obtienes "preparar un informe de clientes", 
 "preparar un informe de stock", "preparar un informe de ventas",
-"preparar un informe de ganancias de la empresa en 2.023"... es posible que tenga lógica pensar que cada uno de ellos 
+"preparar un informe de ganancias de la empresa en 2.023"... puede que tenga lógica pensar que cada uno de ellos 
 se deba implementar con clases diferentes.
 
-Lo malo es que así te vas a encontrar con cuatro problemas diferentes, uno por informe y según evolucione el proyecto, 
-acabarás encontrándote con un problema distinto para cada informe. Que todos los problemas
+Lo malo es que así, en este momento, te vas a enfrentar a cuatro problemas diferentes, uno por informe y según evolucione el proyecto, 
+acabarás encontrándote con tantos problemas como informes. Que todos los problemas
 sean conceptualmente iguales, no significa que dejes de tener infinitos problemas. Que puedas copiar, pegar y modificar código
 no lo hace precisamente mejor, simplemente lo hace más largo.
 
@@ -204,6 +204,10 @@ que texto que puedes parametrizar con el cual obtienes un `IDataReader` que pued
 
 ¿Te has parado en pensar lo que significa hacer todo eso con clases independientes?
 
+* Cargar `IEnumerable<Client>` en `ListView`.
+* Cargar `IEnumerable<Sales>` en `ListView`.
+* Convertir `IEnumerable<Client>` a Json.
+* Convertir `IEnumerable<Sales>` a Json.
 * Exportar `IEnumerable<Client>` a Excel.
 * Exportar `IEnumerable<Sales>` a Excel.
 * Exportar `IEnumerable<Client>` a CSV.
@@ -253,5 +257,5 @@ por ahí escondido en alguna parte).
 La respuesta, por supuesto es sí pero posiblemente no con la estructura de tablas / documentos que tenemos ahora, vamos a necesitar
 muchas más cosas. Ese será el contenido de los siguientes artículos.
 
-Como decía al principio la única razón de éste artículo era sembrar la curiosidad, en el resto de artículos veremos una forma
+Como decía al principio la única razón de éste post era sembrar la curiosidad, en el resto de artículos veremos una forma
 de crear una librería que nos permita generar informes más complejos y versátiles (o eso espero).
