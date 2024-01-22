@@ -35,6 +35,7 @@ Sencillo ¿verdad? Puedo leer la tabla y mostrar los diferentes informes en un f
 seleccione el listado que desea ver y una vez que el usuario haya seleccionado el listado, ejecuto el SQL y obtengo un `IDataReader`:
 
 ```csharp
+await connection.ExecuteReaderAsync(sql, null, System.Data.CommandType.Text, TimeSpan.FromMinutes(5), cancellationToken);
 ```
 
 este `IDataReader` lo puedo transformar según me convenga, por ejemplo, puedo generar un Json con una estructura similar a esta:
@@ -75,7 +76,7 @@ public void Write(string fileName, IDataReader reader)
 /// <summary>
 ///		Crea una fila de cabecera para el CSV con las columnas del <see cref="IDataReader"/>
 /// </summary>
-private Row CreateHeaderRow(StringBuilder builder, IDataReader reader)
+private void CreateHeaderRow(StringBuilder builder, IDataReader reader)
 {
 	// Añade los nombres de los campos
 	for (int index = 0; index < reader.FieldCount; index++)
@@ -91,7 +92,7 @@ private Row CreateHeaderRow(StringBuilder builder, IDataReader reader)
 /// <summary>
 ///		Crea los datos para las filas del <see cref="IDataReader"/>
 /// </summary>
-private List<Row> CreateDataRows(StringBuilder builder, IDataReader reader)
+private void CreateDataRows(StringBuilder builder, IDataReader reader)
 {
 	while (reader.Read())
 	{
