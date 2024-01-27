@@ -5,4 +5,5 @@ cascade:
   type: docs
 ---
 
-En su momento, aquí irá la documentación de mis aplicaciones y librerías.
+1. **[Bau.Ollama.Api](D:/Projects/WebSites/jbautistam.github.io/content/docs/ollama-api):** código C# para acceder
+a la API de [Ollama](https://ollama.ai/).

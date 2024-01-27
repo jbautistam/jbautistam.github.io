@@ -1,5 +1,5 @@
 ---
-title: Documentación de Bau.Ollama.Api
+title: Bau.Ollama.Api
 date: 2024-01-20T15:23:49+01:00
 ---
 
