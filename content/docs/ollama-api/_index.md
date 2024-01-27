@@ -24,7 +24,7 @@ Podéis encontrar el código de [Bau.Ollama.Api](https://github.com/jbautistam/B
 
 ## Preparación
 
-Antes de utilizar la API, debemos preparar el entorno.
+Antes de utilizar la API, debemos preparar el entorno local.
 
 En primer lugar, descargamos la imagen Docker de **Ollama**:
 
@@ -32,13 +32,14 @@ En primer lugar, descargamos la imagen Docker de **Ollama**:
 docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
 ```
 
-Antes de poder llamar a la API, debemos indicar que se ejecute un modelo con el siguiente comando:
+E indicamos que se ejecute un modelo con el siguiente comando:
 
 ```sh
 docker exec -it ollama ollama run llama2
 ```
 
-Este comando ejecuta **Ollama** con el modelo *Llama 2*, pero **Ollama** nos permite ejecutar diferentes modelos de lenguaje. 
+Este comando ejecuta **Ollama** con el modelo *Llama 2*. **Ollama** nos permite ejecutar diferentes modelos de lenguaje, simplemente debemos
+cambiar el argumento `llama2` por el nombre del modelo que deseemos ejecutar (se descargará si es necesario). 
 
 En concreto, en el momento de crear esta API, se podían utilizar estos modelos 
 (la lista actualizada está en la web de [Ollama](https://ollama.ai/library)):
