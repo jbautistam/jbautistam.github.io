@@ -1,5 +1,5 @@
 ---
-title: Bau.Ollama.Api
+title: Api de Ollama para C#
 date: 2024-01-20T15:23:49+01:00
 ---
 
@@ -24,7 +24,7 @@ Podéis encontrar el código de [Bau.Ollama.Api](https://github.com/jbautistam/B
 
 ## Preparación
 
-Antes de utilizar la API, debemos preparar el entorno local.
+Antes de utilizar la API, debemos preparar el entorno.
 
 En primer lugar, descargamos la imagen Docker de **Ollama**:
 
@@ -32,14 +32,13 @@ En primer lugar, descargamos la imagen Docker de **Ollama**:
 docker run -d -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
 ```
 
-E indicamos que se ejecute un modelo con el siguiente comando:
+Antes de poder llamar a la API, debemos indicar que se ejecute un modelo con el siguiente comando:
 
 ```sh
 docker exec -it ollama ollama run llama2
 ```
 
-Este comando ejecuta **Ollama** con el modelo *Llama 2*. **Ollama** nos permite ejecutar diferentes modelos de lenguaje, simplemente debemos
-cambiar el argumento `llama2` por el nombre del modelo que deseemos ejecutar (se descargará si es necesario). 
+Este comando ejecuta **Ollama** con el modelo *Llama 2*, pero **Ollama** nos permite ejecutar diferentes modelos de lenguaje. 
 
 En concreto, en el momento de crear esta API, se podían utilizar estos modelos 
 (la lista actualizada está en la web de [Ollama](https://ollama.ai/library)):
