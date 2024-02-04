@@ -3,7 +3,8 @@ title: Bau Image Prompt Generator
 date: 2024-02-03T15:23:49+01:00
 ---
 
-**Bau Image Prompt Generator** es una aplicación WPF para generación de imágenes con inteligencia artifical utilizando diferentes API.
+**[Bau Image Prompt Generator](https://github.com/jbautistam/BauPromptImage)** es una aplicación WPF para generación 
+de imágenes con inteligencia artifical utilizando diferentes API.
 
 Actualmente, utiliza la API de [Stable Horde](https://stablehorde.net/). **Stable Horde** utiliza un cluster distribuido para la generación
 de imágenes, no es tan rápido como otras APIs pero proporciona una gran cantidad de modelos de forma gratuita siempre que no te importe
