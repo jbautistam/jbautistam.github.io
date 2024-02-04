@@ -116,7 +116,7 @@ Una vez definido el *manager*, podemos agregar un manejador de eventos para que,
 ImageGenerationManager.Progress += (sender, args) => UpdateProgress(args.Generation);
 ```
 
-Para lanzar una nueva generación a un proveedor, debemos llamar al método `` del *manager*:
+Para lanzar una nueva generación a un proveedor, debemos llamar al método `PromptAsync` del *manager*:
 
 ```csharp
 PromptRequestModel prompt = new(provider);
@@ -130,13 +130,13 @@ PromptResultModel result = await ImageGenerationManager.AiProvidersManager.Promp
 
 **Nota:** esta es una versión simplificada sacada del proyecto de ViewModels.
 
-`PromptRequestModel` es la clase con los datos del prompt, incluye el proveedor, los testos positivos y negativos, el modelo seleccionado, etc...
+`PromptRequestModel` es la clase con los datos del prompt, incluye el proveedor, los textos positivos y negativos, el modelo seleccionado, etc...
 
 El método `PromptAsync` llama al proveedor de IA adecuado para indicarle que inicie el proceso, nos devuelve un resultado que
 incluye el `Id` del proceso en caso que la llamada sea correcta (el proveedor puede rechazarla porque la imagen sea demasiado grande, tenga demasiados
 pasos o simplemente porque en ese momento no pueda ejecutarla).
 
-A partir de ese momento, el *manager* se encarga de llamar cada cierto tiempo a la API y controlar el proceso. Cuando acaba, simplemente descarga las
+A partir de ese momento, el *manager* se encarga de llamar cada cierto tiempo a la API y controlar el proceso. Cuando acaba, descarga las
 imágenes generadas.
 
 La llamada a `TasksListViewModel.Add(...)` que aparece en el código anterior, es para mostrar al usuario el progreso en la lista de tareas de la aplicación
