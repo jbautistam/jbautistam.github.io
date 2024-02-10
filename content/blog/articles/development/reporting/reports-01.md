@@ -248,7 +248,7 @@ información con arreglo a esas entidades / datos.
 El caso es que dependiendo de las funcionalidades de nuestro proyecto, los informes siempre van a girar sobre varias
 entidades principales y varios datos de negocio.
 
-¿No hay una forma más sencilla de generarlos? Precisamente para eso existen la herramienta de BI: una herramienta
+¿No hay una forma más sencilla de generarlos? Precisamente para eso existen las aplicaciones de BI: una herramienta
 que nos permite generar informes a partir de nuestros datos sin necesidad de escribir SQL (o esa es la idea, el SQL o similar está
 por ahí escondido en alguna parte).
 
