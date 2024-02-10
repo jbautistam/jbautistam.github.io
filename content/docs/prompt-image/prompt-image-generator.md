@@ -1,5 +1,5 @@
 ﻿---
-title: Bau Image Prompt Generator
+title: Image Prompt Generator
 date: 2024-02-03T15:23:49+01:00
 ---
 

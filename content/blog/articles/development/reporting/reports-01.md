@@ -6,13 +6,13 @@ thumbnail = "/images/noimage.jpg"
 tags = [ "Development", "Reports" ]
 +++
 
-Posiblemente lo que más he desarrollado durante mi vida profesional han sido informes. El segundo lugar debe 
+Posiblemente y para mi desgracia, lo que más he desarrollado durante mi vida profesional han sido sistemas de generación de informes. El segundo lugar debe 
 corresponderle al mantenimiento de usuarios pero esa es otra historia, centrémonos en los informes.
 
-Hay muy pocas aplicaciones de gestión para las que antes o después no nos pidan obtener informes de la base de datos, exportar los datos a archivos 
+Hay muy pocas aplicaciones de gestión para las que antes o después no nos pidan obtener consultas de la base de datos, exportar los datos a archivos 
 o similar.
 
-**Un aviso:** este artículo no tiene código funcional. Este artículo es sólo una introducción. Os explicaré el problema que quiero solucionar 
+**Un aviso:** este artículo no tiene código funcional, es sólo una introducción. Os explicaré el problema que quiero solucionar 
 al final y dejaremos el código para los siguientes artículos.
 
 Mi forma de gestionar los informes desde hace varios proyectos es bastante similar y tampoco tiene ningún misterio: SQL e `IDataReader`.
@@ -32,7 +32,7 @@ Con esos requisitos, suelo crear una tabla de `Reports` en mi base de datos, con
 | SQL     |
 
 Sencillo ¿verdad? Así sólo tenemos que leer la tabla y mostrar los diferentes informes en un formulario y que el usuario
-seleccione el listado que desea ver y una vez que el usuario haya seleccionado el listado, ejecuto la consulta SQL y obtengo un `IDataReader`:
+seleccione el listado que desea ver. Una vez que el usuario ha seleccionado el listado, ejecuto la consulta SQL y obtengo un `IDataReader`:
 
 ```csharp
 await connection.ExecuteReaderAsync(sql, null, System.Data.CommandType.Text, TimeSpan.FromMinutes(5), cancellationToken);
@@ -117,7 +117,7 @@ basada en [Parquet DotNet](https://github.com/aloneguid/parquet-dotnet) que
 también recibe un `IDataReader` y para exportar a Excel, suelo utilizar [otra de mis librerías](https://github.com/jbautistam/LibExcelFiles) 
 con el mismo funcionamiento.
 
-**Nota:** hay muchas librerías similares, escoged la que os guste.
+**Nota:** hay muchas soluciones similares, escoged la que más os guste.
 
 Pero bueno, no todo puede ser tan sencillo: si queremos un generador de informes más o menos funcional vamos a necesitar que el usuario 
 seleccione los datos que desee. No nos sirve de nada un informe que nos muestre en pantalla los 800.000 registros de transacciones
@@ -153,14 +153,14 @@ SELECT Customers.Name, Customers.LastName, Customers.Address, Delegations.Name
 				OR Delegations.Name LIKE '%' + @DelegationName + '%')
 ```
 
-Tenemos dos parámetros `@CustomerName` y `@DelegationName` que se corresponderán con dos registros de parámetros del informe:
+Tenemos dos parámetros `@CustomerName` y `@DelegationName` que se corresponderán con dos registros de la tabla de parámetros del informe:
 
 | Id | ReportId | Type   | Name       | Required | Default  | SqlVariable      |
 |----|----------|--------|------------|----------|----------|------------------|
 | 1  |  2       | string | Customer   | false    |          | @CustomerName    |
 | 2  |  2       | string | Delegation | false    |          | @DelegationName  |
 
-Para obtener el informe sólo tenemos que añadir los parámetros que hayamos recogido del usuario y pasárselo
+Para obtener el informe sólo tenemos que añadir los valores de estos parámetros que hayamos recogido del usuario y pasárselo
 a nuestra SQL.
 
 Según pase el tiempo, nuestra generación de informes se complicará: podemos añadir una tabla de columnas
@@ -180,12 +180,12 @@ Pero ¿por qué no tenemos clases separadas por informe? Quizá os parezca una p
 sobre todo a aquellos que estamos acostumbrados a acceder a la base de datos utilizando ORMs: si tengo un informe de clientes 
 ¿por qué no tener una clase de clientes para generar el informe? ¿no será mejor para cumplir el principio de mínima responsabilidad? 
 
-Pues depende de cómo lo mires: si a partir de tus requisitos obtienes "preparar un informe de clientes", 
+Pues depende de cómo lo mires: si a partir de tus requisitos de negocio obtienes tareas como "preparar un informe de clientes", 
 "preparar un informe de stock", "preparar un informe de ventas",
 "preparar un informe de ganancias de la empresa en 2.023"... puede que tenga lógica pensar que cada uno de ellos 
 se deba implementar con clases diferentes.
 
-Lo malo es que así, en este momento, te vas a enfrentar a cuatro problemas diferentes, uno por informe y según evolucione el proyecto, 
+Lo malo es que a partir de esa división en tareas, te vas a enfrentar a cuatro problemas diferentes, uno por informe y según evolucione el proyecto, 
 acabarás encontrándote con tantos problemas como informes. Que todos los problemas
 sean conceptualmente iguales, no significa que dejes de tener infinitos problemas. Que puedas copiar, pegar y modificar código
 no lo hace precisamente mejor, simplemente lo hace más largo.
@@ -197,7 +197,7 @@ Si te quedas con la idea que necesitas un generador de informes, todo es más se
 que texto que puedes parametrizar con el cual obtienes un `IDataReader` que puedes transformar en:
 
 * Una tabla de datos para un control `ListView` en WPF o Windows Forms (o como se llame en tu sistema de interface de usuario).
-* Una cadena de JSON para enviárselo de vuelta a una tabla a un navegador / frontend.
+* Una cadena de JSON para enviárselo de vuelta a un navegador o a tu frontend.
 * Un archivo Excel.
 * Un archivo Parquet.
 * Un archivo CSV.
@@ -214,9 +214,9 @@ que texto que puedes parametrizar con el cual obtienes un `IDataReader` que pued
 * Exportar `IEnumerable<Sales>` a CSV...
 
 Te obliga a programar, cada informe necesitará su propio diseño y su propia implementación. Si ahora quieres
-cambiar el formato de salida del Excel de clientes, prepárate a cambiar, recompilar, probar y subir el código.
+cambiar el formato de salida del Excel de clientes, prepárate a cambiar, recompilar, probar y subir de nuevo el código.
 
-Por supuesto: escribir SQL es programación, pero una vez desarrollada la consulta,
+Por supuesto: escribir SQL también es programación, pero una vez desarrollada la consulta,
 si sigues los pasos anteriores, no tienes que cambiar tu código. Todo es una cadena de texto que puedes almacenar en 
 la base de datos o en un archivo externo y que puedes modificar, añadir o eliminar sin necesidad de recompilar
 tu aplicación. Todo SQL te devuelve un `IDataReader` que puedes transformar, exportar, mostrar.
@@ -235,7 +235,7 @@ El departamento de negocio ahora quiere estos informes:
 4. Las ventas de los vendedores por cada tienda entre dos fechas.
 5. Las compras de los clientes por cada tienda entre dos fechas.
 6. Las compras de los clientes por cada vendedor en cada tienda entre dos fechas.
-7. Las compras de los clientes por cada vendendor en cada tienda de Madrid entre dos fechas...
+7. Las compras de los clientes por cada vendedor en cada tienda de Madrid entre dos fechas...
 
 ¿Véis el problema? Nos piden n informes, pero en realidad no es más que un informe en el cual el usuario desea
 seleccionar diferentes entidades para los mismos datos.
@@ -246,9 +246,9 @@ información con arreglo a esas entidades / datos.
 **Nota:** existe otra entidad, la fecha, pero nos entendemos.
 
 El caso es que dependiendo de las funcionalidades de nuestro proyecto, los informes siempre van a girar sobre varias
-entidades principales y varios datos que se van a repetir continuamente.
+entidades principales y varios datos de negocio.
 
-¿No hay una forma más sencilla de generarlos? Precisamente es lo que denominamos herramienta de BI: una herramienta
+¿No hay una forma más sencilla de generarlos? Precisamente para eso existen la herramienta de BI: una herramienta
 que nos permite generar informes a partir de nuestros datos sin necesidad de escribir SQL (o esa es la idea, el SQL o similar está
 por ahí escondido en alguna parte).
 
