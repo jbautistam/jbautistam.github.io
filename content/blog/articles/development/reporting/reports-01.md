@@ -257,5 +257,6 @@ por ahí escondido en alguna parte).
 La respuesta, por supuesto es sí pero posiblemente no con la estructura de tablas / documentos que tenemos ahora, vamos a necesitar
 muchas más cosas. Ese será el contenido de los siguientes artículos.
 
-Como decía al principio la única razón de éste post era sembrar la curiosidad, en el [resto de artículos](blog/articles/development/reports-02)
+
+Como decía al principio la única razón de éste post era sembrar la curiosidad, en el [resto de artículos](blog/articles/development/reports-02/reports-02)
 veremos la forma de crear una librería que nos permita generar informes más complejos y versátiles (o eso espero).
