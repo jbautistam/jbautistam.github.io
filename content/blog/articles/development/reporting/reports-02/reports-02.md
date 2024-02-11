@@ -6,7 +6,7 @@ thumbnail = "/images/noimage.jpg"
 tags = [ "Development", "Reports" ]
 +++
 
-Cerramos el [artículo anterior](/blog/articles/development/reporting/reports-01) con varias preguntas sobre informes que nos gustaría generar:
+Cerramos el [artículo anterior](/blog/articles/development/reporting/reports-01/reports-01) con varias preguntas sobre informes que nos gustaría generar:
 
 1. Las ventas de los vendedores entre dos fechas.
 2. Las compras de los clientes entre dos fechas.

@@ -8,5 +8,5 @@ tags = [ "Development", "Reports" ]
 
 Artículos sobre generación de informes:
 
-* [Generación de informes 1](/blog/articles/development/reporting/reports-01): el problema de la generación de informes.
-* [Generación de informes 2](/blog/articles/development/reporting/reports-02): hechos y dimensiones.
+* [Generación de informes 1](/blog/articles/development/reporting/reports-01/reports-01): el problema de la generación de informes.
+* [Generación de informes 2](/blog/articles/development/reporting/reports-02/reports-02): hechos y dimensiones.
