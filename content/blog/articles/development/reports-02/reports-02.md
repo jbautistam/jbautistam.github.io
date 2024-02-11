@@ -6,7 +6,7 @@ thumbnail = "/images/noimage.jpg"
 tags = [ "Development", "Reports" ]
 +++
 
-Cerramos el [artículo anterior](/blog/articles/development/reporting/reports-01/reports-01) con varias preguntas sobre informes que nos gustaría generar:
+Cerramos el [artículo anterior](/blog/articles/development/reporting/reports-01) con varias preguntas sobre informes que nos gustaría generar:
 
 1. Las ventas de los vendedores entre dos fechas.
 2. Las compras de los clientes entre dos fechas.
@@ -49,7 +49,7 @@ contabilizar y tratar. El resto nos sirve para filtrar y para añadir informaci�
 
 Si vamos a un diagrama de la base de datos:
 
-![Diagrama de entidad relación](/blog/articles/development/reporting/images/erd-diagram-1.png)
+![Diagrama de entidad relación](/blog/articles/development/reports-02/images/erd-diagram-1.png)
 
 Podríamos distinguir entre dos tipos de tablas o entidades:
 
@@ -64,12 +64,12 @@ Por supuesto, no tenemos porqué quedarnos en una estructura tan sencilla. Una t
 tener dimensiones asociadas. Por ejemplo, a las tiendas le podríamos añadir la ciudad o
 la categoría de la tienda dentro de la empresa. Al producto le podríamos añadir una tipología o etiquetas para clasificarlo.
 
-![Diagrama de entidad relación](/blog/articles/development/reporting/images/erd-diagram-2.png)
+![Diagrama de entidad relación](/blog/articles/development/reports-02/images/erd-diagram-2.png)
 
 Y no estamos obligados tampoco a tener una única tabla de hechos, podemos tener otras tablas relacionadas o no con
 las mismas entidades, por ejemplo, si añadimos a nuestro diagrama una tabla de stocks:
 
-![Diagrama de entidad relación](/blog/articles/development/reporting/images/erd-diagram-3.png)
+![Diagrama de entidad relación](/blog/articles/development/reports-02/images/erd-diagram-3.png)
 
 Vemos que la tabla de hechos `Stocks` se relaciona con las dimensiones `Products` y `Stores` mientras que la tabla de
 hechos `Sales` se relaciona además con las dimensiones `Customers`, `Sellers` y `Calendar`.
@@ -338,7 +338,7 @@ suele ser no sólo habitual si no también muy conveniente.
 
 Quizá lo veamos mejor con un ejemplo. Esta es una tabla de calendario sencilla:
 
-![Tabla de calendario](/blog/articles/development/reporting/images/calendar-table.png)
+![Tabla de calendario](/blog/articles/development/reports-02/images/calendar-table.png)
 
 **Nota:** he obtenido la imagen de [MsSqlTips](https://www.mssqltips.com/sqlservertip/4054/creating-a-date-dimension-or-calendar-table-in-sql-server/) pero
 es fácil encontrar otras formas de crear esta tabla si buscáis un poco.
