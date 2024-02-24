@@ -328,7 +328,7 @@ para responder a las consultas que nos habíamos planteado siempre que podamos d
 Por supuesto nos queda un largo camino por recorrer. Por ejemplo: parece que la SQL que queremos como resultado no es más que una cadena que podemos 
 crear a partir de las definiones de dimensiones y hechos pero ¿de dónde sacamos estas definiciones? 
 
-Lo veremos en el siguiente artículo pero os adelanto: el truco tiene que ver con el esquema y los metadatos de nuestra
+Lo veremos en el [siguiente artículo](/blog/articles/development/reports-03/reports-03) pero os adelanto: el truco tiene que ver con el esquema y los metadatos de nuestra
 base de datos.
 
 ## Nota al margen: tablas de calendario
