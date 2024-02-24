@@ -45,7 +45,7 @@ de estas sentencias.
 
 De este modo, la librería debería generar una instrucción *SQL* ejecutable que después podemos lanzar sobre la base de datos para obtener
 un `IDataReader` que podamos utilizar para mostrar el informe en pantalla o para generar un `JSON` que podamos enviar al
-frontend, bien para generar archivos CSV, Excel, parquet... es decir, algo que podamos consumir.
+frontend o para generar archivos CSV, Excel, parquet... es decir, algo que podamos consumir.
 
 Para ello vamos a necesitar como entrada a nuestra librería cuatro elementos:
 
@@ -67,7 +67,7 @@ De los campos nos interesan, aparte de su nombre, su tipo, longitud, si conforma
 
 Podríamos recoger también las claves foráneas, pero vamos a dejar las relaciones al esquema lógico. Esto nos permite
 tratar con bases de datos que no implementen este tipo de estructuras como las basadas en archivos (sí
-[DuckDb](https://duckdb.org/), te estoy mirando a ti).
+[DuckDb](https://duckdb.org/), estoy mirándote a ti).
 
 La estructura de entidades iniciales del esqumea físico de nuestra librería tendrá más o menos este aspecto:
 
@@ -103,7 +103,7 @@ El diagrama de entidades de este esquema, tendría este aspecto:
 
 Así nuestra entidad `Dimension` va a ser una entidad sobre un origen de datos que puede tener dimensiones asociadas.
 
-La dimensiones, como decíamos pueden tener dimensiones asociadas o hija, por ejemplo, la dimensión `Stores` va a tener
+Las dimensiones, como decíamos pueden tener dimensiones asociadas o hija, por ejemplo, la dimensión `Stores` va a tener
 una subdimensión llamada `Cities`. 
 
 Estas subdimensiones pueden asociarse a otras dimensiones, por ejemplo, podríamos tener
@@ -120,9 +120,10 @@ una nueva entidad `Reports`:
 
 ![Definición de informes](/blog/articles/development/reports-03/images/entities-diagram-2.png)
 
-Esta entidad asocia una definición de informe con los orígenes de datos (tablas `Fact`) y las dimensiones. Estos informes, van a formarse
-a partir de bloques. Podemos entender estos bloques como las cláusulas `WITH` que hemos visto en los comandos que hemos utilizado como
-ejemplo, pero vamos a tener diferentes tipos de bloques para dar la capacidad al generador de tomar ciertas decisiones:
+Esta entidad asocia una definición de informe con los orígenes de datos (tablas `Fact`) y las dimensiones. 
+
+Estos informes, van a formarse a partir de bloques. Podemos entender estos bloques como las cláusulas `WITH` que hemos visto en los comandos 
+utilizados como ejemplo, pero vamos a tener diferentes tipos de bloques para dar la capacidad al generador de tomar ciertas decisiones:
 
 ![Bloques de informes](/blog/articles/development/reports-03/images/entities-diagram-3.png)
 
@@ -132,7 +133,7 @@ otros que iremos viendo en el futuro al ver ejemplos de uso.
 
 ## Generador
 
-Por supuesto, todas estas entidades conforman nuestra definición, el generador es la parte de la librería que recoge esas definiciones,
+Por supuesto, con todas estas entidades que conforman nuestra definición el generador es la parte de la librería que recoge esas definiciones,
 las mezcla con la solicitud del usuario (las entidades / campos que desea ver / filtrar) y genera una cadena *SQL* válida que podemos
 utilizar para consultar nuestra base de datos.
 
