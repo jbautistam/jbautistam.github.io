@@ -48,7 +48,7 @@ Los productos raíz tienen definida una categoría mientras que los productos ti
 producto raíz sería una camisa (por ejemplo) mientras que el producto sería la talla L de esa camisa. Por supuesto,
 las ventas y el stock está asociadas a productos, no a productos raíz.
 
-Pero aquí me gustaría resaltar las entidades de etiquetas (`Tags`, `TagValues` y `EntityTagValues).
+Pero aquí me gustaría resaltar las entidades de etiquetas (`Tags`, `TagValues` y `EntityTagValues`).
 
 El problema que resuelven estas tablas son las infinitas características que puede tener un producto: color, temporada,
 familia, marca, público objetivo... Si lo tratáramos como campos, es posible que tuviéramos que añadir campos de
@@ -104,13 +104,74 @@ En el ejemplo, sólo he definido etiquetas para los códigos de producto raíz p
 
 Pero entonces, si ya tenemos etiquetas ¿para qué queremos un campo `ClassificationTypeId` en la tabla de productos raíz?
 
-Por dos razones: por rendimiento, si sabemos que siempre vamos a tener ese campo en todos los productos raíz va a ser más
+En primer lugar: por rendimiento, si sabemos que siempre vamos a tener ese campo en todos los productos raíz va a ser más
 rápido obtenerlo de la tabla que buscando por las tablas de etiquetas. 
 
-La segunda razón es más prosaica, simplemente me gustaba enseñar ambas opciones en la base de datos.
+La segunda razón es más prosaica, simplemente quería tener ambas opciones en la base de datos.
 
 ## Definición del modelo físico
 
+Una vez tenemos una base de datos de pruebas, vamos a definir el modelo físico. 
+
+Como decía al principio, voy a obtener un archivo XML del esquema de la base de datos con **BauDbStudio**:
+
+![Generando el esquema físico](/blog/articles/development/reports-04/images/physical-schema.png)
+
+esta opción genera un archivo más o menos de este tipo:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<Schema>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Calendar" >
+		<Field Name = "CalendarId"  Type = "Integer"  DbType = "int"  IsKey = "yes"  Length = "0"  Required = "yes"  Position = "1"  Identity = "yes" />
+		<Field Name = "Date"  Type = "Date"  DbType = "date"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Year"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "3"  Identity = "no" />
+		<Field Name = "Month"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "4"  Identity = "no" />
+		<Field Name = "Day"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "5"  Identity = "no" />
+		<Field Name = "Week"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "6"  Identity = "no" />
+		<Field Name = "YearWeek"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "7"  Identity = "no" />
+		<Field Name = "YearMonth"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "8"  Identity = "no" />
+		<Field Name = "WeekDay"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "9"  Identity = "no" />
+		<Field Name = "NaturalYear"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "10"  Identity = "no" />
+		<Field Name = "NaturalWeek"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "11"  Identity = "no" />
+		<Field Name = "LastWeekDay"  Type = "Boolean"  DbType = "bit"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "12"  Identity = "no" />
+		<Field Name = "LastMonthDay"  Type = "Boolean"  DbType = "bit"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "13"  Identity = "no" />
+		<Field Name = "YearWeekIndex"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "14"  Identity = "no" />
+		<Field Name = "YearMonthIndex"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "15"  Identity = "no" />
+		<Constraint Schema = "Dim"  Catalog = "SalesSample"  Name = "PK_Calendar"  Table = "Calendar"  Field = "CalendarId"  Type = "PrimaryKey"  Position = "1" />
+	</Table>
+	<Table Schema = "Dim"  Catalog = "SalesSample"  Name = "Cities" >
+		<Field Name = "CityId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "1"  Identity = "no" />
+		<Field Name = "StateId"  Type = "Integer"  DbType = "int"  IsKey = "no"  Length = "0"  Required = "yes"  Position = "2"  Identity = "no" />
+		<Field Name = "Name"  Type = "String"  DbType = "nvarchar"  IsKey = "no"  Length = "200"  Required = "yes"  Position = "3"  Identity = "no" />
+	</Table>
+	...
+</Schema>
+```
+
+con las definiciones de tablas y campos de la base de datos. Este esquema será el que utilizaremos para definir el modelo lógico.
+
 ## Definición del modelo lógico
+
+Como decía en el artículo anterior, nuestro modelo lógico define los metadatos, dimensiones y los diferentes orígenes de datos que vamos a utilizar al
+ver nuestros informes.
+
+Para ello, voy a utilizar de nuevo **BauDbStudio**. 
+
+Lo primero, es crear un nuevo proyecto de informes con el esquema que acabamos de crear en el paso anterior:
+
+![Creando un proyecto de informes](/blog/articles/development/reports-04/images/logical-01.png)
+
+Esta importación, ya nos rellena los orígenes de datos a partir del esquema:
+
+![Orígenes de datos](/blog/articles/development/reports-04/images/logical-02.png)
+
+Por cada origen de datos (tabla), podemos definirle algunos datos adicionales que vamos a utilizar en el futuro. Por ejemplo, en la 
+tabla de productos, he definido los alias de un par de campos y he marcado los campos `ProductId`, `ProductRootId` y `SizeId` como
+invisibles para que el usuario no los vea cuando seleccione los productos en la interface de usuario:
+
+![Orígenes de datos: productos](/blog/articles/development/reports-04/images/logical-03.png)
+
+
 
 ## Creación de informes
