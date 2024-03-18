@@ -139,5 +139,5 @@ utilizar para consultar nuestra base de datos.
 
 # Conclusión
 
-En este punto ya hemos definido nuestras entidades y cómo debe funcionar nuestra librería, en el siguiente artículo, veremos un
-ejemplo básico de cómo funciona y cómo se definen estos informes.
+En este punto ya hemos definido nuestras entidades y cómo debe funcionar nuestra librería, en el 
+[siguiente artículo](/blog/articles/development/reports-04/reports-04), veremos un ejemplo básico de cómo funciona y cómo se definen estos informes.
