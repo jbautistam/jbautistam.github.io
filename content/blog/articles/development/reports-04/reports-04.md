@@ -172,6 +172,34 @@ invisibles para que el usuario no los vea cuando seleccione los productos en la 
 
 ![Orígenes de datos: productos](/blog/articles/development/reports-04/images/logical-03.png)
 
+Aparte de modificar los orígenes de datos, podemos añadir dimensiones a partir de un origen de datos. Por ejemplo, agreguemos
+una dimensión para el país a partir del origen de datos `Countries`:
 
+![Dimensiones: countries](/blog/articles/development/reports-04/images/logical-04.png)
+
+En este caso simplemente le cambiamos el nombre:
+
+![Dimensión: Countries](/blog/articles/development/reports-04/images/logical-05.png)
+
+y definimos del mismo modo las dimensiones de regiones y ciudades que ya nos aparecen en nuestro esquema lógico:
+
+![Dimensiones](/blog/articles/development/reports-04/images/logical-06.png)
+
+Pero lo que nos interesa es ver las relaciones internas, es decir, un país tiene varias regiones y cada región puede tener diferentes
+ciudades. Tal como tenemos nuestros datos, las tiendas y el resto de datos se relacionan con la ciudado, por tanto nos interesa tener 
+las dimensiones al revés, es decir, una ciudad pertenece a una región que pertenece a un país.
+
+Por tanto, nuestro siguiente paso es definir las dimensiones relacionadas. Por ejemplo, la dimensión `Cities` se relaciona
+con la dimensión `States` por el campo `CountryId`:
+
+![Relación Countries con States](/blog/articles/development/reports-04/images/logical-06.png)
+
+y, del mismo modo, la dimensión `Cities` se relaciona con `States` por el campo `StateId`. Ahora ya podemos ver el árbol de dimensiones / subdimensiones
+con esos datos:
+
+![Arbol de dimensiones](/blog/articles/development/reports-04/images/logical-07.png)
+
+Vamos a hacer lo mismo con la dimensión `Shops` sobre la tabla de tiendas. Esta dimensión está relacionada con otra dimensión nueva: los tipos de tienda y
+con la dimensión que acabamos de crear con ciudades:
 
 ## Creación de informes
