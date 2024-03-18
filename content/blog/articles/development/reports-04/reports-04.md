@@ -186,20 +186,90 @@ y definimos del mismo modo las dimensiones de regiones y ciudades que ya nos apa
 ![Dimensiones](/blog/articles/development/reports-04/images/logical-06.png)
 
 Pero lo que nos interesa es ver las relaciones internas, es decir, un país tiene varias regiones y cada región puede tener diferentes
-ciudades. Tal como tenemos nuestros datos, las tiendas y el resto de datos se relacionan con la ciudado, por tanto nos interesa tener 
-las dimensiones al revés, es decir, una ciudad pertenece a una región que pertenece a un país.
+ciudades. 
 
-Por tanto, nuestro siguiente paso es definir las dimensiones relacionadas. Por ejemplo, la dimensión `Cities` se relaciona
+Tal como tenemos nuestros datos, las tiendas y el resto de tablas se relacionan con la ciudades, por tanto nos interesa más tener 
+las dimensiones al revés:, una ciudad pertenece a una región que pertenece a un país.
+
+Así, nuestro siguiente paso es definir estas relaciones entre dimensiones: la dimensión `Cities` se relaciona
 con la dimensión `States` por el campo `CountryId`:
 
 ![Relación Countries con States](/blog/articles/development/reports-04/images/logical-06.png)
 
-y, del mismo modo, la dimensión `Cities` se relaciona con `States` por el campo `StateId`. Ahora ya podemos ver el árbol de dimensiones / subdimensiones
+y, del mismo modo, la dimensión `States` se relaciona con `Countries` por el campo `CountryId`. Ahora ya podemos ver el árbol de dimensiones / subdimensiones
 con esos datos:
 
 ![Arbol de dimensiones](/blog/articles/development/reports-04/images/logical-07.png)
 
 Vamos a hacer lo mismo con la dimensión `Shops` sobre la tabla de tiendas. Esta dimensión está relacionada con otra dimensión nueva: los tipos de tienda y
 con la dimensión que acabamos de crear con ciudades:
+
+![Dimensión de tienda](/blog/articles/development/reports-04/images/logical-09.png)
+
+Como vemos, antes de generar nuestros informes, tenemos que preparar el esquema lógico. Todos son iguales así que voy a dejar el ejemplo aquí e indicaré
+en el futuro aquellos pasos que encuentre interesantes.
+
+El caso es que **BauDbStudio** graba todos estas definiciones en otro archivo XML que deja junto al archivo del esquema físico:
+
+![logical-10.png](D:/Projects/WebSites/jbautistam.github.io/content/blog/articles/development/reports-04/images/logical-10.png "logical-10.png")
+
+Este archivo tiene más o menos este aspecto:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?>
+<Dashboard>
+	<Name>Sql Server - SalesSamples.Schema</Name>
+	<Description/>
+	<DataSourceTable Id = "[Dim].[Cities]"  Schema = "Dim"  Table = "Cities"  IsView = "no" >
+		<Column Alias = "CityId"  SourceId = "CityId"  IsPrimaryKey = "no"  Visible = "yes"  Type = "Integer"  Required = "yes" />
+		<Column Alias = "StateId"  SourceId = "StateId"  IsPrimaryKey = "no"  Visible = "yes"  Type = "Integer"  Required = "yes" />
+		<Column Alias = "Name"  SourceId = "Name"  IsPrimaryKey = "no"  Visible = "yes"  Type = "String"  Required = "yes" />
+	</DataSourceTable>
+	
+	...
+	
+	<DataSourceTable Id = "[Dim].[Products]"  Schema = "Dim"  Table = "Products"  IsView = "no" >
+		<Column Alias = "ProductCode"  SourceId = "Code"  IsPrimaryKey = "no"  Visible = "yes"  Type = "String"  Required = "yes" />
+		<Column Alias = "Cost"  SourceId = "Cost"  IsPrimaryKey = "no"  Visible = "yes"  Type = "Decimal"  Required = "yes" />
+		<Column Alias = "ProductName"  SourceId = "Name"  IsPrimaryKey = "no"  Visible = "yes"  Type = "String"  Required = "yes" />
+		<Column Alias = "Price"  SourceId = "Price"  IsPrimaryKey = "no"  Visible = "yes"  Type = "Decimal"  Required = "yes" />
+		<Column Alias = "ProductId"  SourceId = "ProductId"  IsPrimaryKey = "yes"  Visible = "no"  Type = "Integer"  Required = "yes" />
+		<Column Alias = "ProductRootId"  SourceId = "ProductRootId"  IsPrimaryKey = "no"  Visible = "no"  Type = "Integer"  Required = "yes" />
+		<Column Alias = "SizeId"  SourceId = "SizeId"  IsPrimaryKey = "no"  Visible = "no"  Type = "Integer"  Required = "yes" />
+	</DataSourceTable>
+	
+	...
+	
+	<Dimension Id = "Countries"  SourceId = "[Dim].[Countries]" />
+	<Dimension Id = "States"  SourceId = "[Dim].[States]">
+		<Relation SourceId = "Countries" >
+			<ForeignKey Column = "CountryId"  DimensionColumn = "CountryId" />
+		</Relation>
+	</Dimension>
+	<Dimension Id = "Cities"  SourceId = "[Dim].[Cities]" >
+		<Relation SourceId = "States" >
+			<ForeignKey Column = "StateId"  DimensionColumn = "StateId" />
+		</Relation>
+	</Dimension>
+	
+	...
+	
+	<Dimension Id = "Shops"  SourceId = "[Dim].[Shops]" >
+		<Description/>
+		<Relation SourceId = "ShopTypes" >
+			<ForeignKey Column = "ShopTypeId"  DimensionColumn = "ShopTypeId" />
+		</Relation>
+		<Relation SourceId = "Cities" >
+			<ForeignKey Column = "CityId"  DimensionColumn = "CityId" />
+		</Relation>
+	</Dimension>
+</Dashboard>
+```
+
+En el archivo vemos los orígenes de datos con la información de la tabla incluyendo alias y visibilidad de los campos y las dimensiones
+recogen el origen de datos y las relaciones con otras dimensiones.
+
+Voy a repetirlo una vez más, este es simplemente el archivo XML de salida de **BauDbStudio**, vamos a poder utilizar la librería de informes
+sin necesidad de estos archivos siempre que le pasemos una estructura similar.
 
 ## Creación de informes
