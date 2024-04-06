@@ -5,7 +5,7 @@ cascade:
   type: docs
 ---
 
-1. **[Bau.Ollama.Api](/content/docs/ollama-api):** código C# para acceder
+1. **[Acceso a Api de Ollama con C#](/docs/ollama-api):** código C# para acceder
 a la API de [Ollama](https://ollama.ai/).
 
 2. **[Image prompt generator](/docs/prompt-image/prompt-image-generator):** aplicación WPF para generación de imágenes
