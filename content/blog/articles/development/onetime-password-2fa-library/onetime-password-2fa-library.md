@@ -35,7 +35,7 @@ el servidor de la cuenta y un valor numérico inicial o semilla.
 
 En HOTP este valor numérico es un contador que está sincronizado entre el servidor y el cliente y se incrementa cada vez que se genera 
 un código. En TOTP este valor numérico es el valor numérico de la fecha de generación medido como el número de ticks desde la medianoche
-del día 1 de enero de 1970 (es decir, el tiempo Unix o Epoch), así evitamos tener un contador compartido además del secreto
+del día 1 de enero de 1970 (es decir, el tiempo Unix), así evitamos tener un contador compartido además del secreto
 siempre que ambos sistemas estén sincronizados.
 
 El algoritmo para ambos casos se inicia generando una clave compartida entre el servidor y la aplicación de autenticación. Ambos
@@ -43,8 +43,8 @@ sistemas comparten una clave secreta. Esta clave son los códigos QR que veréis
 que no es más que una cadena de texto normalmente codificada en [Base32](https://es.wikipedia.org/wiki/Base32).
 
 Al solicitar un código de 2FA, la aplicación de autenticación recoge esa clave compartida y el valor numérico (contador o fecha de sistema) y
-lo procesa con una función hash HMAC (Hash-based Message Authentication Code). Este función HMAC puede ser SHA1, SHA256 o SHA512 (el habitual
-es SHA1).
+lo procesa con una función hash HMAC (Hash-based Message Authentication Code). Este función HMAC puede ser Sha1, Sha12 o Sha256 (el habitual
+es Sha1).
 
 Una vez generado el código hash, se reduce o trunca para obtener el código OTP de 6 u 8 dígitos que nos muestra la aplicación de autenticación.
 
@@ -137,13 +137,14 @@ int remainingSeconds = totp.TimeManager.GetRemainingSeconds(DateTime.UtcNow);
 
 ## Aplicación de ejemplo
 
-Para terminar, he creado una aplicación WPF de ejemplo de la librería [OneTimePassword](https://github.com/jbautistam/OneTimePassword).
+Para terminar, escribí también una aplicación WPF de ejemplo de la librería [OneTimePassword](https://github.com/jbautistam/OneTimePassword)
+que podéis encontrar como [BauOtp](https://github.com/jbautistam/BauOTP).
 
 Funciona como la mayoría de aplicaciones de autenticación 2FA. Su pantalla principal permite administrar diferentes cuentas:
 
 ![Ventana principal](/blog/articles/development/onetime-password-2fa-library/images/main-window.png)
 
-Al pulsar sobre una de esas cuentas, nos permite configurarla y ver los códigos generados tanto con TOTP utilizando la fecha de sistema
+Al abrir una de esas cuentas, podemos configurarla y ver los códigos generados tanto con TOTP utilizando la fecha de sistema
 como con HOTP utilizando un contador:
 
 ![Datos de una cuenta 2FA](/blog/articles/development/onetime-password-2fa-library/images/2fa-account.png)
