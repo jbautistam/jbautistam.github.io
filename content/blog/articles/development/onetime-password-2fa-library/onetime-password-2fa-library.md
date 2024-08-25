@@ -137,8 +137,8 @@ int remainingSeconds = totp.TimeManager.GetRemainingSeconds(DateTime.UtcNow);
 
 ## Aplicación de ejemplo
 
-Para terminar, escribí también una aplicación WPF de ejemplo de la librería [OneTimePassword](https://github.com/jbautistam/OneTimePassword)
-que podéis encontrar como [BauOtp](https://github.com/jbautistam/BauOTP).
+Para terminar, escribí también una aplicación WPF de ejemplo ([BauOtp](https://github.com/jbautistam/BauOTP)) 
+de la librería [OneTimePassword](https://github.com/jbautistam/OneTimePassword).
 
 Funciona como la mayoría de aplicaciones de autenticación 2FA. Su pantalla principal permite administrar diferentes cuentas:
 
