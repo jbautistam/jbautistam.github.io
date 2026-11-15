@@ -5,4 +5,4 @@ cascade:
   type: blog
 ---
 
-Mi página inicial de blogs
+Mis artículos, ideas, comentarios
